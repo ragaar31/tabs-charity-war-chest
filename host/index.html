@@ -475,6 +475,9 @@ let roundStates = [];
 let armySubmissions = [];
 let bettingPools = [];
 let bets = [];
+let hedgeBets = [];
+let propBets = [];
+let parlays = [];
 let playerSkills = [];
 let playerRecruits = [];
 
@@ -484,6 +487,7 @@ let pickChannel = null;
 let armyChannel = null;
 let skillChannel = null;
 let recruitChannel = null;
+let advancedBetChannel = null;
 
 
 function escapeHtml(value) {
@@ -938,6 +942,64 @@ async function loadState() {
 
     bets =
         betResult.data ?? [];
+
+
+    const hedgeResult =
+        await db
+            .from("hedge_bets")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("created_at");
+
+    if (hedgeResult.error) {
+        console.error(hedgeResult.error);
+        return;
+    }
+
+    hedgeBets = hedgeResult.data ?? [];
+
+
+    const propResult =
+        await db
+            .from("prop_bets")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("created_at");
+
+    if (propResult.error) {
+        console.error(propResult.error);
+        return;
+    }
+
+    propBets = propResult.data ?? [];
+
+
+    const parlayResult =
+        await db
+            .from("parlays")
+            .select(`
+                *,
+                parlay_legs (
+                    leg_number,
+                    match_id,
+                    backed_player_id,
+                    stake_amount,
+                    return_amount,
+                    status
+                )
+            `)
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("created_at");
+
+    if (parlayResult.error) {
+        console.error(parlayResult.error);
+        return;
+    }
+
+    parlays = parlayResult.data ?? [];
 
 
     const skillResult =
@@ -2544,7 +2606,7 @@ function renderBettingHost() {
                         </div>
 
                         <div class="status" style="margin-top:8px;">
-                            Each side includes the House's $1,000 seed.
+                            Each side includes the House's $1,000 seed plus standard, Hedge Fund, and active parlay stake in that pool.
                         </div>
 
                         ${
@@ -2691,8 +2753,7 @@ function renderBettingHost() {
                             </strong>
 
                             <p class="status">
-                                Settling pays winning wagers, awards the fighter +$500 and +1 Skill Point,
-                                then advances to the next fight or Shop phase.
+                                Settling resolves standard wagers, Broker protection, hedges, automatic props, and parlay rollover; then it awards the fighter +$500 and +1 Skill Point and advances.
                             </p>
 
                             <button onclick="settleFight()">
@@ -2715,35 +2776,104 @@ function renderBettingHost() {
     const settledBets =
         bets.filter(
             bet =>
-                bet.round_number ===
-                eventData.current_round
-                &&
-                bet.status === "settled"
+                bet.round_number === eventData.current_round
+                && bet.status === "settled"
         );
 
+    const settledHedges =
+        hedgeBets.filter(
+            bet =>
+                bet.round_number === eventData.current_round
+                && bet.status === "settled"
+        );
+
+    const settledProps =
+        propBets.filter(
+            bet =>
+                bet.round_number === eventData.current_round
+                && bet.status === "settled"
+        );
+
+    const roundParlays =
+        parlays.filter(
+            parlay =>
+                parlay.round_number === eventData.current_round
+                && ["won", "lost", "active"].includes(parlay.status)
+        );
+
+    const propNames = {
+        cheaper_army_wins: "Cheaper Army Wins",
+        winner_used_reinforcements: "Winner Used Reinforcements",
+        winner_used_mercenary: "Winner Used a Mercenary",
+        winner_used_all_zones: "Winner Used All Three Zones"
+    };
+
+    const payoutLines = [];
+
+    settledBets.forEach(bet => {
+        const modifier = bet.modifier_code
+            ? ` • ${bet.modifier_code.replaceAll("_", " ").toUpperCase()}`
+            : "";
+
+        payoutLines.push(`
+            <div class="result-line">
+                ${escapeHtml(playerName(bet.bettor_player_id))}:
+                Standard $${bet.amount.toLocaleString()} on
+                ${escapeHtml(playerName(bet.backed_player_id))}${modifier}
+                → <strong>$${bet.payout.toLocaleString()} return</strong>
+            </div>
+        `);
+    });
+
+    settledHedges.forEach(hedge => {
+        const match = matches.find(row => row.id === hedge.match_id);
+        payoutLines.push(`
+            <div class="result-line">
+                ${escapeHtml(playerName(hedge.bettor_player_id))}:
+                Hedge Fight ${match?.match_number}
+                ($${hedge.player1_amount.toLocaleString()} / $${hedge.player2_amount.toLocaleString()})
+                → <strong>$${hedge.payout.toLocaleString()} return</strong>
+            </div>
+        `);
+    });
+
+    settledProps.forEach(prop => {
+        const match = matches.find(row => row.id === prop.match_id);
+        payoutLines.push(`
+            <div class="result-line">
+                ${escapeHtml(playerName(prop.bettor_player_id))}:
+                Prop Fight ${match?.match_number} — ${escapeHtml(propNames[prop.prop_code] ?? prop.prop_code)}
+                • $${prop.amount.toLocaleString()}
+                → <strong>$${prop.payout.toLocaleString()} return</strong>
+            </div>
+        `);
+    });
+
+    roundParlays.forEach(parlay => {
+        const legs = [...(parlay.parlay_legs ?? [])].sort((a,b) => a.leg_number - b.leg_number);
+        payoutLines.push(`
+            <div class="result-line">
+                ${escapeHtml(playerName(parlay.bettor_player_id))}:
+                ${parlay.leg_count === 3 ? "Moonshot" : "Parlay"}
+                • opening $${parlay.starting_amount.toLocaleString()}
+                • ${parlay.status.toUpperCase()}
+                ${parlay.status === "won" ? `→ <strong>$${parlay.payout.toLocaleString()} return</strong>` : ""}
+                <div class="status">
+                    ${legs.map(leg => {
+                        const match = matches.find(row => row.id === leg.match_id);
+                        return `Leg ${leg.leg_number}: Fight ${match?.match_number} ${escapeHtml(playerName(leg.backed_player_id))} — ${leg.status.toUpperCase()}${leg.stake_amount ? ` ($${leg.stake_amount.toLocaleString()})` : ""}`;
+                    }).join(" • ")}
+                </div>
+            </div>
+        `);
+    });
 
     const payoutSummary =
-        settledBets.length
+        payoutLines.length
         ? `
             <div class="next-phase">
-                <strong>Settled wager returns</strong>
-
-                ${
-                    settledBets.map(
-                        bet => `
-                            <div class="result-line">
-                                ${escapeHtml(playerName(bet.bettor_player_id))}:
-                                $${bet.amount.toLocaleString()}
-                                on
-                                ${escapeHtml(playerName(bet.backed_player_id))}
-                                →
-                                <strong>
-                                    $${bet.payout.toLocaleString()} return
-                                </strong>
-                            </div>
-                        `
-                    ).join("")
-                }
+                <strong>Settled betting returns</strong>
+                ${payoutLines.join("")}
             </div>
           `
         : "";
@@ -3028,6 +3158,10 @@ function startRealtime() {
         db.removeChannel(recruitChannel);
     }
 
+    if (advancedBetChannel) {
+        db.removeChannel(advancedBetChannel);
+    }
+
 
     eventChannel =
         db
@@ -3141,6 +3275,56 @@ function startRealtime() {
                 table: "player_recruits",
                 filter:
                     `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+
+    advancedBetChannel =
+        db
+        .channel(
+            "host-advanced-bets-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "match_betting_pools",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "hedge_bets",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "prop_bets",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "parlays",
+                filter: `event_id=eq.${currentEventId}`
             },
             loadState
         )
