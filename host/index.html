@@ -215,84 +215,93 @@
 
     async function createEvent() {
 
-        const status =
-            document.getElementById("create-status");
+    const status =
+        document.getElementById("create-status");
 
-        status.textContent = "Creating event...";
-
-
-        try {
-
-            const user =
-                await ensureAnonymousSession();
+    status.textContent = "Creating event...";
 
 
-            let event = null;
+    try {
+
+        const user =
+            await ensureAnonymousSession();
 
 
-            for (let attempt = 0; attempt < 5; attempt++) {
-
-                const code = makeRoomCode();
+        let event = null;
 
 
-                const {
-                    data,
-                    error
-                } = await db
-                    .from("events")
-                    .insert({
-                        code: code,
-                        name: "TABS War Chest Betting Special",
-                        host_user_id: user.id
-                    })
-                    .select()
-                    .single();
+        for (let attempt = 0; attempt < 5; attempt++) {
+
+            const code = makeRoomCode();
+
+            const eventId = crypto.randomUUID();
 
 
-                if (!error) {
+            const {
+                error
+            } = await db
+                .from("events")
+                .insert({
+                    id: eventId,
+                    code: code,
+                    name: "TABS War Chest Betting Special",
+                    host_user_id: user.id
+                });
 
-                    event = data;
-                    break;
 
-                }
+            if (!error) {
 
+                event = {
+                    id: eventId,
+                    code: code,
+                    name: "TABS War Chest Betting Special",
+                    host_user_id: user.id
+                };
 
-                if (error.code !== "23505") {
-                    throw error;
-                }
+                break;
 
             }
 
 
-            if (!event) {
-                throw new Error(
-                    "Unable to generate a unique room code."
-                );
+            if (error.code !== "23505") {
+                throw error;
             }
 
+        }
 
-            currentEventId = event.id;
 
-            localStorage.setItem(
-                "tabs_host_event_id",
-                event.id
+        if (!event) {
+
+            throw new Error(
+                "Unable to generate a unique room code."
             );
 
-
-            showLobby(event);
-
         }
 
-        catch (error) {
 
-            console.error(error);
+        currentEventId = event.id;
 
-            status.textContent =
-                "Error: " + error.message;
 
-        }
+        localStorage.setItem(
+            "tabs_host_event_id",
+            event.id
+        );
+
+
+        showLobby(event);
 
     }
+
+    catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "Error: " + error.message;
+
+    }
+
+}
 
 
     async function loadExistingEvent() {
