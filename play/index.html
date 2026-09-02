@@ -486,6 +486,115 @@ select {
     background: rgba(255,255,255,.1);
 }
 
+
+.skill-tree-intro {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.skill-center {
+    width: 150px;
+    min-height: 150px;
+    margin: 18px auto 24px;
+    padding: 20px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    border: 2px solid rgba(255,255,255,.35);
+}
+
+.skill-center strong {
+    display: block;
+    font-size: 2.2rem;
+    margin-top: 4px;
+}
+
+.skill-branches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.skill-branch {
+    padding: 15px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+.skill-branch h3 {
+    margin: 0 0 12px;
+}
+
+.skill-node {
+    padding: 13px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.065);
+    border: 1px solid rgba(255,255,255,.10);
+}
+
+.skill-node.owned {
+    background: rgba(255,255,255,.16);
+    border-color: rgba(255,255,255,.35);
+}
+
+.skill-node.locked { opacity: .5; }
+
+.skill-node-top {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.skill-cost {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    font-size: .75rem;
+    font-weight: bold;
+}
+
+.skill-status-badge {
+    display: inline-block;
+    margin-top: 7px;
+    margin-right: 4px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: bold;
+    background: rgba(255,255,255,.10);
+}
+
+.skill-recruit-select {
+    width: 100%;
+    margin: 9px 0;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+}
+
+.permanent-recruits {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.permanent-recruit {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.bet-limit-note {
+    margin-top: 7px;
+    font-size: .8rem;
+    opacity: .7;
+}
+
 .hidden { display: none !important; }
 .status { opacity: .68; }
 a { color: white; }
@@ -611,6 +720,11 @@ a { color: white; }
 </section>
 
 
+
+<section id="skill-tree-panel" class="panel hidden">
+    <div id="skill-tree-content"></div>
+</section>
+
 <section id="match-panel" class="panel hidden">
 
     <h2 id="match-title">Round 1</h2>
@@ -671,6 +785,10 @@ let visibleArmySubmissions = [];
 let bettingPools = [];
 let myBets = [];
 let pendingBetSides = {};
+let skillNodes = [];
+let playerSkills = [];
+let allRecruits = [];
+let myRecruits = [];
 
 let armyDraft = {
     use_reinforcements: false,
@@ -684,6 +802,8 @@ let eventChannel = null;
 let playerChannel = null;
 let pickChannel = null;
 let armyChannel = null;
+let skillChannel = null;
+let recruitChannel = null;
 
 
 const limits = {
@@ -1192,6 +1312,76 @@ async function loadState() {
         betResult.data ?? [];
 
 
+    if (skillNodes.length === 0) {
+
+        const nodeResult =
+            await db
+                .from("skill_nodes")
+                .select("*")
+                .order("branch")
+                .order("node_order");
+
+        if (nodeResult.error) {
+            console.error(nodeResult.error);
+            return;
+        }
+
+        skillNodes =
+            nodeResult.data ?? [];
+    }
+
+
+    const skillResult =
+        await db
+            .from("player_skills")
+            .select("*")
+            .eq("event_id", currentEventId);
+
+    if (skillResult.error) {
+        console.error(skillResult.error);
+        return;
+    }
+
+    playerSkills =
+        skillResult.data ?? [];
+
+
+    const recruitResult =
+        await db
+            .from("player_recruits")
+            .select(`
+                event_id,
+                player_id,
+                unit_id,
+                source_node,
+                units (
+                    id,
+                    name,
+                    cost,
+                    faction,
+                    tier,
+                    unit_pool,
+                    draft_eligible
+                )
+            `)
+            .eq("event_id", currentEventId);
+
+    if (recruitResult.error) {
+        console.error(recruitResult.error);
+        return;
+    }
+
+    allRecruits =
+        recruitResult.data ?? [];
+
+    myRecruits =
+        allRecruits.filter(
+            recruit =>
+                recruit.player_id ===
+                currentPlayerId
+        );
+
+
     if (
         eventData.status ===
         "army_build"
@@ -1246,6 +1436,7 @@ function render() {
     renderRoster();
     renderDraftBoard();
     renderShop();
+    renderSkillTree();
     renderMatch();
     renderArmyBuilder();
     renderBetting();
@@ -1488,7 +1679,8 @@ function renderRoster() {
             "draft",
             "draft_complete",
             "shop",
-            "army_build"
+            "army_build",
+            "regular_complete"
         ].includes(
             eventData.status
         );
@@ -1581,7 +1773,7 @@ function renderRoster() {
     }
 
 
-    roster.innerHTML =
+    const draftedHtml =
         myPicks.map(
             pick => `
                 <div class="roster-unit">
@@ -1602,6 +1794,40 @@ function renderRoster() {
             `
         )
         .join("");
+
+
+    const recruitHtml =
+        myRecruits.length
+        ? `
+            <div class="permanent-recruits">
+                <h3>Permanent Recruits</h3>
+
+                ${
+                    myRecruits.map(
+                        recruit => `
+                            <div class="permanent-recruit">
+                                <strong>
+                                    ${recruit.units.tier === "X" ? "BLACK MARKET" : recruit.units.tier}
+                                    —
+                                    ${escapeHtml(recruit.units.name)}
+                                </strong>
+
+                                <div class="status">
+                                    ${escapeHtml(recruit.units.faction)}
+                                    •
+                                    ${recruit.units.cost.toLocaleString()}
+                                </div>
+                            </div>
+                        `
+                    ).join("")
+                }
+            </div>
+          `
+        : "";
+
+
+    roster.innerHTML =
+        draftedHtml + recruitHtml;
 }
 
 
@@ -1770,6 +1996,10 @@ function renderUnits(isMyTurn) {
             unit =>
                 unit.tier ===
                 selectedTier
+                &&
+                unit.draft_eligible === true
+                &&
+                (unit.unit_pool ?? "standard") === "standard"
         )
         .sort(
             (a,b) =>
@@ -2147,6 +2377,332 @@ async function buyShopItem(itemCode) {
 }
 
 
+
+const skillBranchMeta = {
+    high_roller: { icon: "🎰", name: "High Roller" },
+    analyst: { icon: "🔍", name: "Analyst" },
+    broker: { icon: "🛡", name: "Broker" },
+    speculator: { icon: "🎲", name: "Speculator" },
+    quartermaster: { icon: "⚔️", name: "Quartermaster" }
+};
+
+
+function mySkillCodes() {
+    return new Set(
+        playerSkills
+        .filter(
+            skill =>
+                skill.player_id ===
+                currentPlayerId
+        )
+        .map(
+            skill => skill.node_code
+        )
+    );
+}
+
+
+function eligiblePermanentRecruits(nodeCode) {
+
+    const unavailable =
+        new Set([
+            ...picks.map(
+                pick => pick.unit_id
+            ),
+            ...allRecruits.map(
+                recruit => recruit.unit_id
+            )
+        ]);
+
+
+    return units
+        .filter(
+            unit => {
+
+                if (unavailable.has(unit.id)) {
+                    return false;
+                }
+
+                if (nodeCode === "free_agent") {
+                    return (
+                        (unit.unit_pool ?? "standard") === "standard"
+                        &&
+                        unit.draft_eligible === true
+                        &&
+                        ["B","C","D"].includes(unit.tier)
+                    );
+                }
+
+                if (nodeCode === "premium_contract") {
+                    return (
+                        (unit.unit_pool ?? "standard") === "standard"
+                        &&
+                        unit.draft_eligible === true
+                        &&
+                        ["A","B","C","D"].includes(unit.tier)
+                    );
+                }
+
+                if (nodeCode === "black_market") {
+                    return unit.unit_pool === "black_market";
+                }
+
+                return false;
+            }
+        )
+        .sort(
+            (a,b) => {
+                if (a.faction !== b.faction) {
+                    return a.faction.localeCompare(b.faction);
+                }
+                return a.cost - b.cost || a.name.localeCompare(b.name);
+            }
+        );
+}
+
+
+function renderSkillTree() {
+
+    const panel =
+        document.getElementById(
+            "skill-tree-panel"
+        );
+
+    const content =
+        document.getElementById(
+            "skill-tree-content"
+        );
+
+
+    if (
+        !["shop","regular_complete"]
+        .includes(eventData.status)
+    ) {
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+    const owned = mySkillCodes();
+    const finalAllocation =
+        eventData.status === "regular_complete";
+
+
+    const branches =
+        Object.keys(skillBranchMeta)
+        .map(
+            branchCode => {
+
+                const meta =
+                    skillBranchMeta[branchCode];
+
+                const nodes =
+                    skillNodes
+                    .filter(
+                        node => node.branch === branchCode
+                    )
+                    .sort(
+                        (a,b) => a.node_order - b.node_order
+                    );
+
+
+                const nodeHtml =
+                    nodes.map(
+                        node => {
+
+                            const isOwned =
+                                owned.has(node.code);
+
+                            const prereqMet =
+                                !node.prerequisite_code
+                                ||
+                                owned.has(node.prerequisite_code);
+
+                            const enoughPoints =
+                                me.skill_points >= node.sp_cost;
+
+                            const canUnlock =
+                                !isOwned && prereqMet && enoughPoints;
+
+                            let recruitControl = "";
+
+                            if (
+                                node.requires_recruit
+                                &&
+                                !isOwned
+                                &&
+                                prereqMet
+                            ) {
+                                const options =
+                                    eligiblePermanentRecruits(node.code);
+
+                                recruitControl = `
+                                    <select
+                                        id="skill-recruit-${node.code}"
+                                        class="skill-recruit-select"
+                                        ${canUnlock ? "" : "disabled"}
+                                    >
+                                        <option value="">Choose recruit...</option>
+                                        ${
+                                            options.map(
+                                                unit => `
+                                                    <option value="${unit.id}">
+                                                        ${unit.tier === "X" ? unit.faction : unit.tier}
+                                                        — ${escapeHtml(unit.name)}
+                                                        (${unit.cost.toLocaleString()})
+                                                    </option>
+                                                `
+                                            ).join("")
+                                        }
+                                    </select>
+                                `;
+                            }
+
+                            let stateText = "Locked";
+                            if (isOwned) stateText = "Unlocked";
+                            else if (!prereqMet) stateText = "Previous node required";
+                            else if (!enoughPoints) stateText = "Need more SP";
+                            else stateText = "Available";
+
+                            return `
+                                <div class="skill-node ${isOwned ? "owned" : ""} ${!isOwned && !prereqMet ? "locked" : ""}">
+                                    <div class="skill-node-top">
+                                        <strong>${escapeHtml(node.display_name)}</strong>
+                                        <span class="skill-cost">${node.sp_cost} SP</span>
+                                    </div>
+
+                                    <p class="status">
+                                        ${escapeHtml(node.description)}
+                                    </p>
+
+                                    <span class="skill-status-badge">${stateText}</span>
+                                    ${
+                                        !node.effect_live
+                                        ? `<span class="skill-status-badge">Advanced betting UI next</span>`
+                                        : ""
+                                    }
+
+                                    ${recruitControl}
+
+                                    ${
+                                        !isOwned
+                                        ? `
+                                            <div style="margin-top:9px;">
+                                                <button
+                                                    ${canUnlock ? "" : "disabled"}
+                                                    onclick="unlockSkillNode('${node.code}', ${node.requires_recruit ? "true" : "false"})"
+                                                >
+                                                    Unlock
+                                                </button>
+                                            </div>
+                                          `
+                                        : ""
+                                    }
+                                </div>
+                            `;
+                        }
+                    ).join("");
+
+                return `
+                    <div class="skill-branch">
+                        <h3>${meta.icon} ${meta.name}</h3>
+                        ${nodeHtml}
+                    </div>
+                `;
+            }
+        ).join("");
+
+
+    content.innerHTML = `
+        <div class="skill-tree-intro">
+            <h2>
+                ${finalAllocation ? "Final Skill Allocation" : `Round ${eventData.current_round} Skill Tree`}
+            </h2>
+
+            <p class="status">
+                Unlock outward from the center. Tier I costs 1 SP, Tier II costs 1 SP, capstones cost 2 SP, and each mastery cashout costs 1 SP.
+            </p>
+
+            ${
+                finalAllocation
+                ? `<p class="status">No more Skill Points can be purchased. Spend what you have before Final War seeding.</p>`
+                : ""
+            }
+        </div>
+
+        <div class="skill-center">
+            <div>
+                WAR CHEST
+                <strong>${me.skill_points}</strong>
+                Skill Points
+            </div>
+        </div>
+
+        <div id="skill-message" class="status"></div>
+
+        <div class="skill-branches">
+            ${branches}
+        </div>
+    `;
+}
+
+
+async function unlockSkillNode(nodeCode, requiresRecruit) {
+
+    let unitId = null;
+
+    if (requiresRecruit) {
+        const select =
+            document.getElementById(
+                `skill-recruit-${nodeCode}`
+            );
+
+        unitId = select?.value || null;
+
+        if (!unitId) {
+            window.alert("Choose the unit you want to recruit first.");
+            return;
+        }
+    }
+
+    const message =
+        document.getElementById("skill-message");
+
+    if (message) {
+        message.textContent = "Unlocking skill...";
+    }
+
+    const { data, error } =
+        await db.rpc(
+            "unlock_skill_node",
+            {
+                p_event_id: currentEventId,
+                p_node_code: nodeCode,
+                p_unit_id: unitId
+            }
+        );
+
+    if (error) {
+        if (message) message.textContent = error.message;
+        return;
+    }
+
+    await loadState();
+
+    const updated =
+        document.getElementById("skill-message");
+
+    if (updated) {
+        updated.textContent =
+            data?.cashout
+            ? `Skill unlocked. +$${Number(data.cashout).toLocaleString()} War Chest cashout awarded.`
+            : "Skill unlocked.";
+    }
+}
+
+
 function renderMatch() {
 
     const panel =
@@ -2410,13 +2966,15 @@ function myDraftedUnitIds() {
 
 function eligibleMercenaries() {
 
-    const drafted =
-        new Set(
-            picks.map(
-                pick =>
-                    pick.unit_id
+    const unavailable =
+        new Set([
+            ...picks.map(
+                pick => pick.unit_id
+            ),
+            ...allRecruits.map(
+                recruit => recruit.unit_id
             )
-        );
+        ]);
 
 
     return units
@@ -2425,23 +2983,17 @@ function eligibleMercenaries() {
                 ["B","C","D"]
                 .includes(unit.tier)
                 &&
-                !drafted.has(
-                    unit.id
-                )
+                (unit.unit_pool ?? "standard") === "standard"
+                &&
+                unit.draft_eligible === true
+                &&
+                !unavailable.has(unit.id)
         )
         .sort(
             (a,b) => {
-
-                if (
-                    a.tier !==
-                    b.tier
-                ) {
-                    return a.tier
-                    .localeCompare(
-                        b.tier
-                    );
+                if (a.tier !== b.tier) {
+                    return a.tier.localeCompare(b.tier);
                 }
-
                 return a.cost - b.cost;
             }
         );
@@ -2453,36 +3005,32 @@ function armyBuilderUnits() {
     const owned =
         myDraftedUnitIds();
 
+    for (const recruit of myRecruits) {
+        owned.add(recruit.unit_id);
+    }
+
 
     const result =
         units.filter(
             unit =>
-                owned.has(
-                    unit.id
-                )
+                owned.has(unit.id)
         );
 
 
-    if (
-        armyDraft.mercenary_unit_id
-    ) {
+    if (armyDraft.mercenary_unit_id) {
 
         const merc =
             units.find(
                 unit =>
                     unit.id ===
-                    armyDraft
-                    .mercenary_unit_id
+                    armyDraft.mercenary_unit_id
             );
-
 
         if (
             merc
             &&
             !result.some(
-                unit =>
-                    unit.id ===
-                    merc.id
+                unit => unit.id === merc.id
             )
         ) {
             result.push(merc);
@@ -2490,14 +3038,13 @@ function armyBuilderUnits() {
     }
 
 
-    return result
-        .sort(
-            (a,b) =>
-                a.tier
-                .localeCompare(b.tier)
-                ||
-                a.cost - b.cost
-        );
+    return result.sort(
+        (a,b) => {
+            const tierA = a.tier === "X" ? "Z" : a.tier;
+            const tierB = b.tier === "X" ? "Z" : b.tier;
+            return tierA.localeCompare(tierB) || a.cost - b.cost;
+        }
+    );
 }
 
 
@@ -3497,6 +4044,72 @@ async function submitArmy() {
 
 
 
+
+function hasSkill(nodeCode) {
+    return playerSkills.some(
+        skill =>
+            skill.player_id === currentPlayerId
+            &&
+            skill.node_code === nodeCode
+    );
+}
+
+
+function currentBettingLimits() {
+    if (hasSkill("deep_pockets")) {
+        return {
+            perFight: 2000,
+            perRound: 3500,
+            allIn: hasSkill("all_in")
+        };
+    }
+
+    if (hasSkill("high_roller")) {
+        return {
+            perFight: 1500,
+            perRound: 2500,
+            allIn: false
+        };
+    }
+
+    return {
+        perFight: 1000,
+        perRound: 2000,
+        allIn: false
+    };
+}
+
+
+function wagerOptionsForMatch(matchId) {
+    const limits = currentBettingLimits();
+    const existing = myBetForMatch(matchId);
+
+    const otherCommitted =
+        myRoundBetTotal() - (existing?.amount ?? 0);
+
+    const remainingRound =
+        Math.max(0, limits.perRound - otherCommitted);
+
+    const maxWager =
+        Math.min(
+            remainingRound,
+            limits.allIn ? limits.perRound : limits.perFight
+        );
+
+    const values = [];
+    for (let value = 250; value <= maxWager; value += 250) {
+        values.push(value);
+    }
+
+    if (existing && !values.includes(existing.amount)) {
+        values.push(existing.amount);
+        values.sort((a,b) => a-b);
+    }
+
+    return values;
+}
+
+
 function bettingRoundMatches() {
     return matches.filter(
         match =>
@@ -3696,6 +4309,9 @@ function renderBetting() {
         const roundTotal =
             myRoundBetTotal();
 
+        const bettingLimits =
+            currentBettingLimits();
+
 
         const cards =
             roundMatches.map(
@@ -3714,8 +4330,13 @@ function renderBetting() {
                         ?? existing?.backed_player_id
                         ?? null;
 
+                    const options =
+                        wagerOptionsForMatch(match.id);
+
                     const amount =
-                        existing?.amount ?? 250;
+                        existing?.amount
+                        ?? options[0]
+                        ?? 250;
 
 
                     if (ownFight) {
@@ -3772,7 +4393,7 @@ function renderBetting() {
                                             ${ready ? "disabled" : ""}
                                         >
                                             ${
-                                                [250,500,750,1000]
+                                                options
                                                 .map(
                                                     value => `
                                                         <option
@@ -3780,6 +4401,7 @@ function renderBetting() {
                                                             ${value === amount ? "selected" : ""}
                                                         >
                                                             $${value.toLocaleString()}
+                                                            ${value > bettingLimits.perFight ? " — ALL IN" : ""}
                                                         </option>
                                                     `
                                                 ).join("")
@@ -3795,6 +4417,12 @@ function renderBetting() {
 
                                     </div>
 
+                                    <div class="bet-limit-note">
+                                        Per-fight limit: $${bettingLimits.perFight.toLocaleString()}
+                                        • Round limit: $${bettingLimits.perRound.toLocaleString()}
+                                        ${bettingLimits.allIn ? "• All In unlocked" : ""}
+                                    </div>
+
                                     ${
                                         existing
                                         ? `
@@ -3803,6 +4431,7 @@ function renderBetting() {
                                                 $${existing.amount.toLocaleString()}
                                                 on
                                                 ${escapeHtml(bettingPlayerName(existing.backed_player_id))}
+                                                ${existing.modifier_code === "all_in" ? "• ALL IN" : ""}
                                                 •
                                                 <button
                                                     class="secondary"
@@ -3832,13 +4461,18 @@ function renderBetting() {
         content.innerHTML = `
             <div class="bet-summary">
                 <div class="status">
-                    Standard Round Allowance
+                    Current Round Allowance
                 </div>
 
                 <strong>
                     $${roundTotal.toLocaleString()}
-                    / $2,000 committed
+                    / $${bettingLimits.perRound.toLocaleString()} committed
                 </strong>
+
+                <div class="status" style="margin-top:5px;">
+                    Per fight: $${bettingLimits.perFight.toLocaleString()}
+                    ${bettingLimits.allIn ? "• All In can exceed this once per round." : ""}
+                </div>
 
                 <div class="status" style="margin-top:5px;">
                     Stakes are held from your War Chest while wagers are active.
@@ -3939,6 +4573,7 @@ function renderBetting() {
                                         $${bet.amount.toLocaleString()}
                                         on
                                         ${escapeHtml(bettingPlayerName(bet.backed_player_id))}
+                                        ${bet.modifier_code === "all_in" ? "• ALL IN" : ""}
                                     </strong>
 
                                     ${
@@ -4230,6 +4865,14 @@ function startRealtime() {
         db.removeChannel(armyChannel);
     }
 
+    if (skillChannel) {
+        db.removeChannel(skillChannel);
+    }
+
+    if (recruitChannel) {
+        db.removeChannel(recruitChannel);
+    }
+
 
     eventChannel =
         db
@@ -4303,6 +4946,46 @@ function startRealtime() {
                 schema: "public",
                 table:
                     "army_submissions",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    skillChannel =
+        db
+        .channel(
+            "player-skills-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "player_skills",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    recruitChannel =
+        db
+        .channel(
+            "player-recruits-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "player_recruits",
                 filter:
                     `event_id=eq.${currentEventId}`
             },
