@@ -271,6 +271,143 @@ button:disabled {
     margin-top: 8px;
 }
 
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.army-builder-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+}
+
+.army-budget {
+    text-align: right;
+}
+
+.army-budget strong {
+    display: block;
+    font-size: 2rem;
+}
+
+.consumable-option {
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+}
+
+.checkbox-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.checkbox-row input {
+    margin-top: 3px;
+}
+
+.army-unit-card {
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.07);
+}
+
+.army-unit-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: start;
+}
+
+.zone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.zone-field label {
+    margin: 0 0 5px;
+    font-size: .72rem;
+    opacity: .65;
+}
+
+.qty-input {
+    width: 100%;
+    padding: 9px;
+    text-align: center;
+}
+
+.army-totals {
+    position: sticky;
+    bottom: 8px;
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(12,15,22,.94);
+    border: 1px solid rgba(255,255,255,.22);
+}
+
+.army-totals-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+}
+
+.army-totals strong {
+    font-size: 1.5rem;
+}
+
+.over-budget {
+    font-weight: bold;
+}
+
+.submitted-army {
+    margin-top: 15px;
+}
+
+.submitted-zone {
+    margin-top: 15px;
+}
+
+.submitted-zone-title {
+    opacity: .6;
+    letter-spacing: 1.5px;
+    font-size: .78rem;
+    font-weight: bold;
+}
+
+.submitted-line {
+    padding: 5px 0;
+}
+
+.submitted-total {
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    font-weight: bold;
+}
+
+.mercenary-tag {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: .72rem;
+    opacity: .65;
+}
+
 .hidden { display: none !important; }
 .status { opacity: .68; }
 a { color: white; }
@@ -405,6 +542,13 @@ a { color: white; }
 </section>
 
 
+<section id="army-builder-panel" class="panel hidden">
+
+    <div id="army-builder-content"></div>
+
+</section>
+
+
 <p style="margin-top:30px;">
     <a href="../">← Return Home</a>
 </p>
@@ -435,12 +579,20 @@ let units = [];
 let items = [];
 let matches = [];
 let roundStates = [];
+let armySubmission = null;
+
+let armyDraft = {
+    use_reinforcements: false,
+    mercenary_unit_id: null,
+    quantities: {}
+};
 
 let selectedTier = "S";
 
 let eventChannel = null;
 let playerChannel = null;
 let pickChannel = null;
+let armyChannel = null;
 
 
 const limits = {
@@ -852,6 +1004,64 @@ async function loadState() {
         stateResult.data ?? [];
 
 
+    const armyResult =
+        await db
+            .from("army_submissions")
+            .select(`
+                id,
+                event_id,
+                round_number,
+                player_id,
+                base_army_budget,
+                final_army_budget,
+                total_cost,
+                reinforcements_used,
+                mercenary_unit_id,
+                submitted_at,
+                army_lines (
+                    unit_id,
+                    zone,
+                    quantity,
+                    units (
+                        name,
+                        cost,
+                        faction,
+                        tier
+                    )
+                )
+            `)
+            .eq("event_id", currentEventId)
+            .eq(
+                "round_number",
+                eventData.current_round || 1
+            )
+            .eq(
+                "player_id",
+                currentPlayerId
+            )
+            .maybeSingle();
+
+
+    if (armyResult.error) {
+        console.error(armyResult.error);
+        return;
+    }
+
+
+    armySubmission =
+        armyResult.data ?? null;
+
+
+    if (
+        eventData.status ===
+        "army_build"
+        &&
+        !armySubmission
+    ) {
+        loadArmyDraft();
+    }
+
+
     render();
 }
 
@@ -897,6 +1107,7 @@ function render() {
     renderDraftBoard();
     renderShop();
     renderMatch();
+    renderArmyBuilder();
 }
 
 
@@ -1852,6 +2063,1230 @@ function renderMatch() {
 }
 
 
+
+function armyDraftStorageKey() {
+
+    return [
+        "tabs_army_draft",
+        currentEventId,
+        eventData?.current_round ?? 0,
+        currentPlayerId
+    ].join("_");
+}
+
+
+function loadArmyDraft() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                armyDraftStorageKey()
+            );
+
+
+        if (!saved) {
+            return;
+        }
+
+
+        const parsed =
+            JSON.parse(saved);
+
+
+        armyDraft = {
+            use_reinforcements:
+                Boolean(
+                    parsed.use_reinforcements
+                ),
+
+            mercenary_unit_id:
+                parsed.mercenary_unit_id
+                ?? null,
+
+            quantities:
+                parsed.quantities
+                ?? {}
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not load saved army draft.",
+            error
+        );
+    }
+}
+
+
+function saveArmyDraft() {
+
+    try {
+
+        localStorage.setItem(
+            armyDraftStorageKey(),
+            JSON.stringify(
+                armyDraft
+            )
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not save army draft.",
+            error
+        );
+    }
+}
+
+
+function clearArmyDraft() {
+
+    try {
+
+        localStorage.removeItem(
+            armyDraftStorageKey()
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+    }
+
+
+    armyDraft = {
+        use_reinforcements: false,
+        mercenary_unit_id: null,
+        quantities: {}
+    };
+}
+
+
+function itemQuantity(
+    itemCode
+) {
+
+    return (
+        items.find(
+            item =>
+                item.item_code ===
+                itemCode
+        )
+        ?.quantity
+        ?? 0
+    );
+}
+
+
+function myDraftedUnitIds() {
+
+    return new Set(
+        picks
+        .filter(
+            pick =>
+                pick.player_id ===
+                currentPlayerId
+        )
+        .map(
+            pick =>
+                pick.unit_id
+        )
+    );
+}
+
+
+function eligibleMercenaries() {
+
+    const drafted =
+        new Set(
+            picks.map(
+                pick =>
+                    pick.unit_id
+            )
+        );
+
+
+    return units
+        .filter(
+            unit =>
+                ["B","C","D"]
+                .includes(unit.tier)
+                &&
+                !drafted.has(
+                    unit.id
+                )
+        )
+        .sort(
+            (a,b) => {
+
+                if (
+                    a.tier !==
+                    b.tier
+                ) {
+                    return a.tier
+                    .localeCompare(
+                        b.tier
+                    );
+                }
+
+                return a.cost - b.cost;
+            }
+        );
+}
+
+
+function armyBuilderUnits() {
+
+    const owned =
+        myDraftedUnitIds();
+
+
+    const result =
+        units.filter(
+            unit =>
+                owned.has(
+                    unit.id
+                )
+        );
+
+
+    if (
+        armyDraft.mercenary_unit_id
+    ) {
+
+        const merc =
+            units.find(
+                unit =>
+                    unit.id ===
+                    armyDraft
+                    .mercenary_unit_id
+            );
+
+
+        if (
+            merc
+            &&
+            !result.some(
+                unit =>
+                    unit.id ===
+                    merc.id
+            )
+        ) {
+            result.push(merc);
+        }
+    }
+
+
+    return result
+        .sort(
+            (a,b) =>
+                a.tier
+                .localeCompare(b.tier)
+                ||
+                a.cost - b.cost
+        );
+}
+
+
+function getQty(
+    unitId,
+    zone
+) {
+
+    return Number(
+        armyDraft.quantities
+        ?.[unitId]
+        ?.[zone]
+        ?? 0
+    );
+}
+
+
+function setArmyQty(
+    unitId,
+    zone,
+    value
+) {
+
+    const quantity =
+        Math.max(
+            0,
+            Math.floor(
+                Number(value) || 0
+            )
+        );
+
+
+    if (
+        !armyDraft.quantities[
+            unitId
+        ]
+    ) {
+
+        armyDraft.quantities[
+            unitId
+        ] = {
+            frontline: 0,
+            midrange: 0,
+            backline: 0
+        };
+    }
+
+
+    armyDraft.quantities[
+        unitId
+    ][zone] =
+        quantity;
+
+
+    saveArmyDraft();
+    renderArmyBuilder();
+}
+
+
+function toggleReinforcements(
+    checked
+) {
+
+    armyDraft.use_reinforcements =
+        Boolean(checked);
+
+    saveArmyDraft();
+    renderArmyBuilder();
+}
+
+
+function selectMercenary(
+    unitId
+) {
+
+    const previous =
+        armyDraft.mercenary_unit_id;
+
+
+    if (
+        previous
+        &&
+        previous !== unitId
+    ) {
+
+        delete armyDraft
+            .quantities[
+                previous
+            ];
+    }
+
+
+    armyDraft.mercenary_unit_id =
+        unitId || null;
+
+
+    saveArmyDraft();
+    renderArmyBuilder();
+}
+
+
+function currentArmyBudget() {
+
+    const state =
+        roundStates.find(
+            row =>
+                row.round_number ===
+                eventData.current_round
+        );
+
+
+    const base =
+        state?.base_army_budget
+        ?? state?.army_budget
+        ?? 0;
+
+
+    return (
+        base
+        +
+        (
+            armyDraft
+            .use_reinforcements
+            ? 750
+            : 0
+        )
+    );
+}
+
+
+function armyTotalCost() {
+
+    const byId =
+        new Map(
+            units.map(
+                unit => [
+                    unit.id,
+                    unit
+                ]
+            )
+        );
+
+
+    let total = 0;
+
+
+    for (
+        const [
+            unitId,
+            zones
+        ]
+        of Object.entries(
+            armyDraft.quantities
+            ?? {}
+        )
+    ) {
+
+        const unit =
+            byId.get(unitId);
+
+
+        if (!unit) {
+            continue;
+        }
+
+
+        total +=
+            unit.cost
+            *
+            (
+                Number(
+                    zones.frontline
+                    ?? 0
+                )
+                +
+                Number(
+                    zones.midrange
+                    ?? 0
+                )
+                +
+                Number(
+                    zones.backline
+                    ?? 0
+                )
+            );
+    }
+
+
+    return total;
+}
+
+
+function buildArmyLines() {
+
+    const allowed =
+        new Set(
+            armyBuilderUnits()
+            .map(
+                unit =>
+                    unit.id
+            )
+        );
+
+
+    const lines = [];
+
+
+    for (
+        const [
+            unitId,
+            zones
+        ]
+        of Object.entries(
+            armyDraft.quantities
+            ?? {}
+        )
+    ) {
+
+        if (
+            !allowed.has(unitId)
+        ) {
+            continue;
+        }
+
+
+        for (
+            const zone of [
+                "frontline",
+                "midrange",
+                "backline"
+            ]
+        ) {
+
+            const quantity =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            zones[zone]
+                            ?? 0
+                        )
+                    )
+                );
+
+
+            if (quantity > 0) {
+
+                lines.push({
+                    unit_id:
+                        unitId,
+
+                    zone:
+                        zone,
+
+                    quantity:
+                        quantity
+                });
+            }
+        }
+    }
+
+
+    return lines;
+}
+
+
+function renderArmyBuilder() {
+
+    const panel =
+        document.getElementById(
+            "army-builder-panel"
+        );
+
+
+    if (
+        eventData.status !==
+        "army_build"
+    ) {
+
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    const content =
+        document.getElementById(
+            "army-builder-content"
+        );
+
+
+    if (armySubmission) {
+
+        const zones = {
+            frontline: [],
+            midrange: [],
+            backline: []
+        };
+
+
+        for (
+            const line of
+            armySubmission.army_lines
+            ?? []
+        ) {
+
+            zones[line.zone].push(
+                line
+            );
+        }
+
+
+        const zoneHtml =
+            [
+                ["frontline", "FRONTLINE"],
+                ["midrange", "MID-RANGE"],
+                ["backline", "BACKLINE"]
+            ]
+            .map(
+                ([key, label]) => {
+
+                    const lines =
+                        zones[key];
+
+
+                    if (
+                        lines.length === 0
+                    ) {
+                        return "";
+                    }
+
+
+                    return `
+                        <div class="submitted-zone">
+
+                            <div class="submitted-zone-title">
+                                ${label}
+                            </div>
+
+                            ${
+                                lines.map(
+                                    line => `
+                                        <div class="submitted-line">
+                                            ${line.quantity}×
+                                            ${escapeHtml(line.units.name)}
+                                        </div>
+                                    `
+                                ).join("")
+                            }
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+
+
+        const extras = [];
+
+        if (
+            armySubmission
+            .reinforcements_used
+        ) {
+            extras.push(
+                "Reinforcements +750"
+            );
+        }
+
+        if (
+            armySubmission
+            .mercenary_unit_id
+        ) {
+
+            const merc =
+                (
+                    armySubmission
+                    .army_lines
+                    ?? []
+                )
+                .find(
+                    line =>
+                        line.unit_id ===
+                        armySubmission
+                        .mercenary_unit_id
+                );
+
+            extras.push(
+                `Mercenary: ${
+                    merc
+                    ? escapeHtml(
+                        merc.units.name
+                      )
+                    : "Contract Used"
+                }`
+            );
+        }
+
+
+        content.innerHTML = `
+            <h2>✅ Army Submitted</h2>
+
+            <p class="status">
+                Your army is locked.
+                The host can reopen it if you need to make a correction.
+            </p>
+
+            <div class="submitted-army">
+
+                ${zoneHtml}
+
+                <div class="submitted-total">
+                    ${
+                        armySubmission
+                        .total_cost
+                        .toLocaleString()
+                    }
+                    /
+                    ${
+                        armySubmission
+                        .final_army_budget
+                        .toLocaleString()
+                    }
+                    points
+                </div>
+
+                ${
+                    extras.length
+                    ? `
+                        <p class="status">
+                            ${extras.join(" • ")}
+                        </p>
+                      `
+                    : ""
+                }
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const match =
+        matches.find(
+            row =>
+                row.round_number ===
+                eventData.current_round
+                &&
+                (
+                    row.player1_id ===
+                    currentPlayerId
+                    ||
+                    row.player2_id ===
+                    currentPlayerId
+                )
+        );
+
+
+    const opponentId =
+        match
+        ? (
+            match.player1_id ===
+            currentPlayerId
+            ? match.player2_id
+            : match.player1_id
+          )
+        : null;
+
+
+    const opponent =
+        players.find(
+            player =>
+                player.id ===
+                opponentId
+        );
+
+
+    const hasReinforcements =
+        itemQuantity(
+            "reinforcements"
+        ) > 0;
+
+
+    const hasMercenary =
+        itemQuantity(
+            "mercenary"
+        ) > 0;
+
+
+    if (
+        !hasReinforcements
+    ) {
+        armyDraft
+            .use_reinforcements =
+            false;
+    }
+
+
+    if (
+        !hasMercenary
+    ) {
+        armyDraft
+            .mercenary_unit_id =
+            null;
+    }
+
+
+    const mercenaries =
+        eligibleMercenaries();
+
+
+    if (
+        armyDraft.mercenary_unit_id
+        &&
+        !mercenaries.some(
+            unit =>
+                unit.id ===
+                armyDraft
+                .mercenary_unit_id
+        )
+    ) {
+
+        delete armyDraft.quantities[
+            armyDraft
+            .mercenary_unit_id
+        ];
+
+        armyDraft
+            .mercenary_unit_id =
+            null;
+    }
+
+
+    const builderUnits =
+        armyBuilderUnits();
+
+
+    const total =
+        armyTotalCost();
+
+
+    const budget =
+        currentArmyBudget();
+
+
+    const overBudget =
+        total > budget;
+
+
+    const lines =
+        buildArmyLines();
+
+
+    const canSubmit =
+        total > 0
+        &&
+        !overBudget
+        &&
+        lines.length > 0;
+
+
+    content.innerHTML = `
+        <div class="army-builder-header">
+
+            <div>
+                <h2 style="margin-top:0;">
+                    Build Your Army
+                </h2>
+
+                <div class="status">
+                    Opponent
+                </div>
+
+                <strong>
+                    ${escapeHtml(opponent?.display_name ?? "Opponent")}
+                </strong>
+            </div>
+
+
+            <div class="army-budget">
+
+                <div class="status">
+                    Army Budget
+                </div>
+
+                <strong>
+                    ${budget.toLocaleString()}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        ${
+            hasReinforcements
+            ? `
+                <div class="consumable-option">
+
+                    <label class="checkbox-row">
+
+                        <input
+                            type="checkbox"
+                            ${
+                                armyDraft.use_reinforcements
+                                ? "checked"
+                                : ""
+                            }
+                            onchange="
+                                toggleReinforcements(
+                                    this.checked
+                                )
+                            "
+                        >
+
+                        <span>
+                            <strong>
+                                Use Reinforcements
+                            </strong>
+
+                            <div class="status">
+                                Consume one item when submitted to add +750 army points this fight.
+                            </div>
+                        </span>
+
+                    </label>
+
+                </div>
+              `
+            : ""
+        }
+
+
+        ${
+            hasMercenary
+            ? `
+                <div class="consumable-option">
+
+                    <strong>
+                        Mercenary Contract
+                    </strong>
+
+                    <div class="status">
+                        Choose one undrafted B/C/D unit for this fight.
+                        The contract is consumed only when you submit.
+                    </div>
+
+                    <select
+                        style="margin-top:10px;"
+                        onchange="
+                            selectMercenary(
+                                this.value
+                            )
+                        "
+                    >
+
+                        <option value="">
+                            Do not use a Mercenary Contract
+                        </option>
+
+                        ${
+                            mercenaries.map(
+                                unit => `
+                                    <option
+                                        value="${unit.id}"
+                                        ${
+                                            armyDraft
+                                            .mercenary_unit_id
+                                            ===
+                                            unit.id
+                                            ? "selected"
+                                            : ""
+                                        }
+                                    >
+                                        ${unit.tier} — ${escapeHtml(unit.name)}
+                                        (${unit.cost.toLocaleString()})
+                                    </option>
+                                `
+                            ).join("")
+                        }
+
+                    </select>
+
+                </div>
+              `
+            : ""
+        }
+
+
+        <div style="margin-top:18px;">
+
+            ${
+                builderUnits.map(
+                    unit => {
+
+                        const isMercenary =
+                            unit.id ===
+                            armyDraft
+                            .mercenary_unit_id;
+
+
+                        return `
+                            <div class="army-unit-card">
+
+                                <div class="army-unit-top">
+
+                                    <div>
+                                        <strong>
+                                            ${unit.tier}
+                                            —
+                                            ${escapeHtml(unit.name)}
+                                        </strong>
+
+                                        ${
+                                            isMercenary
+                                            ? `
+                                                <span class="mercenary-tag">
+                                                    MERCENARY
+                                                </span>
+                                              `
+                                            : ""
+                                        }
+
+                                        <div class="status">
+                                            ${unit.cost.toLocaleString()}
+                                            points each
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="zone-grid">
+
+                                    <div class="zone-field">
+
+                                        <label>
+                                            Frontline
+                                        </label>
+
+                                        <input
+                                            class="qty-input"
+                                            type="number"
+                                            inputmode="numeric"
+                                            min="0"
+                                            step="1"
+                                            value="${
+                                                getQty(
+                                                    unit.id,
+                                                    "frontline"
+                                                )
+                                            }"
+                                            oninput="
+                                                setArmyQty(
+                                                    '${unit.id}',
+                                                    'frontline',
+                                                    this.value
+                                                )
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <div class="zone-field">
+
+                                        <label>
+                                            Mid-range
+                                        </label>
+
+                                        <input
+                                            class="qty-input"
+                                            type="number"
+                                            inputmode="numeric"
+                                            min="0"
+                                            step="1"
+                                            value="${
+                                                getQty(
+                                                    unit.id,
+                                                    "midrange"
+                                                )
+                                            }"
+                                            oninput="
+                                                setArmyQty(
+                                                    '${unit.id}',
+                                                    'midrange',
+                                                    this.value
+                                                )
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <div class="zone-field">
+
+                                        <label>
+                                            Backline
+                                        </label>
+
+                                        <input
+                                            class="qty-input"
+                                            type="number"
+                                            inputmode="numeric"
+                                            min="0"
+                                            step="1"
+                                            value="${
+                                                getQty(
+                                                    unit.id,
+                                                    "backline"
+                                                )
+                                            }"
+                                            oninput="
+                                                setArmyQty(
+                                                    '${unit.id}',
+                                                    'backline',
+                                                    this.value
+                                                )
+                                            "
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        `;
+                    }
+                ).join("")
+            }
+
+        </div>
+
+
+        <div class="army-totals">
+
+            <div class="army-totals-row">
+
+                <div>
+                    <div class="status">
+                        Army Total
+                    </div>
+
+                    <strong
+                        class="${
+                            overBudget
+                            ? "over-budget"
+                            : ""
+                        }"
+                    >
+                        ${total.toLocaleString()}
+                        /
+                        ${budget.toLocaleString()}
+                    </strong>
+                </div>
+
+
+                <button
+                    ${
+                        canSubmit
+                        ? ""
+                        : "disabled"
+                    }
+                    onclick="submitArmy()"
+                >
+                    Submit Army
+                </button>
+
+            </div>
+
+            ${
+                overBudget
+                ? `
+                    <p class="status">
+                        Remove ${
+                            (total - budget)
+                            .toLocaleString()
+                        } points before submitting.
+                    </p>
+                  `
+                : `
+                    <p class="status">
+                        ${
+                            (budget - total)
+                            .toLocaleString()
+                        }
+                        points remaining.
+                    </p>
+                  `
+            }
+
+            <div
+                id="army-message"
+                class="status"
+            ></div>
+
+        </div>
+    `;
+}
+
+
+async function submitArmy() {
+
+    const message =
+        document.getElementById(
+            "army-message"
+        );
+
+
+    if (!message) {
+        return;
+    }
+
+
+    const lines =
+        buildArmyLines();
+
+
+    const total =
+        armyTotalCost();
+
+
+    const budget =
+        currentArmyBudget();
+
+
+    if (
+        lines.length === 0
+        ||
+        total <= 0
+    ) {
+
+        message.textContent =
+            "Add at least one unit before submitting.";
+
+        return;
+    }
+
+
+    if (total > budget) {
+
+        message.textContent =
+            "Your army is over budget.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "Submitting and locking army...";
+
+
+    const { error } =
+        await db.rpc(
+            "submit_army",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_round_number:
+                    eventData.current_round,
+
+                p_lines:
+                    lines,
+
+                p_use_reinforcements:
+                    armyDraft
+                    .use_reinforcements,
+
+                p_mercenary_unit_id:
+                    armyDraft
+                    .mercenary_unit_id
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.textContent =
+            error.message;
+
+        return;
+    }
+
+
+    clearArmyDraft();
+
+    await loadState();
+}
+
+
+
 function startRealtime() {
 
     if (!currentEventId) {
@@ -1869,6 +3304,10 @@ function startRealtime() {
 
     if (pickChannel) {
         db.removeChannel(pickChannel);
+    }
+
+    if (armyChannel) {
+        db.removeChannel(armyChannel);
     }
 
 
@@ -1930,6 +3369,27 @@ function startRealtime() {
             loadState
         )
         .subscribe();
+
+    armyChannel =
+        db
+        .channel(
+            "my-army-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table:
+                    "army_submissions",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
 }
 
 
