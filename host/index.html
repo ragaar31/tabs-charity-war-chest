@@ -83,6 +83,45 @@ button:disabled {
     font-weight: bold;
 }
 
+.host-event-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.host-event-toolbar .actions {
+    margin-top: 0;
+}
+
+.new-event-button {
+    background: #6d2932;
+    color: white;
+}
+
+.new-event-note {
+    margin-top: 6px;
+    max-width: 310px;
+    text-align: right;
+    font-size: .78rem;
+}
+
+@media (max-width: 620px) {
+    .host-event-toolbar {
+        display: block;
+    }
+
+    .host-event-toolbar .actions {
+        margin-top: 16px;
+    }
+
+    .new-event-note {
+        text-align: left;
+        max-width: none;
+    }
+}
+
 .player-row {
     padding: 13px;
     margin-top: 8px;
@@ -368,9 +407,28 @@ a { color: white; }
 
 <section id="event-panel" class="panel hidden">
 
-    <div id="lobby-info">
-        <div class="status">Room Code</div>
-        <div id="room-code">------</div>
+    <div class="host-event-toolbar">
+
+        <div id="lobby-info">
+            <div class="status">Room Code</div>
+            <div id="room-code">------</div>
+        </div>
+
+        <div>
+            <div class="actions">
+                <button
+                    class="new-event-button"
+                    onclick="startNewEvent()"
+                >
+                    Start New Event
+                </button>
+            </div>
+
+            <div class="status new-event-note">
+                Leaves this event saved in Supabase and returns this browser to a fresh Host screen.
+            </div>
+        </div>
+
     </div>
 
     <h2 id="phase-title">Lobby</h2>
@@ -3113,6 +3171,38 @@ async function closeShopAndLockBudgets() {
     setMessage(
         "Army tiers locked. Round matchups revealed."
     );
+}
+
+
+function startNewEvent() {
+
+    const phaseLabel =
+        eventData?.status
+        ? eventData.status.replaceAll("_", " ")
+        : "current";
+
+
+    const confirmed = window.confirm(
+        `Start a new event?\n\n` +
+        `This will leave the ${phaseLabel} event and return this Host browser to the Create Event screen. ` +
+        `The old event will remain saved in Supabase, and players will need to join the new room code.`
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    localStorage.removeItem(
+        "tabs_host_event_id"
+    );
+
+
+    currentEventId = null;
+
+
+    window.location.reload();
 }
 
 
