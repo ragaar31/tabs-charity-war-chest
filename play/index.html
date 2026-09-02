@@ -525,6 +525,57 @@ select {
     margin: 0 0 12px;
 }
 
+.quartermaster-branch {
+    grid-column: 1 / -1;
+}
+
+.quartermaster-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.final-war-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.2);
+    font-size: .68rem;
+    font-weight: bold;
+    letter-spacing: .08em;
+}
+
+.quartermaster-note {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.16);
+}
+
+.quartermaster-note strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.quartermaster-node-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.quartermaster-node-grid .skill-node {
+    margin-top: 0;
+}
+
+@media (max-width: 560px) {
+    .quartermaster-node-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .skill-node {
     padding: 13px;
     margin-top: 8px;
@@ -2602,10 +2653,31 @@ function renderSkillTree() {
                         }
                     ).join("");
 
+                const isQuartermaster =
+                    branchCode === "quartermaster";
+
+                const quartermasterNote =
+                    isQuartermaster
+                    ? `
+                        <div class="quartermaster-note">
+                            <strong>Final War Branch</strong>
+                            Permanent recruits from Quartermaster stay in your faction for the Final War. This is the only branch whose unlocked skill effects carry into Final War; other branch abilities are regular-season only. Mastery cashouts still add to your War Chest normally.
+                        </div>
+                      `
+                    : "";
+
                 return `
-                    <div class="skill-branch">
-                        <h3>${meta.icon} ${meta.name}</h3>
-                        ${nodeHtml}
+                    <div class="skill-branch ${isQuartermaster ? "quartermaster-branch" : ""}">
+                        <h3 class="${isQuartermaster ? "quartermaster-heading" : ""}">
+                            ${meta.icon} ${meta.name}
+                            ${isQuartermaster ? `<span class="final-war-badge">FINAL WAR</span>` : ""}
+                        </h3>
+
+                        ${quartermasterNote}
+
+                        <div class="${isQuartermaster ? "quartermaster-node-grid" : ""}">
+                            ${nodeHtml}
+                        </div>
                     </div>
                 `;
             }
