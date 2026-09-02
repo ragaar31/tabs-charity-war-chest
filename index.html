@@ -87,15 +87,21 @@
             opacity: 0.72;
         }
 
-        .card button {
-            margin-top: 15px;
-            padding: 12px 18px;
-            border: 0;
-            border-radius: 9px;
-            font-weight: bold;
-            opacity: 0.45;
-            cursor: not-allowed;
-        }
+        .card .button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 18px;
+    border-radius: 9px;
+    background: white;
+    color: #11151f;
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.card .button:hover {
+    transform: translateY(-2px);
+}
 
         footer {
             margin-top: 55px;
@@ -121,13 +127,16 @@
     <main class="page">
 
         <header>
-            <div class="eyebrow">Charity Livestream Event</div>
+            <div class="eyebrow">DreamHarrier • Extra Life Charity Event</div>
 
             <h1>TABS<br>WAR CHEST</h1>
 
+            <h2>BETTING SPECIAL</h2>
+
             <p class="subtitle">
-                Draft your faction. Build your army. Bet on the battles.
-                Grow your War Chest and fight your way into the Final War.
+    Draft your faction. Build your army. Bet on the battles.
+    Grow your War Chest and fight your way into the Final War —
+    all benefiting Extra Life.
             </p>
 
             <div class="status">
@@ -146,9 +155,9 @@
                     battle results, War Chests, and Final War.
                 </p>
 
-                <button disabled>
-                    Coming Soon
-                </button>
+                <a class="button" href="host/">
+                    Host Dashboard
+                </a>
             </article>
 
 
@@ -160,9 +169,9 @@
                     place bets, purchase skills, and manage your faction.
                 </p>
 
-                <button disabled>
-                    Coming Soon
-                </button>
+<a class="button" href="play/">
+    Player Portal
+</a>
             </article>
 
 
@@ -174,9 +183,9 @@
                     betting pools, leaderboards, armies, and results.
                 </p>
 
-                <button disabled>
-                    Coming Soon
-                </button>
+<a class="button" href="overlay/">
+    Broadcast View
+</a>
             </article>
 
         </section>
