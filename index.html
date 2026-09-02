@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TABS Charity War Chest</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top, #32394a 0%, #161922 45%, #090b10 100%);
+            color: white;
+        }
+
+        .page {
+            width: min(1100px, 92%);
+            margin: 0 auto;
+            padding: 60px 0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 55px;
+        }
+
+        .eyebrow {
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            opacity: 0.65;
+        }
+
+        h1 {
+            margin: 10px 0;
+            font-size: clamp(2.8rem, 8vw, 6rem);
+            line-height: 0.95;
+        }
+
+        .subtitle {
+            max-width: 650px;
+            margin: 20px auto 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 999px;
+            background: rgba(255,255,255,.06);
+            font-size: 0.85rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            min-height: 220px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 18px;
+            background: rgba(255,255,255,.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .card p {
+            line-height: 1.55;
+            opacity: 0.72;
+        }
+
+        .card button {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 9px;
+            font-weight: bold;
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        footer {
+            margin-top: 55px;
+            text-align: center;
+            opacity: 0.45;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 800px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="page">
+
+        <header>
+            <div class="eyebrow">Charity Livestream Event</div>
+
+            <h1>TABS<br>WAR CHEST</h1>
+
+            <p class="subtitle">
+                Draft your faction. Build your army. Bet on the battles.
+                Grow your War Chest and fight your way into the Final War.
+            </p>
+
+            <div class="status">
+                ● Prototype System Online
+            </div>
+        </header>
+
+
+        <section class="grid">
+
+            <article class="card">
+                <h2>🎮 Host Dashboard</h2>
+
+                <p>
+                    Control the draft, rounds, betting, shop,
+                    battle results, War Chests, and Final War.
+                </p>
+
+                <button disabled>
+                    Coming Soon
+                </button>
+            </article>
+
+
+            <article class="card">
+                <h2>📱 Player Portal</h2>
+
+                <p>
+                    Join the event, draft units, build armies,
+                    place bets, purchase skills, and manage your faction.
+                </p>
+
+                <button disabled>
+                    Coming Soon
+                </button>
+            </article>
+
+
+            <article class="card">
+                <h2>📺 Broadcast</h2>
+
+                <p>
+                    Live graphics for OBS including matchups,
+                    betting pools, leaderboards, armies, and results.
+                </p>
+
+                <button disabled>
+                    Coming Soon
+                </button>
+            </article>
+
+        </section>
+
+
+        <footer>
+            TABS Charity War Chest — Prototype
+        </footer>
+
+    </main>
+
+</body>
+</html>
