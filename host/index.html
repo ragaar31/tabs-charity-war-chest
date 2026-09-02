@@ -2,37 +2,20 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>
-    Host Dashboard | TABS War Chest Betting Special
-</title>
+<title>Host Dashboard | TABS War Chest Betting Special</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
     min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
-
     background:
-        radial-gradient(
-            circle at top,
-            #343c50,
-            #171b26 45%,
-            #090b10 100%
-        );
-
+        radial-gradient(circle at top, #343c50, #171b26 45%, #090b10 100%);
     color: white;
 }
 
@@ -54,29 +37,20 @@ h1 {
     margin: 8px 0 4px;
 }
 
-.subtitle {
-    opacity: .7;
-}
+.subtitle, .status { opacity: .68; }
 
 .panel {
     margin-top: 24px;
     padding: 24px;
-
     background: rgba(255,255,255,.07);
-
-    border:
-        1px solid
-        rgba(255,255,255,.15);
-
+    border: 1px solid rgba(255,255,255,.15);
     border-radius: 16px;
 }
 
 button {
     padding: 12px 18px;
-
     border: 0;
     border-radius: 8px;
-
     font-weight: bold;
     cursor: pointer;
 }
@@ -112,86 +86,54 @@ button:disabled {
 .player-row {
     padding: 13px;
     margin-top: 8px;
-
     display: grid;
-
-    grid-template-columns:
-        minmax(140px, 1fr)
-        auto
-        auto;
-
+    grid-template-columns: minmax(140px,1fr) auto auto;
     gap: 12px;
     align-items: center;
-
     background: rgba(255,255,255,.07);
-
     border-radius: 9px;
 }
 
 .order-number {
     width: 35px;
     height: 35px;
-
     display: inline-grid;
     place-items: center;
-
     border-radius: 50%;
-
     background: white;
     color: #11151f;
-
     font-weight: bold;
 }
 
 .current-drafter {
     padding: 22px;
     margin-top: 18px;
-
     text-align: center;
-
     border-radius: 14px;
-
-    background:
-        rgba(255,255,255,.12);
-
-    border:
-        2px solid
-        rgba(255,255,255,.35);
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.35);
 }
 
 .current-drafter strong {
     display: block;
     margin-top: 6px;
-
     font-size: 2rem;
 }
 
 .rosters {
     margin-top: 20px;
-
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(230px,1fr)
-        );
-
+    grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
     gap: 12px;
 }
 
 .roster {
     padding: 16px;
-
-    background:
-        rgba(255,255,255,.06);
-
+    background: rgba(255,255,255,.06);
     border-radius: 12px;
 }
 
-.roster h3 {
-    margin-top: 0;
-}
+.roster h3 { margin-top: 0; }
 
 .roster-unit {
     margin-top: 6px;
@@ -200,29 +142,50 @@ button:disabled {
 
 .tier {
     display: inline-block;
-
     min-width: 24px;
-
     text-align: center;
     font-weight: bold;
-
     margin-right: 6px;
 }
 
-.status {
-    opacity: .65;
+.shop-grid,
+.match-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+    gap: 12px;
+    margin-top: 16px;
 }
 
-.hidden {
-    display: none !important;
+.shop-player,
+.match-card {
+    padding: 17px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.07);
 }
 
-a {
-    color: white;
+.money {
+    font-size: 1.45rem;
+    font-weight: bold;
+    margin: 7px 0;
 }
 
+.budget {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+.vs {
+    text-align: center;
+    opacity: .55;
+    font-weight: bold;
+    margin: 6px 0;
+}
+
+.hidden { display: none !important; }
+
+a { color: white; }
 </style>
-
 </head>
 
 
@@ -230,66 +193,32 @@ a {
 
 <main>
 
-<div class="eyebrow">
-    DreamHarrier • Extra Life
-</div>
+<div class="eyebrow">DreamHarrier • Extra Life</div>
 
 <h1>Host Dashboard</h1>
 
-<p class="subtitle">
-    TABS War Chest Betting Special
-</p>
+<p class="subtitle">TABS War Chest Betting Special</p>
 
 
-<section
-    id="create-panel"
-    class="panel hidden"
->
-
+<section id="create-panel" class="panel hidden">
     <h2>Create Event</h2>
-
-    <p>
-        Start a new War Chest session.
-    </p>
-
-    <button id="create-event">
-        Create Event
-    </button>
-
+    <p>Start a new War Chest session.</p>
+    <button id="create-event">Create Event</button>
 </section>
 
 
-<section
-    id="event-panel"
-    class="panel hidden"
->
+<section id="event-panel" class="panel hidden">
 
     <div id="lobby-info">
-
-        <div class="status">
-            Room Code
-        </div>
-
-        <div id="room-code">
-            ------
-        </div>
-
+        <div class="status">Room Code</div>
+        <div id="room-code">------</div>
     </div>
 
-
-    <h2 id="phase-title">
-        Lobby
-    </h2>
-
+    <h2 id="phase-title">Lobby</h2>
 
     <div id="host-actions"></div>
 
-
-    <p
-        id="host-message"
-        class="status"
-    ></p>
-
+    <p id="host-message" class="status"></p>
 
     <h3>
         Players
@@ -301,46 +230,56 @@ a {
 </section>
 
 
-<section
-    id="draft-panel"
-    class="panel hidden"
->
-
-    <h2>Snake Draft</h2>
-
+<section id="draft-panel" class="panel hidden">
+    <h2 id="draft-panel-title">Factions</h2>
     <div id="draft-status"></div>
-
     <div id="rosters" class="rosters"></div>
+</section>
 
+
+<section id="shop-host-panel" class="panel hidden">
+    <h2>Quartermaster</h2>
+
+    <p class="status">
+        Players are spending from their War Chests.
+        Their next army tier will be calculated after you close the Shop.
+    </p>
+
+    <div id="shop-host-grid" class="shop-grid"></div>
+</section>
+
+
+<section id="round-panel" class="panel hidden">
+    <h2 id="round-heading">Round 1</h2>
+
+    <p class="status">
+        Army tiers are locked. Army submission is the next system we will add.
+    </p>
+
+    <div id="match-grid" class="match-grid"></div>
 </section>
 
 
 <p style="margin-top:30px;">
-    <a href="../">
-        ← Return Home
-    </a>
+    <a href="../">← Return Home</a>
 </p>
 
 </main>
 
 
-<script
-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-client.js"></script>
-
 
 <script>
 
 let currentEventId =
-    localStorage.getItem(
-        "tabs_host_event_id"
-    );
+    localStorage.getItem("tabs_host_event_id");
 
 let eventData = null;
 let players = [];
 let picks = [];
+let matches = [];
+let roundStates = [];
 
 let eventChannel = null;
 let playerChannel = null;
@@ -348,38 +287,36 @@ let pickChannel = null;
 
 
 function escapeHtml(value) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        value ?? "";
-
+    const div = document.createElement("div");
+    div.textContent = value ?? "";
     return div.innerHTML;
-
 }
 
 
 function makeRoomCode() {
-
-    const chars =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let code = "";
 
     for (let i = 0; i < 6; i++) {
-
         code += chars[
-            Math.floor(
-                Math.random() *
-                chars.length
-            )
+            Math.floor(Math.random() * chars.length)
         ];
-
     }
 
     return code;
+}
 
+
+function projectedArmyBudget(player) {
+    const wealth =
+        player.war_chest - player.debt;
+
+    if (wealth < 6000) return 8000;
+    if (wealth < 8500) return 9000;
+    if (wealth < 11000) return 10000;
+    if (wealth < 14500) return 11000;
+
+    return 12000;
 }
 
 
@@ -393,16 +330,11 @@ function getCurrentDraftState() {
         return null;
     }
 
-    const pick =
-        eventData.draft_pick_number;
-
-    const count =
-        players.length;
+    const pick = eventData.draft_pick_number;
+    const count = players.length;
 
     const round =
-        Math.floor(
-            (pick - 1) / count
-        ) + 1;
+        Math.floor((pick - 1) / count) + 1;
 
     const index =
         (pick - 1) % count;
@@ -414,9 +346,7 @@ function getCurrentDraftState() {
 
     const player =
         players.find(
-            p =>
-                p.draft_position ===
-                position
+            p => p.draft_position === position
         );
 
     return {
@@ -425,7 +355,103 @@ function getCurrentDraftState() {
         position,
         player
     };
+}
 
+
+function shuffleArray(values) {
+
+    const array = [...values];
+
+    for (let i = array.length - 1; i > 0; i--) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [array[i], array[j]] =
+            [array[j], array[i]];
+    }
+
+    return array;
+}
+
+
+function generateSchedule() {
+
+    let rotation =
+        shuffleArray(
+            players.map(p => p.id)
+        );
+
+    if (rotation.length % 2 !== 0) {
+        throw new Error(
+            "The current regular-season format requires an even number of players."
+        );
+    }
+
+    const schedule = [];
+    const playerCount = rotation.length;
+
+    for (
+        let round = 1;
+        round <= 3;
+        round++
+    ) {
+
+        const pairs = [];
+
+        for (
+            let i = 0;
+            i < playerCount / 2;
+            i++
+        ) {
+
+            pairs.push({
+                player1_id:
+                    rotation[i],
+
+                player2_id:
+                    rotation[
+                        playerCount - 1 - i
+                    ]
+            });
+        }
+
+        const randomizedPairs =
+            shuffleArray(pairs);
+
+        randomizedPairs.forEach(
+            (pair, index) => {
+
+                schedule.push({
+                    round_number: round,
+                    match_number: index + 1,
+                    player1_id:
+                        pair.player1_id,
+                    player2_id:
+                        pair.player2_id
+                });
+
+            }
+        );
+
+
+        if (playerCount > 2) {
+
+            rotation = [
+                rotation[0],
+                rotation[playerCount - 1],
+                ...rotation.slice(
+                    1,
+                    playerCount - 1
+                )
+            ];
+
+        }
+    }
+
+    return schedule;
 }
 
 
@@ -452,18 +478,17 @@ async function createEvent() {
             const code =
                 makeRoomCode();
 
-            const {
-                error
-            } = await db
-                .from("events")
-                .insert({
-                    id,
-                    code,
-                    name:
-                        "TABS War Chest Betting Special",
-                    host_user_id:
-                        user.id
-                });
+            const { error } =
+                await db
+                    .from("events")
+                    .insert({
+                        id,
+                        code,
+                        name:
+                            "TABS War Chest Betting Special",
+                        host_user_id:
+                            user.id
+                    });
 
             if (!error) {
 
@@ -475,20 +500,15 @@ async function createEvent() {
                 break;
             }
 
-            if (
-                error.code !== "23505"
-            ) {
+            if (error.code !== "23505") {
                 throw error;
             }
-
         }
 
         if (!created) {
-
             throw new Error(
                 "Unable to create event."
             );
-
         }
 
         currentEventId =
@@ -500,7 +520,6 @@ async function createEvent() {
         );
 
         await loadState();
-
         startRealtime();
 
     }
@@ -512,9 +531,7 @@ async function createEvent() {
         setMessage(
             "Error: " + error.message
         );
-
     }
-
 }
 
 
@@ -523,12 +540,8 @@ async function loadState() {
     if (!currentEventId) {
 
         document
-            .getElementById(
-                "create-panel"
-            )
-            .classList.remove(
-                "hidden"
-            );
+            .getElementById("create-panel")
+            .classList.remove("hidden");
 
         return;
     }
@@ -538,10 +551,7 @@ async function loadState() {
         await db
             .from("events")
             .select("*")
-            .eq(
-                "id",
-                currentEventId
-            )
+            .eq("id", currentEventId)
             .maybeSingle();
 
 
@@ -561,12 +571,8 @@ async function loadState() {
         currentEventId = null;
 
         document
-            .getElementById(
-                "create-panel"
-            )
-            .classList.remove(
-                "hidden"
-            );
+            .getElementById("create-panel")
+            .classList.remove("hidden");
 
         return;
     }
@@ -580,21 +586,12 @@ async function loadState() {
         await db
             .from("players")
             .select("*")
-            .eq(
-                "event_id",
-                currentEventId
-            )
-            .order(
-                "joined_at"
-            );
+            .eq("event_id", currentEventId)
+            .order("joined_at");
 
 
     if (playerResult.error) {
-
-        console.error(
-            playerResult.error
-        );
-
+        console.error(playerResult.error);
         return;
     }
 
@@ -617,21 +614,12 @@ async function loadState() {
                     tier
                 )
             `)
-            .eq(
-                "event_id",
-                currentEventId
-            )
-            .order(
-                "pick_number"
-            );
+            .eq("event_id", currentEventId)
+            .order("pick_number");
 
 
     if (pickResult.error) {
-
-        console.error(
-            pickResult.error
-        );
-
+        console.error(pickResult.error);
         return;
     }
 
@@ -640,42 +628,65 @@ async function loadState() {
         pickResult.data ?? [];
 
 
-    render();
+    const matchResult =
+        await db
+            .from("matches")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("match_number");
 
+
+    if (matchResult.error) {
+        console.error(matchResult.error);
+        return;
+    }
+
+
+    matches =
+        matchResult.data ?? [];
+
+
+    const stateResult =
+        await db
+            .from("round_player_state")
+            .select("*")
+            .eq("event_id", currentEventId);
+
+
+    if (stateResult.error) {
+        console.error(stateResult.error);
+        return;
+    }
+
+
+    roundStates =
+        stateResult.data ?? [];
+
+
+    render();
 }
 
 
 function render() {
 
     document
-        .getElementById(
-            "create-panel"
-        )
-        .classList.add(
-            "hidden"
-        );
+        .getElementById("create-panel")
+        .classList.add("hidden");
 
     document
-        .getElementById(
-            "event-panel"
-        )
-        .classList.remove(
-            "hidden"
-        );
+        .getElementById("event-panel")
+        .classList.remove("hidden");
 
 
     document
-        .getElementById(
-            "room-code"
-        )
+        .getElementById("room-code")
         .textContent =
             eventData.code;
 
 
     document
-        .getElementById(
-            "player-count"
-        )
+        .getElementById("player-count")
         .textContent =
             players.length;
 
@@ -683,7 +694,8 @@ function render() {
     renderActions();
     renderPlayers();
     renderDraft();
-
+    renderShopHost();
+    renderRound();
 }
 
 
@@ -703,32 +715,23 @@ function renderActions() {
     actions.innerHTML = "";
 
 
-    if (
-        eventData.status ===
-        "lobby"
-    ) {
+    if (eventData.status === "lobby") {
 
         title.textContent =
             "Lobby Open";
 
         actions.innerHTML = `
             <div class="actions">
-
-                <button
-                    onclick="lockLobby()"
-                >
+                <button onclick="lockLobby()">
                     Lock Lobby
                 </button>
-
             </div>
         `;
-
     }
 
 
     else if (
-        eventData.status ===
-        "locked"
+        eventData.status === "locked"
     ) {
 
         title.textContent =
@@ -736,18 +739,11 @@ function renderActions() {
 
         actions.innerHTML = `
             <div class="actions">
-
-                <button
-                    onclick="
-                        randomizeOrder()
-                    "
-                >
+                <button onclick="randomizeOrder()">
                     Determine Draft Order
                 </button>
-
             </div>
         `;
-
     }
 
 
@@ -764,35 +760,26 @@ function renderActions() {
 
                 <button
                     class="secondary"
-                    onclick="
-                        randomizeOrder()
-                    "
+                    onclick="randomizeOrder()"
                 >
                     Reroll Order
                 </button>
 
-                <button
-                    onclick="
-                        beginDraft()
-                    "
-                >
+                <button onclick="beginDraft()">
                     Begin Draft
                 </button>
 
             </div>
         `;
-
     }
 
 
     else if (
-        eventData.status ===
-        "draft"
+        eventData.status === "draft"
     ) {
 
         title.textContent =
             "Draft In Progress";
-
     }
 
 
@@ -804,8 +791,45 @@ function renderActions() {
         title.textContent =
             "Draft Complete";
 
+        actions.innerHTML = `
+            <div class="actions">
+                <button onclick="startRegularSeason()">
+                    Begin Regular Season
+                </button>
+            </div>
+        `;
     }
 
+
+    else if (
+        eventData.status === "shop"
+    ) {
+
+        title.textContent =
+            `Round ${eventData.current_round} Shop`;
+
+        actions.innerHTML = `
+            <div class="actions">
+
+                <button
+                    onclick="closeShopAndLockBudgets()"
+                >
+                    Close Shop & Lock Army Tiers
+                </button>
+
+            </div>
+        `;
+    }
+
+
+    else if (
+        eventData.status ===
+        "army_build"
+    ) {
+
+        title.textContent =
+            `Round ${eventData.current_round} Army Build`;
+    }
 }
 
 
@@ -822,11 +846,9 @@ function renderPlayers() {
 
 
     if (
-        eventData.status !==
-        "lobby" &&
+        eventData.status !== "lobby" &&
         displayPlayers.some(
-            p =>
-                p.draft_position
+            p => p.draft_position
         )
     ) {
 
@@ -835,18 +857,16 @@ function renderPlayers() {
                 a.draft_position -
                 b.draft_position
         );
-
     }
 
 
-    if (
-        displayPlayers.length === 0
-    ) {
+    if (displayPlayers.length === 0) {
 
-        list.innerHTML =
-            `<p class="status">
+        list.innerHTML = `
+            <p class="status">
                 Waiting for players...
-             </p>`;
+            </p>
+        `;
 
         return;
     }
@@ -859,50 +879,35 @@ function renderPlayers() {
                 const position =
                     player.draft_position
                     ? `
-                        <span
-                            class="
-                                order-number
-                            "
-                        >
-                            ${
-                                player
-                                .draft_position
-                            }
+                        <span class="order-number">
+                            ${player.draft_position}
                         </span>
                     `
                     : `<span></span>`;
 
 
                 const remove =
-                    eventData.status ===
-                    "lobby"
+                    eventData.status === "lobby"
                     ? `
                         <button
                             class="danger"
-                            onclick="
-                                removePlayer(
-                                    '${player.id}'
-                                )
-                            "
+                            onclick="removePlayer('${player.id}')"
                         >
                             Remove
                         </button>
                     `
-                    : `<span></span>`;
+                    : `
+                        <span>
+                            $${player.war_chest.toLocaleString()}
+                        </span>
+                    `;
 
 
                 return `
-                    <div
-                        class="player-row"
-                    >
+                    <div class="player-row">
 
                         <strong>
-                            ${
-                                escapeHtml(
-                                    player
-                                    .display_name
-                                )
-                            }
+                            ${escapeHtml(player.display_name)}
                         </strong>
 
                         ${position}
@@ -911,11 +916,9 @@ function renderPlayers() {
 
                     </div>
                 `;
-
             }
         )
         .join("");
-
 }
 
 
@@ -926,84 +929,61 @@ function renderDraft() {
             "draft-panel"
         );
 
+    const title =
+        document.getElementById(
+            "draft-panel-title"
+        );
+
     const status =
         document.getElementById(
             "draft-status"
         );
 
 
-    if (
-        ![
+    const showFactionPanel =
+        [
             "draft",
-            "draft_complete"
+            "draft_complete",
+            "shop",
+            "army_build"
         ].includes(
             eventData.status
-        )
-    ) {
-
-        panel.classList.add(
-            "hidden"
         );
 
+
+    if (!showFactionPanel) {
+
+        panel.classList.add("hidden");
         return;
-
     }
 
 
-    panel.classList.remove(
-        "hidden"
-    );
+    panel.classList.remove("hidden");
 
 
-    if (
-        eventData.status ===
-        "draft_complete"
-    ) {
+    if (eventData.status === "draft") {
 
-        status.innerHTML = `
-            <div
-                class="current-drafter"
-            >
-                <div>
-                    Draft Complete
-                </div>
-
-                <strong>
-                    All factions locked.
-                </strong>
-            </div>
-        `;
-
-    }
-
-    else {
+        title.textContent =
+            "Snake Draft";
 
         const state =
             getCurrentDraftState();
 
-
         status.innerHTML = `
-            <div
-                class="current-drafter"
-            >
+            <div class="current-drafter">
 
                 <div>
-                    Round
-                    ${state.round}
-                    of 8
+                    Round ${state.round} of 8
                     •
-                    Pick
-                    ${state.pick}
+                    Pick ${state.pick}
                 </div>
 
                 <strong>
                     ${
                         escapeHtml(
-                            state
-                            .player
+                            state.player
                             ?.display_name
-                            ??
-                            "Loading..."
+                            ?? "Loading..."
                         )
                     }
                 </strong>
@@ -1014,12 +994,22 @@ function renderDraft() {
 
             </div>
         `;
+    }
 
+    else {
+
+        title.textContent =
+            "Factions";
+
+        status.innerHTML = `
+            <p class="status">
+                Drafted faction rosters are locked.
+            </p>
+        `;
     }
 
 
     renderRosters();
-
 }
 
 
@@ -1057,40 +1047,22 @@ function renderRosters() {
                     playerPicks.length
                     ? playerPicks.map(
                         pick => `
-                            <div
-                                class="
-                                    roster-unit
-                                "
-                            >
-                                <span
-                                    class="tier"
-                                >
-                                    ${
-                                        pick.units
-                                        .tier
-                                    }
+                            <div class="roster-unit">
+
+                                <span class="tier">
+                                    ${pick.units.tier}
                                 </span>
 
-                                ${
-                                    escapeHtml(
-                                        pick.units
-                                        .name
-                                    )
-                                }
+                                ${escapeHtml(pick.units.name)}
 
                                 —
-                                ${
-                                    pick.units
-                                    .cost
-                                    .toLocaleString()
-                                }
+                                ${pick.units.cost.toLocaleString()}
+
                             </div>
                         `
                     ).join("")
                     : `
-                        <div
-                            class="status"
-                        >
+                        <div class="status">
                             No picks yet.
                         </div>
                     `;
@@ -1100,19 +1072,11 @@ function renderRosters() {
                     <div class="roster">
 
                         <h3>
-                            ${
-                                escapeHtml(
-                                    player
-                                    .display_name
-                                )
-                            }
+                            ${escapeHtml(player.display_name)}
                         </h3>
 
                         <div class="status">
-                            ${
-                                playerPicks
-                                .length
-                            }
+                            ${playerPicks.length}
                             / 8 units
                         </div>
 
@@ -1120,80 +1084,247 @@ function renderRosters() {
 
                     </div>
                 `;
-
             }
         )
         .join("");
-
 }
 
 
-async function removePlayer(
-    playerId
-) {
+function renderShopHost() {
 
-    if (
-        eventData.status !==
-        "lobby"
-    ) {
+    const panel =
+        document.getElementById(
+            "shop-host-panel"
+        );
+
+    const grid =
+        document.getElementById(
+            "shop-host-grid"
+        );
+
+
+    if (eventData.status !== "shop") {
+
+        panel.classList.add("hidden");
         return;
     }
 
 
-    const {
-        error
-    } = await db
-        .from("players")
-        .delete()
-        .eq(
-            "id",
-            playerId
+    panel.classList.remove("hidden");
+
+
+    grid.innerHTML =
+        players.map(
+            player => `
+                <div class="shop-player">
+
+                    <strong>
+                        ${escapeHtml(player.display_name)}
+                    </strong>
+
+                    <div class="money">
+                        $${player.war_chest.toLocaleString()}
+                    </div>
+
+                    <div class="status">
+                        Skill Points:
+                        ${player.skill_points}
+                    </div>
+
+                    <div class="status">
+                        Projected Army:
+                        ${projectedArmyBudget(player).toLocaleString()}
+                    </div>
+
+                    ${
+                        player.debt > 0
+                        ? `
+                            <div class="status">
+                                House Debt:
+                                $${player.debt.toLocaleString()}
+                            </div>
+                          `
+                        : ""
+                    }
+
+                </div>
+            `
+        )
+        .join("");
+}
+
+
+function renderRound() {
+
+    const panel =
+        document.getElementById(
+            "round-panel"
         );
+
+
+    if (
+        eventData.status !==
+        "army_build"
+    ) {
+
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    document
+        .getElementById(
+            "round-heading"
+        )
+        .textContent =
+            `Round ${eventData.current_round} Matchups`;
+
+
+    const currentMatches =
+        matches.filter(
+            match =>
+                match.round_number ===
+                eventData.current_round
+        );
+
+
+    const grid =
+        document.getElementById(
+            "match-grid"
+        );
+
+
+    grid.innerHTML =
+        currentMatches.map(
+            match => {
+
+                const p1 =
+                    players.find(
+                        p => p.id ===
+                        match.player1_id
+                    );
+
+                const p2 =
+                    players.find(
+                        p => p.id ===
+                        match.player2_id
+                    );
+
+                const p1State =
+                    roundStates.find(
+                        state =>
+                            state.round_number ===
+                            eventData.current_round
+                            &&
+                            state.player_id ===
+                            match.player1_id
+                    );
+
+                const p2State =
+                    roundStates.find(
+                        state =>
+                            state.round_number ===
+                            eventData.current_round
+                            &&
+                            state.player_id ===
+                            match.player2_id
+                    );
+
+
+                return `
+                    <div class="match-card">
+
+                        <div>
+                            <strong>
+                                ${escapeHtml(p1?.display_name ?? "Player")}
+                            </strong>
+
+                            <div class="budget">
+                                ${
+                                    (
+                                        p1State
+                                        ?.army_budget
+                                        ?? 0
+                                    )
+                                    .toLocaleString()
+                                }
+                            </div>
+                        </div>
+
+                        <div class="vs">
+                            VS
+                        </div>
+
+                        <div>
+                            <strong>
+                                ${escapeHtml(p2?.display_name ?? "Player")}
+                            </strong>
+
+                            <div class="budget">
+                                ${
+                                    (
+                                        p2State
+                                        ?.army_budget
+                                        ?? 0
+                                    )
+                                    .toLocaleString()
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            }
+        )
+        .join("");
+}
+
+
+async function removePlayer(playerId) {
+
+    if (eventData.status !== "lobby") {
+        return;
+    }
+
+
+    const { error } =
+        await db
+            .from("players")
+            .delete()
+            .eq("id", playerId);
 
 
     if (error) {
-
-        setMessage(
-            error.message
-        );
-
+        setMessage(error.message);
     }
-
 }
 
 
 async function lockLobby() {
 
-    setMessage(
-        "Locking lobby..."
-    );
+    setMessage("Locking lobby...");
 
-
-    const {
-        error
-    } = await db.rpc(
-        "lock_lobby",
-        {
-            p_event_id:
-                currentEventId
-        }
-    );
+    const { error } =
+        await db.rpc(
+            "lock_lobby",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
 
 
     if (error) {
 
-        setMessage(
-            error.message
-        );
-
+        setMessage(error.message);
         return;
     }
 
 
-    setMessage(
-        "Lobby locked."
-    );
-
+    setMessage("Lobby locked.");
 }
 
 
@@ -1204,23 +1335,19 @@ async function randomizeOrder() {
     );
 
 
-    const {
-        error
-    } = await db.rpc(
-        "randomize_draft_order",
-        {
-            p_event_id:
-                currentEventId
-        }
-    );
+    const { error } =
+        await db.rpc(
+            "randomize_draft_order",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
 
 
     if (error) {
 
-        setMessage(
-            error.message
-        );
-
+        setMessage(error.message);
         return;
     }
 
@@ -1228,48 +1355,114 @@ async function randomizeOrder() {
     setMessage(
         "Draft order determined."
     );
-
 }
 
 
 async function beginDraft() {
 
-    setMessage(
-        "Starting draft..."
-    );
+    setMessage("Starting draft...");
 
 
-    const {
-        error
-    } = await db.rpc(
-        "begin_draft",
-        {
-            p_event_id:
-                currentEventId
-        }
-    );
+    const { error } =
+        await db.rpc(
+            "begin_draft",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
 
 
     if (error) {
 
+        setMessage(error.message);
+        return;
+    }
+
+
+    setMessage("Draft started.");
+}
+
+
+async function startRegularSeason() {
+
+    setMessage(
+        "Generating regular-season schedule..."
+    );
+
+
+    try {
+
+        const schedule =
+            generateSchedule();
+
+
+        const { error } =
+            await db.rpc(
+                "start_regular_season",
+                {
+                    p_event_id:
+                        currentEventId,
+
+                    p_schedule:
+                        schedule
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
         setMessage(
-            error.message
+            "Regular season started. Quartermaster is open."
         );
 
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setMessage(
+            "Error: " + error.message
+        );
+    }
+}
+
+
+async function closeShopAndLockBudgets() {
+
+    setMessage(
+        "Closing Shop and locking army tiers..."
+    );
+
+
+    const { error } =
+        await db.rpc(
+            "lock_shop_and_army_budgets",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(error.message);
         return;
     }
 
 
     setMessage(
-        "Draft started."
+        "Army tiers locked. Round matchups revealed."
     );
-
 }
 
 
-function setMessage(
-    message
-) {
+function setMessage(message) {
 
     document
         .getElementById(
@@ -1277,7 +1470,6 @@ function setMessage(
         )
         .textContent =
             message;
-
 }
 
 
@@ -1289,29 +1481,22 @@ function startRealtime() {
 
 
     if (eventChannel) {
-        db.removeChannel(
-            eventChannel
-        );
+        db.removeChannel(eventChannel);
     }
 
     if (playerChannel) {
-        db.removeChannel(
-            playerChannel
-        );
+        db.removeChannel(playerChannel);
     }
 
     if (pickChannel) {
-        db.removeChannel(
-            pickChannel
-        );
+        db.removeChannel(pickChannel);
     }
 
 
     eventChannel =
         db
         .channel(
-            "event-" +
-            currentEventId
+            "event-" + currentEventId
         )
         .on(
             "postgres_changes",
@@ -1330,8 +1515,7 @@ function startRealtime() {
     playerChannel =
         db
         .channel(
-            "players-" +
-            currentEventId
+            "players-" + currentEventId
         )
         .on(
             "postgres_changes",
@@ -1358,22 +1542,18 @@ function startRealtime() {
             {
                 event: "*",
                 schema: "public",
-                table:
-                    "draft_picks",
+                table: "draft_picks",
                 filter:
                     `event_id=eq.${currentEventId}`
             },
             loadState
         )
         .subscribe();
-
 }
 
 
 document
-    .getElementById(
-        "create-event"
-    )
+    .getElementById("create-event")
     .addEventListener(
         "click",
         createEvent
@@ -1385,13 +1565,10 @@ async function initialize() {
     try {
 
         await ensureAnonymousSession();
-
         await loadState();
 
         if (currentEventId) {
-
             startRealtime();
-
         }
 
     }
@@ -1399,13 +1576,8 @@ async function initialize() {
     catch (error) {
 
         console.error(error);
-
-        setMessage(
-            error.message
-        );
-
+        setMessage(error.message);
     }
-
 }
 
 
