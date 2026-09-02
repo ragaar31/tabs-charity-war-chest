@@ -315,6 +315,32 @@ button:disabled {
     border-top: 1px solid rgba(255,255,255,.09);
 }
 
+
+.skill-host-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.skill-host-card {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+}
+
+.skill-host-list {
+    margin-top: 9px;
+    font-size: .88rem;
+    line-height: 1.5;
+}
+
+.skill-host-recruit {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,.09);
+}
+
 .hidden { display: none !important; }
 
 a { color: white; }
@@ -382,6 +408,15 @@ a { color: white; }
 </section>
 
 
+
+<section id="skill-host-panel" class="panel hidden">
+    <h2>Skill Tree Status</h2>
+    <p class="status">
+        Players allocate Skill Points during Shop phases and once more after Round 3.
+    </p>
+    <div id="skill-host-grid" class="skill-host-grid"></div>
+</section>
+
 <section id="round-panel" class="panel hidden">
     <h2 id="round-heading">Round 1</h2>
 
@@ -440,11 +475,15 @@ let roundStates = [];
 let armySubmissions = [];
 let bettingPools = [];
 let bets = [];
+let playerSkills = [];
+let playerRecruits = [];
 
 let eventChannel = null;
 let playerChannel = null;
 let pickChannel = null;
 let armyChannel = null;
+let skillChannel = null;
+let recruitChannel = null;
 
 
 function escapeHtml(value) {
@@ -901,6 +940,54 @@ async function loadState() {
         betResult.data ?? [];
 
 
+    const skillResult =
+        await db
+            .from("player_skills")
+            .select(`
+                player_id,
+                node_code,
+                skill_nodes (
+                    display_name,
+                    branch,
+                    node_order
+                )
+            `)
+            .eq("event_id", currentEventId);
+
+    if (skillResult.error) {
+        console.error(skillResult.error);
+        return;
+    }
+
+    playerSkills =
+        skillResult.data ?? [];
+
+
+    const recruitResult =
+        await db
+            .from("player_recruits")
+            .select(`
+                player_id,
+                unit_id,
+                source_node,
+                units (
+                    name,
+                    cost,
+                    faction,
+                    tier
+                )
+            `)
+            .eq("event_id", currentEventId);
+
+    if (recruitResult.error) {
+        console.error(recruitResult.error);
+        return;
+    }
+
+    playerRecruits =
+        recruitResult.data ?? [];
+
+
     render();
 }
 
@@ -932,6 +1019,7 @@ function render() {
     renderPlayers();
     renderDraft();
     renderShopHost();
+    renderSkillHost();
     renderRound();
     renderArmyHost();
     renderBettingHost();
@@ -1429,6 +1517,107 @@ function renderShopHost() {
             `
         )
         .join("");
+}
+
+
+
+function renderSkillHost() {
+
+    const panel =
+        document.getElementById(
+            "skill-host-panel"
+        );
+
+    const grid =
+        document.getElementById(
+            "skill-host-grid"
+        );
+
+    const activePhases = [
+        "shop",
+        "army_build",
+        "betting_open",
+        "betting_locked",
+        "fight",
+        "regular_complete"
+    ];
+
+    if (!activePhases.includes(eventData.status)) {
+        panel.classList.add("hidden");
+        return;
+    }
+
+    panel.classList.remove("hidden");
+
+    grid.innerHTML =
+        players.map(
+            player => {
+
+                const skills =
+                    playerSkills
+                    .filter(
+                        row => row.player_id === player.id
+                    )
+                    .sort(
+                        (a,b) => {
+                            const branchA = a.skill_nodes?.branch ?? "";
+                            const branchB = b.skill_nodes?.branch ?? "";
+                            return branchA.localeCompare(branchB)
+                                ||
+                                (a.skill_nodes?.node_order ?? 0)
+                                -
+                                (b.skill_nodes?.node_order ?? 0);
+                        }
+                    );
+
+                const recruits =
+                    playerRecruits.filter(
+                        row => row.player_id === player.id
+                    );
+
+                return `
+                    <div class="skill-host-card">
+                        <strong>
+                            ${escapeHtml(player.display_name)}
+                        </strong>
+
+                        <div class="money">
+                            ${player.skill_points} SP unspent
+                        </div>
+
+                        <div class="skill-host-list">
+                            ${
+                                skills.length
+                                ? skills.map(
+                                    row => escapeHtml(
+                                        row.skill_nodes?.display_name
+                                        ?? row.node_code
+                                    )
+                                  ).join(" • ")
+                                : `<span class="status">No skills unlocked.</span>`
+                            }
+                        </div>
+
+                        ${
+                            recruits.length
+                            ? `
+                                <div class="skill-host-recruit">
+                                    <strong>Permanent recruits</strong>
+                                    <div class="status">
+                                        ${
+                                            recruits.map(
+                                                row => `${escapeHtml(row.units.name)} (${row.units.cost.toLocaleString()})`
+                                            ).join(" • ")
+                                        }
+                                    </div>
+                                </div>
+                              `
+                            : ""
+                        }
+                    </div>
+                `;
+            }
+        ).join("");
 }
 
 
@@ -2202,7 +2391,7 @@ function renderBettingHost() {
         content.innerHTML = `
             <p>
                 All three regular-season rounds are complete.
-                Final War setup will be the next milestone.
+                Final Skill Allocation is now open before Final War seeding.
             </p>
 
             <div class="betting-ready-grid">
@@ -2831,6 +3020,14 @@ function startRealtime() {
         db.removeChannel(armyChannel);
     }
 
+    if (skillChannel) {
+        db.removeChannel(skillChannel);
+    }
+
+    if (recruitChannel) {
+        db.removeChannel(recruitChannel);
+    }
+
 
     eventChannel =
         db
@@ -2902,6 +3099,46 @@ function startRealtime() {
                 schema: "public",
                 table:
                     "army_submissions",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    skillChannel =
+        db
+        .channel(
+            "host-skills-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "player_skills",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    recruitChannel =
+        db
+        .channel(
+            "host-recruits-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "player_recruits",
                 filter:
                     `event_id=eq.${currentEventId}`
             },
