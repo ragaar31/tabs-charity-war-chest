@@ -82,6 +82,22 @@ button:disabled {
     letter-spacing: 3px;
 }
 
+.player-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.leave-event-button {
+    background: rgba(255,255,255,.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,.18);
+}
+
+.leave-event-button:hover {
+    background: rgba(255,255,255,.16);
+}
+
 .stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -795,6 +811,15 @@ a { color: white; }
             <strong id="skill-points">0</strong>
         </div>
 
+    </div>
+
+    <div class="player-actions">
+        <button
+            class="leave-event-button"
+            onclick="leaveEvent()"
+        >
+            Leave Event
+        </button>
     </div>
 
 </section>
@@ -5722,6 +5747,90 @@ async function setBettingReady(ready) {
 
 
     await loadState();
+}
+
+
+function clearLocalEventDrafts() {
+
+    if (!currentEventId) {
+        return;
+    }
+
+    const prefix =
+        `tabs_army_draft_${currentEventId}_`;
+
+    const keysToRemove = [];
+
+    for (
+        let i = 0;
+        i < localStorage.length;
+        i++
+    ) {
+
+        const key =
+            localStorage.key(i);
+
+        if (
+            key &&
+            key.startsWith(prefix)
+        ) {
+            keysToRemove.push(key);
+        }
+    }
+
+    for (const key of keysToRemove) {
+        localStorage.removeItem(key);
+    }
+}
+
+
+function leaveEvent() {
+
+    const confirmed =
+        window.confirm(
+            "Leave this event on this device? " +
+            "You will return to the Join Event screen. " +
+            "Your player record and completed game data will remain in the event."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    clearLocalEventDrafts();
+
+
+    if (eventChannel) {
+        db.removeChannel(eventChannel);
+        eventChannel = null;
+    }
+
+    if (playerChannel) {
+        db.removeChannel(playerChannel);
+        playerChannel = null;
+    }
+
+    if (pickChannel) {
+        db.removeChannel(pickChannel);
+        pickChannel = null;
+    }
+
+
+    localStorage.removeItem(
+        "tabs_player_event_id"
+    );
+
+    localStorage.removeItem(
+        "tabs_player_id"
+    );
+
+
+    currentEventId = null;
+    currentPlayerId = null;
+
+
+    location.reload();
 }
 
 
