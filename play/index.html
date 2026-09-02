@@ -2,42 +2,20 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>
-    Player Portal | TABS War Chest Betting Special
-</title>
+<title>Player Portal | TABS War Chest Betting Special</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-
     min-height: 100vh;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Arial, Helvetica, sans-serif;
     background:
-        radial-gradient(
-            circle at top,
-            #343c50,
-            #171b26 45%,
-            #090b10 100%
-        );
-
+        radial-gradient(circle at top, #343c50, #171b26 45%, #090b10 100%);
     color: white;
 }
 
@@ -56,67 +34,35 @@ main {
 
 h1 {
     margin-bottom: 5px;
-
-    font-size:
-        clamp(
-            2rem,
-            9vw,
-            3.5rem
-        );
+    font-size: clamp(2rem, 9vw, 3.5rem);
 }
 
 .panel {
     margin-top: 20px;
     padding: 20px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .07
-        );
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .15
-        );
-
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.15);
     border-radius: 15px;
 }
 
 label {
     display: block;
-
-    margin:
-        15px
-        0
-        6px;
-
+    margin: 15px 0 6px;
     font-weight: bold;
 }
 
 input {
     width: 100%;
-
     padding: 14px;
-
     border: 0;
     border-radius: 8px;
-
     font-size: 1rem;
 }
 
 button {
     padding: 12px 16px;
-
     border: 0;
     border-radius: 8px;
-
     font-weight: bold;
     cursor: pointer;
 }
@@ -138,32 +84,16 @@ button:disabled {
 
 .stats {
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            1fr
-        );
-
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-
     margin-top: 15px;
 }
 
 .stat {
     padding: 14px;
-
     text-align: center;
-
     border-radius: 10px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .07
-        );
+    background: rgba(255,255,255,.07);
 }
 
 .stat strong {
@@ -179,64 +109,32 @@ button:disabled {
 
 .order-player {
     padding: 11px;
-
     display: flex;
     gap: 10px;
     align-items: center;
-
     border-radius: 8px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .06
-        );
+    background: rgba(255,255,255,.06);
 }
 
 .order-number {
     width: 30px;
     height: 30px;
-
     display: grid;
     place-items: center;
-
     flex: 0 0 auto;
-
     border-radius: 50%;
-
     background: white;
     color: #11151f;
-
     font-weight: bold;
 }
 
 .current {
     padding: 18px;
-
     margin-bottom: 15px;
-
     text-align: center;
-
     border-radius: 12px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .13
-        );
-
-    border:
-        2px solid
-        rgba(
-            255,
-            255,
-            255,
-            .3
-        );
+    background: rgba(255,255,255,.13);
+    border: 2px solid rgba(255,255,255,.3);
 }
 
 .current strong {
@@ -246,151 +144,137 @@ button:disabled {
 }
 
 .your-turn {
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .22
-        );
+    background: rgba(255,255,255,.22);
 }
 
 .tier-tabs {
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            5,
-            1fr
-        );
-
+    grid-template-columns: repeat(5, 1fr);
     gap: 6px;
-
     margin-top: 15px;
 }
 
-.tier-tab {
-    padding: 12px 4px;
-}
+.tier-tab { padding: 12px 4px; }
 
 .tier-tab.active {
-    outline:
-        3px solid white;
+    outline: 3px solid white;
 }
 
 .unit-grid {
     display: grid;
     gap: 8px;
-
     margin-top: 12px;
 }
 
 .unit-card {
     padding: 14px;
-
     display: grid;
-
-    grid-template-columns:
-        1fr auto;
-
+    grid-template-columns: 1fr auto;
     gap: 12px;
     align-items: center;
-
     border-radius: 10px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .07
-        );
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .1
-        );
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.1);
 }
 
-.unit-card.taken {
-    opacity: .42;
-}
+.unit-card.taken { opacity: .42; }
 
-.unit-name {
-    font-weight: bold;
-}
+.unit-name { font-weight: bold; }
 
 .unit-meta {
     margin-top: 4px;
-
     font-size: .8rem;
-
     opacity: .65;
 }
 
 .roster-unit {
     padding: 9px 0;
-
-    border-bottom:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .1
-        );
+    border-bottom: 1px solid rgba(255,255,255,.1);
 }
 
 .limit-row {
     margin-top: 12px;
-
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            1fr
-        );
-
+    grid-template-columns: repeat(4, 1fr);
     gap: 6px;
 }
 
 .limit {
     padding: 8px;
-
     text-align: center;
-
     border-radius: 7px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            .06
-        );
-
+    background: rgba(255,255,255,.06);
     font-size: .8rem;
 }
 
-.hidden {
-    display: none !important;
+.shop-grid {
+    display: grid;
+    gap: 9px;
+    margin-top: 15px;
 }
 
-.status {
-    opacity: .65;
+.shop-item {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
 }
 
-a {
-    color: white;
+.shop-item strong {
+    display: block;
 }
 
+.price {
+    margin-top: 4px;
+    opacity: .7;
+    font-size: .85rem;
+}
+
+.projected {
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 10px;
+    background: rgba(255,255,255,.1);
+    text-align: center;
+}
+
+.projected strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 1.7rem;
+}
+
+.inventory-item {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.match-card {
+    padding: 20px;
+    margin-top: 12px;
+    text-align: center;
+    border-radius: 12px;
+    background: rgba(255,255,255,.09);
+}
+
+.match-card h3 {
+    font-size: 1.7rem;
+    margin: 7px 0;
+}
+
+.budget-big {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.hidden { display: none !important; }
+.status { opacity: .68; }
+a { color: white; }
 </style>
-
 </head>
 
 
@@ -398,28 +282,18 @@ a {
 
 <main>
 
-<div class="eyebrow">
-    DreamHarrier • Extra Life
-</div>
+<div class="eyebrow">DreamHarrier • Extra Life</div>
 
 <h1>Player Portal</h1>
 
-<p class="status">
-    TABS War Chest Betting Special
-</p>
+<p class="status">TABS War Chest Betting Special</p>
 
 
-<section
-    id="join-panel"
-    class="panel"
->
+<section id="join-panel" class="panel">
 
     <h2>Join Event</h2>
 
-
-    <label for="room">
-        Room Code
-    </label>
+    <label for="room">Room Code</label>
 
     <input
         id="room"
@@ -428,10 +302,7 @@ a {
         placeholder="ABC123"
     >
 
-
-    <label for="player-name">
-        Player Name
-    </label>
+    <label for="player-name">Player Name</label>
 
     <input
         id="player-name"
@@ -440,51 +311,31 @@ a {
         placeholder="Your name"
     >
 
-
     <button id="join-event">
         Join Event
     </button>
 
-
-    <p
-        id="join-status"
-        class="status"
-    ></p>
+    <p id="join-status" class="status"></p>
 
 </section>
 
 
-<section
-    id="player-panel"
-    class="panel hidden"
->
+<section id="player-panel" class="panel hidden">
 
-    <div class="status">
-        Connected Player
-    </div>
+    <div class="status">Connected Player</div>
 
-    <h2 id="display-name">
-        Player
-    </h2>
-
+    <h2 id="display-name">Player</h2>
 
     <div class="stats">
 
         <div class="stat">
             War Chest
-
-            <strong id="war-chest">
-                $10,000
-            </strong>
+            <strong id="war-chest">$10,000</strong>
         </div>
 
-
         <div class="stat">
-            Drafted
-
-            <strong id="draft-count">
-                0 / 8
-            </strong>
+            Skill Points
+            <strong id="skill-points">0</strong>
         </div>
 
     </div>
@@ -492,20 +343,12 @@ a {
 </section>
 
 
-<section
-    id="phase-panel"
-    class="panel hidden"
->
-
+<section id="phase-panel" class="panel hidden">
     <div id="phase-content"></div>
-
 </section>
 
 
-<section
-    id="roster-panel"
-    class="panel hidden"
->
+<section id="roster-panel" class="panel hidden">
 
     <h2>Your Faction</h2>
 
@@ -516,50 +359,61 @@ a {
 </section>
 
 
-<section
-    id="draft-board-panel"
-    class="panel hidden"
->
+<section id="draft-board-panel" class="panel hidden">
 
     <h2>Draft Board</h2>
 
     <div id="current-drafter"></div>
 
-    <div
-        id="draft-message"
-        class="status"
-    ></div>
+    <div id="draft-message" class="status"></div>
+
+    <div id="tier-tabs" class="tier-tabs"></div>
+
+    <div id="unit-grid" class="unit-grid"></div>
+
+</section>
 
 
-    <div
-        id="tier-tabs"
-        class="tier-tabs"
-    ></div>
+<section id="shop-panel" class="panel hidden">
+
+    <h2>Quartermaster</h2>
+
+    <p class="status">
+        Purchases come directly from your War Chest.
+        Your army tier will lock after the Shop closes.
+    </p>
+
+    <div id="projected-army" class="projected"></div>
+
+    <div id="shop-message" class="status"></div>
+
+    <div id="shop-grid" class="shop-grid"></div>
+
+    <h3>Your Consumables</h3>
+
+    <div id="inventory"></div>
+
+</section>
 
 
-    <div
-        id="unit-grid"
-        class="unit-grid"
-    ></div>
+<section id="match-panel" class="panel hidden">
+
+    <h2 id="match-title">Round 1</h2>
+
+    <div id="my-match"></div>
 
 </section>
 
 
 <p style="margin-top:30px;">
-    <a href="../">
-        ← Return Home
-    </a>
+    <a href="../">← Return Home</a>
 </p>
 
 </main>
 
 
-<script
-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-client.js"></script>
-
 
 <script>
 
@@ -578,6 +432,9 @@ let me = null;
 let players = [];
 let picks = [];
 let units = [];
+let items = [];
+let matches = [];
+let roundStates = [];
 
 let selectedTier = "S";
 
@@ -595,18 +452,83 @@ const limits = {
 };
 
 
+const shopItems = [
+    {
+        code: "skill-point",
+        name: "Skill Point",
+        price: 1500,
+        description:
+            "Gain 1 Skill Point. Maximum one purchased per Shop phase."
+    },
+    {
+        code: "reinforcements",
+        name: "Reinforcements",
+        price: 750,
+        description:
+            "+750 army points in one regular-season fight."
+    },
+    {
+        code: "mercenary",
+        name: "Mercenary Contract",
+        price: 750,
+        description:
+            "Use one undrafted B/C/D-tier unit in one regular-season fight."
+    },
+    {
+        code: "war-bond",
+        name: "War Bond",
+        price: 500,
+        description:
+            "Activate before your fight. If you win, gain $1,000."
+    },
+    {
+        code: "rainy-day",
+        name: "Rainy Day Fund",
+        price: 750,
+        description:
+            "After a betting round where you lose at least $1,500, use this to gain $1,000."
+    }
+];
+
+
+const itemNames = {
+    "reinforcements":
+        "Reinforcements",
+
+    "mercenary":
+        "Mercenary Contract",
+
+    "war-bond":
+        "War Bond",
+
+    "rainy-day":
+        "Rainy Day Fund"
+};
+
+
 function escapeHtml(value) {
 
     const div =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     div.textContent =
         value ?? "";
 
     return div.innerHTML;
+}
 
+
+function projectedArmyBudget() {
+
+    const wealth =
+        me.war_chest - me.debt;
+
+    if (wealth < 6000) return 8000;
+    if (wealth < 8500) return 9000;
+    if (wealth < 11000) return 10000;
+    if (wealth < 14500) return 11000;
+
+    return 12000;
 }
 
 
@@ -614,8 +536,7 @@ function getCurrentDraftState() {
 
     if (
         !eventData ||
-        eventData.status !==
-        "draft" ||
+        eventData.status !== "draft" ||
         players.length === 0
     ) {
         return null;
@@ -655,7 +576,6 @@ function getCurrentDraftState() {
         position,
         player
     };
-
 }
 
 
@@ -663,24 +583,21 @@ async function joinEvent() {
 
     const code =
         document
-        .getElementById("room")
-        .value
-        .trim()
-        .toUpperCase();
+            .getElementById("room")
+            .value
+            .trim()
+            .toUpperCase();
 
 
     const name =
         document
-        .getElementById(
-            "player-name"
-        )
-        .value
-        .trim();
+            .getElementById("player-name")
+            .value
+            .trim();
 
 
     const status =
-        document
-        .getElementById(
+        document.getElementById(
             "join-status"
         );
 
@@ -703,16 +620,14 @@ async function joinEvent() {
         await ensureAnonymousSession();
 
 
-        const {
-            data,
-            error
-        } = await db.rpc(
-            "join_event",
-            {
-                p_code: code,
-                p_display_name: name
-            }
-        );
+        const { data, error } =
+            await db.rpc(
+                "join_event",
+                {
+                    p_code: code,
+                    p_display_name: name
+                }
+            );
 
 
         if (error) {
@@ -743,7 +658,6 @@ async function joinEvent() {
 
 
         await loadState();
-
         startRealtime();
 
     }
@@ -751,12 +665,9 @@ async function joinEvent() {
     catch (error) {
 
         console.error(error);
-
         status.textContent =
             error.message;
-
     }
-
 }
 
 
@@ -772,13 +683,10 @@ async function loadState() {
 
     const meResult =
         await db
-        .from("players")
-        .select("*")
-        .eq(
-            "id",
-            currentPlayerId
-        )
-        .maybeSingle();
+            .from("players")
+            .select("*")
+            .eq("id", currentPlayerId)
+            .maybeSingle();
 
 
     if (
@@ -800,16 +708,16 @@ async function loadState() {
 
     const eventResult =
         await db
-        .from("events")
-        .select("*")
-        .eq(
-            "id",
-            currentEventId
-        )
-        .maybeSingle();
+            .from("events")
+            .select("*")
+            .eq("id", currentEventId)
+            .maybeSingle();
 
 
-    if (eventResult.error) {
+    if (
+        eventResult.error ||
+        !eventResult.data
+    ) {
 
         console.error(
             eventResult.error
@@ -825,13 +733,16 @@ async function loadState() {
 
     const playerResult =
         await db
-        .from("players")
-        .select("*")
-        .eq(
-            "event_id",
-            currentEventId
-        )
-        .order("joined_at");
+            .from("players")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("joined_at");
+
+
+    if (playerResult.error) {
+        console.error(playerResult.error);
+        return;
+    }
 
 
     players =
@@ -840,25 +751,26 @@ async function loadState() {
 
     const pickResult =
         await db
-        .from("draft_picks")
-        .select(`
-            pick_number,
-            player_id,
-            unit_id,
-            units (
-                name,
-                cost,
-                faction,
-                tier
-            )
-        `)
-        .eq(
-            "event_id",
-            currentEventId
-        )
-        .order(
-            "pick_number"
-        );
+            .from("draft_picks")
+            .select(`
+                pick_number,
+                player_id,
+                unit_id,
+                units (
+                    name,
+                    cost,
+                    faction,
+                    tier
+                )
+            `)
+            .eq("event_id", currentEventId)
+            .order("pick_number");
+
+
+    if (pickResult.error) {
+        console.error(pickResult.error);
+        return;
+    }
 
 
     picks =
@@ -869,101 +781,122 @@ async function loadState() {
 
         const unitResult =
             await db
-            .from("units")
-            .select("*")
-            .order("sort_order");
+                .from("units")
+                .select("*")
+                .order("sort_order");
 
 
         if (unitResult.error) {
-
-            console.error(
-                unitResult.error
-            );
-
+            console.error(unitResult.error);
             return;
         }
 
 
         units =
             unitResult.data ?? [];
-
     }
 
 
-    render();
+    const itemResult =
+        await db
+            .from("player_items")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("player_id", currentPlayerId);
 
+
+    if (itemResult.error) {
+        console.error(itemResult.error);
+        return;
+    }
+
+
+    items =
+        itemResult.data ?? [];
+
+
+    const matchResult =
+        await db
+            .from("matches")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("match_number");
+
+
+    if (matchResult.error) {
+        console.error(matchResult.error);
+        return;
+    }
+
+
+    matches =
+        matchResult.data ?? [];
+
+
+    const stateResult =
+        await db
+            .from("round_player_state")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("player_id", currentPlayerId);
+
+
+    if (stateResult.error) {
+        console.error(stateResult.error);
+        return;
+    }
+
+
+    roundStates =
+        stateResult.data ?? [];
+
+
+    render();
 }
 
 
 function render() {
 
     document
-        .getElementById(
-            "join-panel"
-        )
-        .classList.add(
-            "hidden"
-        );
+        .getElementById("join-panel")
+        .classList.add("hidden");
 
 
     document
-        .getElementById(
-            "player-panel"
-        )
-        .classList.remove(
-            "hidden"
-        );
+        .getElementById("player-panel")
+        .classList.remove("hidden");
 
 
     document
-        .getElementById(
-            "phase-panel"
-        )
-        .classList.remove(
-            "hidden"
-        );
+        .getElementById("phase-panel")
+        .classList.remove("hidden");
 
 
     document
-        .getElementById(
-            "display-name"
-        )
+        .getElementById("display-name")
         .textContent =
             me.display_name;
 
 
     document
-        .getElementById(
-            "war-chest"
-        )
+        .getElementById("war-chest")
         .textContent =
             "$" +
-            me.war_chest
-            .toLocaleString();
-
-
-    const myPicks =
-        picks.filter(
-            p =>
-                p.player_id ===
-                currentPlayerId
-        );
+            me.war_chest.toLocaleString();
 
 
     document
-        .getElementById(
-            "draft-count"
-        )
+        .getElementById("skill-points")
         .textContent =
-            `${myPicks.length} / 8`;
+            me.skill_points;
 
 
     renderPhase();
-
     renderRoster();
-
     renderDraftBoard();
-
+    renderShop();
+    renderMatch();
 }
 
 
@@ -975,10 +908,7 @@ function renderPhase() {
         );
 
 
-    if (
-        eventData.status ===
-        "lobby"
-    ) {
+    if (eventData.status === "lobby") {
 
         container.innerHTML = `
             <h2>Lobby Open</h2>
@@ -988,13 +918,11 @@ function renderPhase() {
                 to lock the lobby.
             </p>
         `;
-
     }
 
 
     else if (
-        eventData.status ===
-        "locked"
+        eventData.status === "locked"
     ) {
 
         container.innerHTML = `
@@ -1005,7 +933,6 @@ function renderPhase() {
                 Draft order is next.
             </p>
         `;
-
     }
 
 
@@ -1031,30 +958,14 @@ function renderPhase() {
                 ${
                     ordered.map(
                         player => `
-                            <div
-                                class="
-                                    order-player
-                                "
-                            >
+                            <div class="order-player">
 
-                                <span
-                                    class="
-                                        order-number
-                                    "
-                                >
-                                    ${
-                                        player
-                                        .draft_position
-                                    }
+                                <span class="order-number">
+                                    ${player.draft_position}
                                 </span>
 
                                 <strong>
-                                    ${
-                                        escapeHtml(
-                                            player
-                                            .display_name
-                                        )
-                                    }
+                                    ${escapeHtml(player.display_name)}
                                 </strong>
 
                             </div>
@@ -1069,13 +980,11 @@ function renderPhase() {
                 the snake draft shortly.
             </p>
         `;
-
     }
 
 
     else if (
-        eventData.status ===
-        "draft"
+        eventData.status === "draft"
     ) {
 
         const state =
@@ -1094,7 +1003,6 @@ function renderPhase() {
                 ${state.pick}
             </p>
         `;
-
     }
 
 
@@ -1104,17 +1012,48 @@ function renderPhase() {
     ) {
 
         container.innerHTML = `
+            <h2>Draft Complete</h2>
+
+            <p>
+                Waiting for the host
+                to begin the regular season.
+            </p>
+        `;
+    }
+
+
+    else if (
+        eventData.status === "shop"
+    ) {
+
+        container.innerHTML = `
             <h2>
-                Draft Complete
+                Round ${eventData.current_round}
+                Shop
             </h2>
 
             <p>
-                Your faction is locked.
+                The Quartermaster is open.
             </p>
         `;
-
     }
 
+
+    else if (
+        eventData.status ===
+        "army_build"
+    ) {
+
+        container.innerHTML = `
+            <h2>
+                Round ${eventData.current_round}
+            </h2>
+
+            <p>
+                Matchups and army tiers are locked.
+            </p>
+        `;
+    }
 }
 
 
@@ -1126,26 +1065,25 @@ function renderRoster() {
         );
 
 
-    if (
-        ![
+    const showRoster =
+        [
             "draft",
-            "draft_complete"
+            "draft_complete",
+            "shop",
+            "army_build"
         ].includes(
             eventData.status
-        )
-    ) {
-
-        panel.classList.add(
-            "hidden"
         );
 
+
+    if (!showRoster) {
+
+        panel.classList.add("hidden");
         return;
     }
 
 
-    panel.classList.remove(
-        "hidden"
-    );
+    panel.classList.remove("hidden");
 
 
     const myPicks =
@@ -1165,21 +1103,13 @@ function renderRoster() {
     };
 
 
-    for (
-        const pick of myPicks
-    ) {
-
-        counts[
-            pick.units.tier
-        ]++;
-
+    for (const pick of myPicks) {
+        counts[pick.units.tier]++;
     }
 
 
     document
-        .getElementById(
-            "tier-limits"
-        )
+        .getElementById("tier-limits")
         .innerHTML = `
             <div class="limit-row">
 
@@ -1207,10 +1137,7 @@ function renderRoster() {
                 <div class="limit">
                     C/D
                     <strong>
-                        ${
-                            counts.C +
-                            counts.D
-                        }
+                        ${counts.C + counts.D}
                     </strong>
                 </div>
 
@@ -1224,9 +1151,7 @@ function renderRoster() {
         );
 
 
-    if (
-        myPicks.length === 0
-    ) {
+    if (myPicks.length === 0) {
 
         roster.innerHTML = `
             <p class="status">
@@ -1241,41 +1166,24 @@ function renderRoster() {
     roster.innerHTML =
         myPicks.map(
             pick => `
-                <div
-                    class="
-                        roster-unit
-                    "
-                >
+                <div class="roster-unit">
+
                     <strong>
-                        ${
-                            pick.units.tier
-                        }
+                        ${pick.units.tier}
                         —
-                        ${
-                            escapeHtml(
-                                pick.units
-                                .name
-                            )
-                        }
+                        ${escapeHtml(pick.units.name)}
                     </strong>
 
                     <div class="status">
-                        ${
-                            pick.units
-                            .faction
-                        }
+                        ${pick.units.faction}
                         •
-                        ${
-                            pick.units
-                            .cost
-                            .toLocaleString()
-                        }
+                        ${pick.units.cost.toLocaleString()}
                     </div>
+
                 </div>
             `
         )
         .join("");
-
 }
 
 
@@ -1287,22 +1195,14 @@ function renderDraftBoard() {
         );
 
 
-    if (
-        eventData.status !==
-        "draft"
-    ) {
+    if (eventData.status !== "draft") {
 
-        panel.classList.add(
-            "hidden"
-        );
-
+        panel.classList.add("hidden");
         return;
     }
 
 
-    panel.classList.remove(
-        "hidden"
-    );
+    panel.classList.remove("hidden");
 
 
     const state =
@@ -1343,28 +1243,21 @@ function renderDraftBoard() {
                 escapeHtml(
                     state.player
                     ?.display_name
-                    ??
-                    "Loading..."
+                    ?? "Loading..."
                 )
             }
         </strong>
 
         <div>
-            Round
-            ${state.round}
+            Round ${state.round}
             •
-            Pick
-            ${state.pick}
+            Pick ${state.pick}
         </div>
     `;
 
 
     renderTierTabs();
-
-    renderUnits(
-        isMyTurn
-    );
-
+    renderUnits(isMyTurn);
 }
 
 
@@ -1384,42 +1277,28 @@ function renderTierTabs() {
                     class="
                         tier-tab
                         ${
-                            selectedTier ===
-                            tier
+                            selectedTier === tier
                             ? "active"
                             : ""
                         }
                     "
-                    onclick="
-                        selectTier(
-                            '${tier}'
-                        )
-                    "
+                    onclick="selectTier('${tier}')"
                 >
                     ${tier}
                 </button>
             `
         )
         .join("");
-
 }
 
 
-function selectTier(
-    tier
-) {
-
-    selectedTier =
-        tier;
-
+function selectTier(tier) {
+    selectedTier = tier;
     renderDraftBoard();
-
 }
 
 
-function renderUnits(
-    isMyTurn
-) {
+function renderUnits(isMyTurn) {
 
     const grid =
         document.getElementById(
@@ -1430,15 +1309,13 @@ function renderUnits(
     const drafted =
         new Map();
 
-    for (
-        const pick of picks
-    ) {
+
+    for (const pick of picks) {
 
         drafted.set(
             pick.unit_id,
             pick.player_id
         );
-
     }
 
 
@@ -1459,20 +1336,13 @@ function renderUnits(
     };
 
 
-    for (
-        const pick of myPicks
-    ) {
-
-        counts[
-            pick.units.tier
-        ]++;
-
+    for (const pick of myPicks) {
+        counts[pick.units.tier]++;
     }
 
 
     const tierMaxed =
-        counts[selectedTier]
-        >=
+        counts[selectedTier] >=
         limits[selectedTier];
 
 
@@ -1528,31 +1398,19 @@ function renderUnits(
                     myPicks.length >= 8;
 
 
-                let label =
-                    "Draft";
+                let label = "Draft";
 
 
                 if (mine) {
-
-                    label =
-                        "Yours";
-
+                    label = "Yours";
                 }
 
                 else if (owner) {
-
-                    label =
-                        `Taken`;
-
+                    label = "Taken";
                 }
 
-                else if (
-                    tierMaxed
-                ) {
-
-                    label =
-                        "Tier Full";
-
+                else if (tierMaxed) {
+                    label = "Tier Full";
                 }
 
 
@@ -1570,45 +1428,22 @@ function renderUnits(
 
                         <div>
 
-                            <div
-                                class="
-                                    unit-name
-                                "
-                            >
-                                ${
-                                    escapeHtml(
-                                        unit.name
-                                    )
-                                }
+                            <div class="unit-name">
+                                ${escapeHtml(unit.name)}
                             </div>
 
-                            <div
-                                class="
-                                    unit-meta
-                                "
-                            >
-                                ${
-                                    unit.faction
-                                }
+                            <div class="unit-meta">
+                                ${unit.faction}
                                 •
-                                ${
-                                    unit.cost
-                                    .toLocaleString()
-                                }
+                                ${unit.cost.toLocaleString()}
                                 points
 
                                 ${
                                     owner &&
                                     !mine
                                     ? `
-                                        •
-                                        Drafted by
-                                        ${
-                                            escapeHtml(
-                                                owner
-                                                .display_name
-                                            )
-                                        }
+                                        • Drafted by
+                                        ${escapeHtml(owner.display_name)}
                                       `
                                     : ""
                                 }
@@ -1623,28 +1458,20 @@ function renderUnits(
                                 ? "disabled"
                                 : ""
                             }
-                            onclick="
-                                makePick(
-                                    '${unit.id}'
-                                )
-                            "
+                            onclick="makePick('${unit.id}')"
                         >
                             ${label}
                         </button>
 
                     </div>
                 `;
-
             }
         )
         .join("");
-
 }
 
 
-async function makePick(
-    unitId
-) {
+async function makePick(unitId) {
 
     const message =
         document.getElementById(
@@ -1656,24 +1483,22 @@ async function makePick(
         "Submitting pick...";
 
 
-    const {
-        error
-    } = await db.rpc(
-        "submit_draft_pick",
-        {
-            p_event_id:
-                currentEventId,
+    const { error } =
+        await db.rpc(
+            "submit_draft_pick",
+            {
+                p_event_id:
+                    currentEventId,
 
-            p_unit_id:
-                unitId
-        }
-    );
+                p_unit_id:
+                    unitId
+            }
+        );
 
 
     if (error) {
 
         console.error(error);
-
         message.textContent =
             error.message;
 
@@ -1683,7 +1508,347 @@ async function makePick(
 
     message.textContent =
         "Pick confirmed.";
+}
 
+
+function renderShop() {
+
+    const panel =
+        document.getElementById(
+            "shop-panel"
+        );
+
+
+    if (eventData.status !== "shop") {
+
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    const projected =
+        projectedArmyBudget();
+
+
+    document
+        .getElementById(
+            "projected-army"
+        )
+        .innerHTML = `
+            Projected Army Budget
+
+            <strong>
+                ${projected.toLocaleString()}
+            </strong>
+
+            <div class="status">
+                Net Wealth:
+                $${(me.war_chest - me.debt).toLocaleString()}
+            </div>
+        `;
+
+
+    const skillAlreadyPurchased =
+        me.last_skill_purchase_round ===
+        eventData.current_round;
+
+
+    const totalConsumables =
+        items.reduce(
+            (total, item) =>
+                total + item.quantity,
+            0
+        );
+
+
+    const shop =
+        document.getElementById(
+            "shop-grid"
+        );
+
+
+    shop.innerHTML =
+        shopItems.map(
+            item => {
+
+                const isSkill =
+                    item.code ===
+                    "skill-point";
+
+
+                const disabled =
+                    me.debt > 0
+                    ||
+                    me.war_chest <
+                        item.price
+                    ||
+                    (
+                        isSkill &&
+                        skillAlreadyPurchased
+                    )
+                    ||
+                    (
+                        !isSkill &&
+                        totalConsumables >= 2
+                    );
+
+
+                let buttonText =
+                    "Buy";
+
+
+                if (
+                    isSkill &&
+                    skillAlreadyPurchased
+                ) {
+                    buttonText = "Purchased";
+                }
+
+
+                return `
+                    <div class="shop-item">
+
+                        <div>
+
+                            <strong>
+                                ${item.name}
+                            </strong>
+
+                            <div class="price">
+                                $${item.price.toLocaleString()}
+                            </div>
+
+                            <div class="status">
+                                ${item.description}
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            ${
+                                disabled
+                                ? "disabled"
+                                : ""
+                            }
+                            onclick="buyShopItem('${item.code}')"
+                        >
+                            ${buttonText}
+                        </button>
+
+                    </div>
+                `;
+            }
+        )
+        .join("");
+
+
+    const inventory =
+        document.getElementById(
+            "inventory"
+        );
+
+
+    if (items.length === 0) {
+
+        inventory.innerHTML = `
+            <p class="status">
+                No consumables purchased.
+            </p>
+        `;
+    }
+
+    else {
+
+        inventory.innerHTML =
+            items
+            .filter(
+                item =>
+                    item.quantity > 0
+            )
+            .map(
+                item => `
+                    <div class="inventory-item">
+
+                        <strong>
+                            ${itemNames[item.item_code]}
+                        </strong>
+
+                        × ${item.quantity}
+
+                    </div>
+                `
+            )
+            .join("");
+    }
+}
+
+
+async function buyShopItem(itemCode) {
+
+    const message =
+        document.getElementById(
+            "shop-message"
+        );
+
+
+    message.textContent =
+        "Processing purchase...";
+
+
+    const { error } =
+        await db.rpc(
+            "buy_shop_item",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_item_code:
+                    itemCode
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+        message.textContent =
+            error.message;
+
+        return;
+    }
+
+
+    message.textContent =
+        "Purchase complete.";
+
+    await loadState();
+}
+
+
+function renderMatch() {
+
+    const panel =
+        document.getElementById(
+            "match-panel"
+        );
+
+
+    if (
+        eventData.status !==
+        "army_build"
+    ) {
+
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    document
+        .getElementById(
+            "match-title"
+        )
+        .textContent =
+            `Round ${eventData.current_round}`;
+
+
+    const myMatch =
+        matches.find(
+            match =>
+                match.round_number ===
+                eventData.current_round
+                &&
+                (
+                    match.player1_id ===
+                    currentPlayerId
+                    ||
+                    match.player2_id ===
+                    currentPlayerId
+                )
+        );
+
+
+    const myState =
+        roundStates.find(
+            state =>
+                state.round_number ===
+                eventData.current_round
+        );
+
+
+    if (!myMatch) {
+
+        document
+            .getElementById(
+                "my-match"
+            )
+            .innerHTML = `
+                <p>
+                    No match found for this round.
+                </p>
+            `;
+
+        return;
+    }
+
+
+    const opponentId =
+        myMatch.player1_id ===
+        currentPlayerId
+        ? myMatch.player2_id
+        : myMatch.player1_id;
+
+
+    const opponent =
+        players.find(
+            player =>
+                player.id ===
+                opponentId
+        );
+
+
+    document
+        .getElementById(
+            "my-match"
+        )
+        .innerHTML = `
+            <div class="match-card">
+
+                <div class="status">
+                    Your Opponent
+                </div>
+
+                <h3>
+                    ${escapeHtml(opponent?.display_name ?? "Opponent")}
+                </h3>
+
+                <div class="status">
+                    Your Locked Army Budget
+                </div>
+
+                <div class="budget-big">
+                    ${
+                        (
+                            myState
+                            ?.army_budget
+                            ?? 0
+                        )
+                        .toLocaleString()
+                    }
+                </div>
+
+                <p>
+                    Army submission is coming next.
+                </p>
+
+            </div>
+        `;
 }
 
 
@@ -1695,21 +1860,15 @@ function startRealtime() {
 
 
     if (eventChannel) {
-        db.removeChannel(
-            eventChannel
-        );
+        db.removeChannel(eventChannel);
     }
 
     if (playerChannel) {
-        db.removeChannel(
-            playerChannel
-        );
+        db.removeChannel(playerChannel);
     }
 
     if (pickChannel) {
-        db.removeChannel(
-            pickChannel
-        );
+        db.removeChannel(pickChannel);
     }
 
 
@@ -1764,22 +1923,18 @@ function startRealtime() {
             {
                 event: "*",
                 schema: "public",
-                table:
-                    "draft_picks",
+                table: "draft_picks",
                 filter:
                     `event_id=eq.${currentEventId}`
             },
             loadState
         )
         .subscribe();
-
 }
 
 
 document
-    .getElementById(
-        "join-event"
-    )
+    .getElementById("join-event")
     .addEventListener(
         "click",
         joinEvent
@@ -1799,11 +1954,8 @@ async function initialize() {
         ) {
 
             await loadState();
-
             startRealtime();
-
         }
-
     }
 
     catch (error) {
@@ -1816,9 +1968,7 @@ async function initialize() {
             )
             .textContent =
                 error.message;
-
     }
-
 }
 
 
