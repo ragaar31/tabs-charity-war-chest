@@ -492,23 +492,20 @@ select {
     margin-bottom: 18px;
 }
 
-.skill-center {
-    width: 150px;
-    min-height: 150px;
-    margin: 18px auto 24px;
-    padding: 20px;
-    display: grid;
-    place-items: center;
-    text-align: center;
-    border-radius: 50%;
-    background: rgba(255,255,255,.14);
-    border: 2px solid rgba(255,255,255,.35);
+.skill-points-summary {
+    margin: 18px 0 24px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.18);
 }
 
-.skill-center strong {
-    display: block;
-    font-size: 2.2rem;
-    margin-top: 4px;
+.skill-points-summary strong {
+    font-size: 1.8rem;
 }
 
 .skill-branches {
@@ -2562,7 +2559,7 @@ function renderSkillTree() {
 
                             let stateText = "Locked";
                             if (isOwned) stateText = "Unlocked";
-                            else if (!prereqMet) stateText = "Previous node required";
+                            else if (!prereqMet) stateText = "Previous skill required";
                             else if (!enoughPoints) stateText = "Need more SP";
                             else stateText = "Available";
 
@@ -2622,7 +2619,7 @@ function renderSkillTree() {
             </h2>
 
             <p class="status">
-                Unlock outward from the center. Tier I costs 1 SP, Tier II costs 1 SP, capstones cost 2 SP, and each mastery cashout costs 1 SP.
+                Progress through any branch from top to bottom. The first skill costs 1 SP, the second costs 1 SP, each capstone costs 2 SP, and each mastery cashout costs 1 SP.
             </p>
 
             ${
@@ -2632,12 +2629,9 @@ function renderSkillTree() {
             }
         </div>
 
-        <div class="skill-center">
-            <div>
-                WAR CHEST
-                <strong>${me.skill_points}</strong>
-                Skill Points
-            </div>
+        <div class="skill-points-summary">
+            <span>Skill Points Available</span>
+            <strong>${me.skill_points} SP</strong>
         </div>
 
         <div id="skill-message" class="status"></div>
