@@ -643,6 +643,91 @@ select {
     opacity: .7;
 }
 
+
+.advanced-betting {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.13);
+}
+
+.advanced-betting h3 {
+    margin: 0 0 6px;
+}
+
+.advanced-betting h4 {
+    margin: 14px 0 7px;
+}
+
+.skill-ready {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    font-size: .68rem;
+    font-weight: bold;
+}
+
+.advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.advanced-card {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+}
+
+.advanced-card button,
+.advanced-card select {
+    margin-top: 7px;
+}
+
+.intel-armies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modifier-select {
+    min-width: 155px;
+}
+
+.advanced-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.advanced-form-row select {
+    flex: 1 1 130px;
+}
+
+.parlay-match {
+    padding: 10px;
+    margin-top: 7px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.06);
+}
+
+.parlay-leg-status {
+    margin-top: 5px;
+    font-size: .85rem;
+}
+
+.slip-line {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+}
+
 .hidden { display: none !important; }
 .status { opacity: .68; }
 a { color: white; }
@@ -837,6 +922,12 @@ let skillNodes = [];
 let playerSkills = [];
 let allRecruits = [];
 let myRecruits = [];
+let skillIntel = [];
+let skillUses = [];
+let myHedgeBets = [];
+let myPropBets = [];
+let myParlays = [];
+let pendingParlaySides = {};
 
 let armyDraft = {
     use_reinforcements: false,
@@ -852,6 +943,7 @@ let pickChannel = null;
 let armyChannel = null;
 let skillChannel = null;
 let recruitChannel = null;
+let advancedBetChannel = null;
 
 
 const limits = {
@@ -1358,6 +1450,97 @@ async function loadState() {
 
     myBets =
         betResult.data ?? [];
+
+
+    const intelResult =
+        await db
+            .from("skill_intel")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("round_number", eventData.current_round || 1)
+            .eq("viewer_player_id", currentPlayerId);
+
+    if (intelResult.error) {
+        console.error(intelResult.error);
+        return;
+    }
+
+    skillIntel = intelResult.data ?? [];
+
+
+    const skillUseResult =
+        await db
+            .from("player_skill_uses")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("round_number", eventData.current_round || 1)
+            .eq("player_id", currentPlayerId);
+
+    if (skillUseResult.error) {
+        console.error(skillUseResult.error);
+        return;
+    }
+
+    skillUses = skillUseResult.data ?? [];
+
+
+    const hedgeResult =
+        await db
+            .from("hedge_bets")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("round_number", eventData.current_round || 1)
+            .eq("bettor_player_id", currentPlayerId);
+
+    if (hedgeResult.error) {
+        console.error(hedgeResult.error);
+        return;
+    }
+
+    myHedgeBets = hedgeResult.data ?? [];
+
+
+    const propResult =
+        await db
+            .from("prop_bets")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .eq("round_number", eventData.current_round || 1)
+            .eq("bettor_player_id", currentPlayerId);
+
+    if (propResult.error) {
+        console.error(propResult.error);
+        return;
+    }
+
+    myPropBets = propResult.data ?? [];
+
+
+    const parlayResult =
+        await db
+            .from("parlays")
+            .select(`
+                *,
+                parlay_legs (
+                    id,
+                    leg_number,
+                    match_id,
+                    backed_player_id,
+                    stake_amount,
+                    return_amount,
+                    status
+                )
+            `)
+            .eq("event_id", currentEventId)
+            .eq("round_number", eventData.current_round || 1)
+            .eq("bettor_player_id", currentPlayerId);
+
+    if (parlayResult.error) {
+        console.error(parlayResult.error);
+        return;
+    }
+
+    myParlays = parlayResult.data ?? [];
 
 
     if (skillNodes.length === 0) {
@@ -2626,12 +2809,6 @@ function renderSkillTree() {
                                     </p>
 
                                     <span class="skill-status-badge">${stateText}</span>
-                                    ${
-                                        !node.effect_live
-                                        ? `<span class="skill-status-badge">Advanced betting UI next</span>`
-                                        : ""
-                                    }
-
                                     ${recruitControl}
 
                                     ${
@@ -4200,9 +4377,87 @@ function myBetForMatch(matchId) {
 
 
 function myRoundBetTotal() {
-    return myBets.reduce(
+    const standard = myBets.reduce(
         (sum, bet) => sum + bet.amount,
         0
+    );
+
+    const hedges = myHedgeBets.reduce(
+        (sum, bet) =>
+            sum + bet.player1_amount + bet.player2_amount,
+        0
+    );
+
+    const props = myPropBets.reduce(
+        (sum, bet) => sum + bet.amount,
+        0
+    );
+
+    const parlays = myParlays.reduce(
+        (sum, parlay) => sum + parlay.starting_amount,
+        0
+    );
+
+    return standard + hedges + props + parlays;
+}
+
+
+const propCatalog = {
+    cheaper_army_wins: {
+        name: "Cheaper Army Wins",
+        odds: "2× return",
+        description: "The winning submitted army spent fewer points than the losing army. Equal totals refund the stake."
+    },
+    winner_used_reinforcements: {
+        name: "Winner Used Reinforcements",
+        odds: "3× return",
+        description: "The winner activated Reinforcements for this fight."
+    },
+    winner_used_mercenary: {
+        name: "Winner Used a Mercenary",
+        odds: "3× return",
+        description: "The winner fielded a Mercenary Contract unit."
+    },
+    winner_used_all_zones: {
+        name: "Winner Used All Three Zones",
+        odds: "2× return",
+        description: "The winning army fielded at least one unit in Frontline, Mid-range, and Backline."
+    }
+};
+
+
+function modifierLabel(code) {
+    const labels = {
+        all_in: "ALL IN",
+        insurance: "INSURANCE",
+        no_sweat: "NO-SWEAT",
+        closing_line: "CLOSING LINE"
+    };
+
+    return labels[code] ?? "";
+}
+
+
+function currentHedge() {
+    return myHedgeBets[0] ?? null;
+}
+
+
+function currentProp() {
+    return myPropBets[0] ?? null;
+}
+
+
+function currentParlay() {
+    return myParlays[0] ?? null;
+}
+
+
+function eligibleOtherMatches() {
+    return bettingRoundMatches().filter(
+        match =>
+            match.player1_id !== currentPlayerId
+            && match.player2_id !== currentPlayerId
     );
 }
 
@@ -4280,23 +4535,541 @@ function renderPublicArmy(submission) {
 }
 
 
+function renderAnalystOpen(ready) {
+    if (!hasSkill("scout_report")) {
+        return "";
+    }
+
+    const intel = skillIntel[0] ?? null;
+
+    if (intel) {
+        const match = matches.find(row => row.id === intel.match_id);
+        const revealedIds =
+            intel.mode === "full_recon"
+            ? [match?.player1_id, match?.player2_id]
+            : [intel.target_player_id];
+
+        return `
+            <div class="advanced-betting">
+                <h3>🔍 Analyst <span class="skill-ready">USED</span></h3>
+                <p class="status">
+                    ${intel.mode === "full_recon" ? "Full Recon" : "Scout Report"} intel is private to you.
+                </p>
+
+                <div class="intel-armies">
+                    ${
+                        revealedIds
+                        .filter(Boolean)
+                        .map(playerId => {
+                            const submission = visibleArmySubmissions.find(
+                                row => row.player_id === playerId
+                            );
+
+                            return `
+                                <div class="advanced-card">
+                                    <strong>${escapeHtml(bettingPlayerName(playerId))}</strong>
+                                    ${renderPublicArmy(submission)}
+                                </div>
+                            `;
+                        })
+                        .join("")
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+    const cards = bettingRoundMatches().map(match => {
+        const scoutButtons = [match.player1_id, match.player2_id]
+            .filter(playerId => playerId !== currentPlayerId)
+            .map(playerId => `
+                <button
+                    class="secondary"
+                    ${ready ? "disabled" : ""}
+                    onclick="useRecon('${match.id}', 'scout', '${playerId}')"
+                >
+                    Scout ${escapeHtml(bettingPlayerName(playerId))}
+                </button>
+            `)
+            .join("");
+
+        const fullButton = hasSkill("full_recon")
+            ? `
+                <button
+                    ${ready ? "disabled" : ""}
+                    onclick="useRecon('${match.id}', 'full_recon', null)"
+                >
+                    Full Recon: Both Armies
+                </button>
+              `
+            : "";
+
+        return `
+            <div class="advanced-card">
+                <strong>
+                    Fight ${match.match_number}: ${escapeHtml(bettingPlayerName(match.player1_id))}
+                    vs ${escapeHtml(bettingPlayerName(match.player2_id))}
+                </strong>
+                <div class="advanced-form-row">
+                    ${scoutButtons}
+                    ${fullButton}
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    return `
+        <div class="advanced-betting">
+            <h3>🔍 Analyst <span class="skill-ready">1 USE THIS ROUND</span></h3>
+            <p class="status">
+                Scout one fighter's exact army before betting closes. With Full Recon, you may spend the same once-per-round use to inspect both armies in one matchup instead.
+            </p>
+            <div class="advanced-grid">${cards}</div>
+        </div>
+    `;
+}
+
+
+function renderBrokerOpen(ready) {
+    if (!hasSkill("insurance") && !hasSkill("hedge_fund") && !hasSkill("no_sweat")) {
+        return "";
+    }
+
+    const hedge = currentHedge();
+    const limits = currentBettingLimits();
+    const insuranceUsed = myBets.some(bet => bet.modifier_code === "insurance");
+    const noSweatUsed = myBets.some(bet => bet.modifier_code === "no_sweat");
+
+    let hedgeHtml = "";
+
+    if (hasSkill("hedge_fund")) {
+        if (hedge) {
+            const match = matches.find(row => row.id === hedge.match_id);
+            hedgeHtml = `
+                <div class="advanced-card">
+                    <strong>Hedge Fund — Active</strong>
+                    <div class="status" style="margin-top:5px;">
+                        Fight ${match?.match_number}: $${hedge.player1_amount.toLocaleString()} on
+                        ${escapeHtml(bettingPlayerName(match?.player1_id))} +
+                        $${hedge.player2_amount.toLocaleString()} on
+                        ${escapeHtml(bettingPlayerName(match?.player2_id))}
+                    </div>
+                    <button
+                        class="secondary"
+                        ${ready ? "disabled" : ""}
+                        onclick="cancelHedgeBet()"
+                    >
+                        Cancel Hedge
+                    </button>
+                </div>
+            `;
+        }
+        else {
+            const amountOptions = [];
+            for (let amount = 250; amount <= limits.perFight; amount += 250) {
+                amountOptions.push(amount);
+            }
+
+            hedgeHtml = eligibleOtherMatches().map(match => `
+                <div class="advanced-card">
+                    <strong>Hedge Fight ${match.match_number}</strong>
+                    <div class="status">
+                        Combined amount must stay within your $${limits.perFight.toLocaleString()} per-fight limit.
+                    </div>
+
+                    <div class="advanced-form-row">
+                        <label>
+                            ${escapeHtml(bettingPlayerName(match.player1_id))}
+                            <select id="hedge-p1-${match.id}" ${ready ? "disabled" : ""}>
+                                ${amountOptions.map(value => `
+                                    <option value="${value}" ${value === 500 ? "selected" : ""}>$${value.toLocaleString()}</option>
+                                `).join("")}
+                            </select>
+                        </label>
+
+                        <label>
+                            ${escapeHtml(bettingPlayerName(match.player2_id))}
+                            <select id="hedge-p2-${match.id}" ${ready ? "disabled" : ""}>
+                                ${amountOptions.map(value => `
+                                    <option value="${value}" ${value === 500 ? "selected" : ""}>$${value.toLocaleString()}</option>
+                                `).join("")}
+                            </select>
+                        </label>
+
+                        <button
+                            ${ready ? "disabled" : ""}
+                            onclick="placeHedgeBet('${match.id}')"
+                        >
+                            Place Hedge
+                        </button>
+                    </div>
+                </div>
+            `).join("");
+        }
+    }
+
+    return `
+        <div class="advanced-betting">
+            <h3>🛡 Broker</h3>
+            <div class="status">
+                Insurance: ${insuranceUsed ? "USED" : hasSkill("insurance") ? "available" : "locked"}
+                • No-Sweat: ${noSweatUsed ? "USED" : hasSkill("no_sweat") ? "available" : "locked"}
+            </div>
+            <p class="status">
+                Insurance and No-Sweat are selected directly on a normal winner wager. Each may be used once per round and cannot share a wager with another activated modifier.
+            </p>
+            ${hedgeHtml}
+        </div>
+    `;
+}
+
+
+function renderSpeculatorOpen(ready) {
+    if (!hasSkill("prop_bettor")) {
+        return "";
+    }
+
+    const prop = currentProp();
+    const parlay = currentParlay();
+    const others = eligibleOtherMatches();
+    const limits = currentBettingLimits();
+
+    let propHtml = "";
+
+    if (prop) {
+        const match = matches.find(row => row.id === prop.match_id);
+        const meta = propCatalog[prop.prop_code];
+        propHtml = `
+            <div class="advanced-card">
+                <strong>Prop Bet — Active</strong>
+                <div class="status">
+                    Fight ${match?.match_number} • ${meta?.name ?? prop.prop_code}
+                    • $${prop.amount.toLocaleString()} • ${meta?.odds ?? ""}
+                </div>
+                <button
+                    class="secondary"
+                    ${ready ? "disabled" : ""}
+                    onclick="cancelPropBet()"
+                >
+                    Cancel Prop
+                </button>
+            </div>
+        `;
+    }
+    else if (others.length) {
+        propHtml = `
+            <div class="advanced-card">
+                <strong>Prop Bettor</strong>
+                <div class="advanced-form-row">
+                    <select id="prop-match" ${ready ? "disabled" : ""}>
+                        ${others.map(match => `
+                            <option value="${match.id}">
+                                Fight ${match.match_number}: ${escapeHtml(bettingPlayerName(match.player1_id))} vs ${escapeHtml(bettingPlayerName(match.player2_id))}
+                            </option>
+                        `).join("")}
+                    </select>
+
+                    <select id="prop-code" ${ready ? "disabled" : ""}>
+                        ${Object.entries(propCatalog).map(([code, meta]) => `
+                            <option value="${code}">${meta.name} — ${meta.odds}</option>
+                        `).join("")}
+                    </select>
+
+                    <select id="prop-amount" ${ready ? "disabled" : ""}>
+                        <option value="250">$250</option>
+                        <option value="500">$500</option>
+                    </select>
+
+                    <button ${ready ? "disabled" : ""} onclick="placePropBet()">
+                        Place Prop
+                    </button>
+                </div>
+                <p class="status">
+                    One prop per round. Props count toward your round betting allowance and resolve automatically.
+                </p>
+            </div>
+        `;
+    }
+
+    let parlayHtml = "";
+
+    if (hasSkill("parlay_license")) {
+        if (parlay) {
+            const legs = [...(parlay.parlay_legs ?? [])]
+                .sort((a,b) => a.leg_number - b.leg_number);
+
+            parlayHtml = `
+                <div class="advanced-card">
+                    <strong>${parlay.leg_count === 3 ? "Moonshot" : "Parlay"} — Active</strong>
+                    ${legs.map(leg => {
+                        const match = matches.find(row => row.id === leg.match_id);
+                        return `
+                            <div class="slip-line">
+                                Leg ${leg.leg_number} • Fight ${match?.match_number} •
+                                ${escapeHtml(bettingPlayerName(leg.backed_player_id))}
+                            </div>
+                        `;
+                    }).join("")}
+                    <div class="status" style="margin-top:6px;">
+                        Opening stake: $${parlay.starting_amount.toLocaleString()}
+                    </div>
+                    <button
+                        class="secondary"
+                        ${ready ? "disabled" : ""}
+                        onclick="cancelParlay()"
+                    >
+                        Cancel Parlay
+                    </button>
+                </div>
+            `;
+        }
+        else if (others.length >= 2) {
+            const maxAmount = Math.min(
+                limits.perFight,
+                Math.max(0, limits.perRound - myRoundBetTotal())
+            );
+
+            const wagerValues = [];
+            for (let value = 250; value <= maxAmount; value += 250) {
+                wagerValues.push(value);
+            }
+
+            parlayHtml = `
+                <div class="advanced-card">
+                    <strong>${hasSkill("moonshot") ? "Parlay / Moonshot" : "Parlay License"}</strong>
+                    <p class="status">
+                        Pick winners in future fight order. Your opening stake enters Leg 1's House-seeded pool; every winning return automatically rolls into the next leg.
+                    </p>
+
+                    ${others.map(match => {
+                        const selected = pendingParlaySides[match.id] ?? null;
+                        return `
+                            <div class="parlay-match">
+                                <strong>Fight ${match.match_number}</strong>
+                                <div class="bet-choice-grid">
+                                    <button
+                                        class="bet-choice ${selected === match.player1_id ? "selected" : ""}"
+                                        ${ready ? "disabled" : ""}
+                                        onclick="chooseParlaySide('${match.id}', '${match.player1_id}')"
+                                    >
+                                        ${escapeHtml(bettingPlayerName(match.player1_id))}
+                                    </button>
+                                    <button
+                                        class="bet-choice ${selected === match.player2_id ? "selected" : ""}"
+                                        ${ready ? "disabled" : ""}
+                                        onclick="chooseParlaySide('${match.id}', '${match.player2_id}')"
+                                    >
+                                        ${escapeHtml(bettingPlayerName(match.player2_id))}
+                                    </button>
+                                </div>
+                                ${selected ? `<button class="secondary" ${ready ? "disabled" : ""} onclick="clearParlayLeg('${match.id}')">Clear Leg</button>` : ""}
+                            </div>
+                        `;
+                    }).join("")}
+
+                    <div class="advanced-form-row">
+                        <select id="parlay-amount" ${ready || wagerValues.length === 0 ? "disabled" : ""}>
+                            ${wagerValues.map(value => `<option value="${value}">$${value.toLocaleString()}</option>`).join("")}
+                        </select>
+
+                        <button ${ready || wagerValues.length === 0 ? "disabled" : ""} onclick="placeParlay(2)">
+                            Place 2-Leg Parlay
+                        </button>
+
+                        ${hasSkill("moonshot") ? `
+                            <button ${ready || wagerValues.length === 0 || others.length < 3 ? "disabled" : ""} onclick="placeParlay(3)">
+                                Place 3-Leg Moonshot
+                            </button>
+                        ` : ""}
+                    </div>
+                </div>
+            `;
+        }
+        else {
+            parlayHtml = `
+                <div class="advanced-card">
+                    <strong>Parlay License</strong>
+                    <p class="status">
+                        You need at least two fights this round that do not involve you. With this attendance/matchup structure, a parlay is unavailable this round.
+                    </p>
+                </div>
+            `;
+        }
+    }
+
+    return `
+        <div class="advanced-betting">
+            <h3>🎲 Speculator</h3>
+            <div class="advanced-grid">
+                ${propHtml}
+                ${parlayHtml}
+            </div>
+        </div>
+    `;
+}
+
+
+function renderAdvancedLocked() {
+    const hedge = currentHedge();
+    const prop = currentProp();
+    const parlay = currentParlay();
+    const intel = skillIntel[0] ?? null;
+
+    const closingUsed = skillUses.some(
+        use => use.node_code === "closing_line"
+    );
+
+    const closingEligible = myBets.filter(bet => {
+        const match = matches.find(row => row.id === bet.match_id);
+        return bet.status === "open"
+            && bet.modifier_code === null
+            && bet.amount <= 1000
+            && match?.status === "scheduled";
+    });
+
+    const closingHtml = hasSkill("closing_line") && eventData.status === "betting_locked"
+        ? `
+            <div class="advanced-betting">
+                <h3>🔍 Closing Line ${closingUsed ? `<span class="skill-ready">USED</span>` : `<span class="skill-ready">AVAILABLE</span>`}</h3>
+                ${
+                    closingUsed
+                    ? `<p class="status">You already moved one wager after seeing the pools this round.</p>`
+                    : closingEligible.length
+                        ? `
+                            <p class="status">
+                                Once this round, move one unmodified standard winner bet of $1,000 or less to the opposite fighter. It must happen before that fight's army reveal.
+                            </p>
+                            ${closingEligible.map(bet => {
+                                const match = matches.find(row => row.id === bet.match_id);
+                                const other = bet.backed_player_id === match?.player1_id
+                                    ? match?.player2_id
+                                    : match?.player1_id;
+                                return `
+                                    <div class="advanced-card">
+                                        Fight ${match?.match_number}: Move
+                                        <strong>$${bet.amount.toLocaleString()}</strong>
+                                        from ${escapeHtml(bettingPlayerName(bet.backed_player_id))}
+                                        to ${escapeHtml(bettingPlayerName(other))}
+                                        <button onclick="useClosingLine('${bet.id}')">
+                                            Move Wager
+                                        </button>
+                                    </div>
+                                `;
+                            }).join("")}
+                          `
+                        : `<p class="status">No eligible Closing Line wager is currently available.</p>`
+                }
+            </div>
+          `
+        : "";
+
+    const intelHtml = intel
+        ? (() => {
+            const match = matches.find(row => row.id === intel.match_id);
+            const ids = intel.mode === "full_recon"
+                ? [match?.player1_id, match?.player2_id]
+                : [intel.target_player_id];
+            return `
+                <div class="advanced-betting">
+                    <h3>🔍 Your Analyst Intel</h3>
+                    <div class="intel-armies">
+                        ${ids.filter(Boolean).map(playerId => {
+                            const submission = visibleArmySubmissions.find(row => row.player_id === playerId);
+                            return `
+                                <div class="advanced-card">
+                                    <strong>${escapeHtml(bettingPlayerName(playerId))}</strong>
+                                    ${renderPublicArmy(submission)}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+          })()
+        : "";
+
+    const slipParts = [];
+
+    if (hedge) {
+        const match = matches.find(row => row.id === hedge.match_id);
+        slipParts.push(`
+            <div class="slip-line">
+                <strong>Hedge Fund</strong> • Fight ${match?.match_number} •
+                $${hedge.player1_amount.toLocaleString()} ${escapeHtml(bettingPlayerName(match?.player1_id))} /
+                $${hedge.player2_amount.toLocaleString()} ${escapeHtml(bettingPlayerName(match?.player2_id))}
+                ${hedge.status === "settled" ? `• Return $${hedge.payout.toLocaleString()}` : ""}
+            </div>
+        `);
+    }
+
+    if (prop) {
+        const match = matches.find(row => row.id === prop.match_id);
+        const meta = propCatalog[prop.prop_code];
+        slipParts.push(`
+            <div class="slip-line">
+                <strong>Prop</strong> • Fight ${match?.match_number} • ${meta?.name ?? prop.prop_code}
+                • $${prop.amount.toLocaleString()}
+                ${prop.status === "settled" ? `• Return $${prop.payout.toLocaleString()}` : ""}
+            </div>
+        `);
+    }
+
+    if (parlay) {
+        const legs = [...(parlay.parlay_legs ?? [])].sort((a,b) => a.leg_number - b.leg_number);
+        slipParts.push(`
+            <div class="slip-line">
+                <strong>${parlay.leg_count === 3 ? "Moonshot" : "Parlay"}</strong>
+                • Opening $${parlay.starting_amount.toLocaleString()}
+                • ${parlay.status.toUpperCase()}
+                ${parlay.status === "won" ? `• Return $${parlay.payout.toLocaleString()}` : ""}
+                ${legs.map(leg => {
+                    const match = matches.find(row => row.id === leg.match_id);
+                    const money = leg.stake_amount > 0 ? ` • Stake $${leg.stake_amount.toLocaleString()}` : "";
+                    const returned = leg.return_amount > 0 ? ` → $${leg.return_amount.toLocaleString()}` : "";
+                    return `<div class="parlay-leg-status">Leg ${leg.leg_number}: Fight ${match?.match_number} — ${escapeHtml(bettingPlayerName(leg.backed_player_id))} • ${leg.status.toUpperCase()}${money}${returned}</div>`;
+                }).join("")}
+            </div>
+        `);
+    }
+
+    const slipHtml = slipParts.length
+        ? `
+            <div class="advanced-betting">
+                <h3>Advanced Betting Slip</h3>
+                ${slipParts.join("")}
+            </div>
+          `
+        : "";
+
+    return closingHtml + intelHtml + slipHtml;
+}
+
+
+function standardModifierOptions(existing) {
+    const insuranceTaken = myBets.some(
+        bet => bet.modifier_code === "insurance" && bet.id !== existing?.id
+    );
+
+    const noSweatTaken = myBets.some(
+        bet => bet.modifier_code === "no_sweat" && bet.id !== existing?.id
+    );
+
+    const selected = ["insurance", "no_sweat"].includes(existing?.modifier_code)
+        ? existing.modifier_code
+        : "";
+
+    return `
+        <option value="" ${selected === "" ? "selected" : ""}>No active modifier</option>
+        ${hasSkill("insurance") && !insuranceTaken ? `<option value="insurance" ${selected === "insurance" ? "selected" : ""}>Insurance — 50% loss recovery, max $500</option>` : ""}
+        ${hasSkill("no_sweat") && !noSweatTaken ? `<option value="no_sweat" ${selected === "no_sweat" ? "selected" : ""}>No-Sweat — loss recovery up to $1,000</option>` : ""}
+    `;
+}
+
+
 function renderBetting() {
-
-    const panel =
-        document.getElementById(
-            "betting-panel"
-        );
-
-    const title =
-        document.getElementById(
-            "betting-title"
-        );
-
-    const content =
-        document.getElementById(
-            "betting-content"
-        );
-
+    const panel = document.getElementById("betting-panel");
+    const title = document.getElementById("betting-title");
+    const content = document.getElementById("betting-content");
 
     const phases = [
         "betting_open",
@@ -4305,471 +5078,305 @@ function renderBetting() {
         "regular_complete"
     ];
 
-
     if (!phases.includes(eventData.status)) {
         panel.classList.add("hidden");
         return;
     }
 
-
     panel.classList.remove("hidden");
 
-
     if (eventData.status === "regular_complete") {
+        title.textContent = "Regular Season Complete";
 
-        title.textContent =
-            "Regular Season Complete";
-
-        const standings =
-            [...players]
-            .sort(
-                (a,b) =>
-                    b.war_chest - a.war_chest
-                    ||
-                    b.wins - a.wins
-            );
-
+        const standings = [...players].sort(
+            (a,b) => b.war_chest - a.war_chest || b.wins - a.wins
+        );
 
         content.innerHTML = `
-            <p>
-                Final War setup is next.
-            </p>
-
-            ${
-                standings.map(
-                    (player, index) => `
-                        <div class="bet-summary">
-                            <strong>
-                                #${index + 1}
-                                ${escapeHtml(player.display_name)}
-                            </strong>
-
-                            <div class="status">
-                                $${player.war_chest.toLocaleString()}
-                                •
-                                ${player.wins} wins
-                            </div>
-                        </div>
-                    `
-                ).join("")
-            }
+            <p>Final War setup is next.</p>
+            ${standings.map((player, index) => `
+                <div class="bet-summary">
+                    <strong>#${index + 1} ${escapeHtml(player.display_name)}</strong>
+                    <div class="status">
+                        $${player.war_chest.toLocaleString()} • ${player.wins} wins
+                    </div>
+                </div>
+            `).join("")}
         `;
-
         return;
     }
 
-
-    const roundMatches =
-        bettingRoundMatches();
-
+    const roundMatches = bettingRoundMatches();
 
     if (eventData.status === "betting_open") {
+        title.textContent = `Round ${eventData.current_round} Betting`;
 
-        title.textContent =
-            `Round ${eventData.current_round} Betting`;
+        const ready = me.betting_ready_round === eventData.current_round;
+        const roundTotal = myRoundBetTotal();
+        const bettingLimits = currentBettingLimits();
 
-        const ready =
-            me.betting_ready_round ===
-            eventData.current_round;
+        const cards = roundMatches.map(match => {
+            const ownFight =
+                match.player1_id === currentPlayerId
+                || match.player2_id === currentPlayerId;
 
-        const roundTotal =
-            myRoundBetTotal();
+            const existing = myBetForMatch(match.id);
+            const selectedSide =
+                pendingBetSides[match.id]
+                ?? existing?.backed_player_id
+                ?? null;
 
-        const bettingLimits =
-            currentBettingLimits();
+            const options = wagerOptionsForMatch(match.id);
+            const amount = existing?.amount ?? options[0] ?? 250;
 
+            if (ownFight) {
+                return `
+                    <div class="bet-match-card">
+                        <strong>
+                            ${escapeHtml(bettingPlayerName(match.player1_id))}
+                            vs ${escapeHtml(bettingPlayerName(match.player2_id))}
+                        </strong>
+                        <p class="status">
+                            This is your fight — you cannot wager on it.
+                        </p>
+                    </div>
+                `;
+            }
 
-        const cards =
-            roundMatches.map(
-                match => {
+            return `
+                <div class="bet-match-card">
+                    <strong>Fight ${match.match_number}</strong>
 
-                    const ownFight =
-                        match.player1_id === currentPlayerId
-                        ||
-                        match.player2_id === currentPlayerId;
+                    <div class="bet-choice-grid">
+                        <button
+                            class="bet-choice ${selectedSide === match.player1_id ? "selected" : ""}"
+                            ${ready ? "disabled" : ""}
+                            onclick="chooseBetSide('${match.id}', '${match.player1_id}')"
+                        >
+                            ${escapeHtml(bettingPlayerName(match.player1_id))}
+                        </button>
 
-                    const existing =
-                        myBetForMatch(match.id);
+                        <button
+                            class="bet-choice ${selectedSide === match.player2_id ? "selected" : ""}"
+                            ${ready ? "disabled" : ""}
+                            onclick="chooseBetSide('${match.id}', '${match.player2_id}')"
+                        >
+                            ${escapeHtml(bettingPlayerName(match.player2_id))}
+                        </button>
+                    </div>
 
-                    const selectedSide =
-                        pendingBetSides[match.id]
-                        ?? existing?.backed_player_id
-                        ?? null;
+                    ${selectedSide ? `
+                        <div class="bet-controls">
+                            <select id="bet-amount-${match.id}" ${ready ? "disabled" : ""}>
+                                ${options.map(value => `
+                                    <option value="${value}" ${value === amount ? "selected" : ""}>
+                                        $${value.toLocaleString()}
+                                        ${value > bettingLimits.perFight ? " — ALL IN" : ""}
+                                    </option>
+                                `).join("")}
+                            </select>
 
-                    const options =
-                        wagerOptionsForMatch(match.id);
-
-                    const amount =
-                        existing?.amount
-                        ?? options[0]
-                        ?? 250;
-
-
-                    if (ownFight) {
-                        return `
-                            <div class="bet-match-card">
-                                <strong>
-                                    ${escapeHtml(bettingPlayerName(match.player1_id))}
-                                    vs
-                                    ${escapeHtml(bettingPlayerName(match.player2_id))}
-                                </strong>
-
-                                <p class="status">
-                                    This is your fight — you cannot wager on it.
-                                </p>
-                            </div>
-                        `;
-                    }
-
-
-                    return `
-                        <div class="bet-match-card">
-
-                            <strong>
-                                Fight ${match.match_number}
-                            </strong>
-
-                            <div class="bet-choice-grid">
-
-                                <button
-                                    class="bet-choice ${selectedSide === match.player1_id ? "selected" : ""}"
+                            ${hasSkill("insurance") || hasSkill("no_sweat") ? `
+                                <select
+                                    id="bet-modifier-${match.id}"
+                                    class="modifier-select"
                                     ${ready ? "disabled" : ""}
-                                    onclick="chooseBetSide('${match.id}', '${match.player1_id}')"
                                 >
-                                    ${escapeHtml(bettingPlayerName(match.player1_id))}
-                                </button>
+                                    ${standardModifierOptions(existing)}
+                                </select>
+                            ` : ""}
 
-                                <button
-                                    class="bet-choice ${selectedSide === match.player2_id ? "selected" : ""}"
-                                    ${ready ? "disabled" : ""}
-                                    onclick="chooseBetSide('${match.id}', '${match.player2_id}')"
-                                >
-                                    ${escapeHtml(bettingPlayerName(match.player2_id))}
-                                </button>
-
-                            </div>
-
-                            ${
-                                selectedSide
-                                ? `
-                                    <div class="bet-controls">
-
-                                        <select
-                                            id="bet-amount-${match.id}"
-                                            ${ready ? "disabled" : ""}
-                                        >
-                                            ${
-                                                options
-                                                .map(
-                                                    value => `
-                                                        <option
-                                                            value="${value}"
-                                                            ${value === amount ? "selected" : ""}
-                                                        >
-                                                            $${value.toLocaleString()}
-                                                            ${value > bettingLimits.perFight ? " — ALL IN" : ""}
-                                                        </option>
-                                                    `
-                                                ).join("")
-                                            }
-                                        </select>
-
-                                        <button
-                                            ${ready ? "disabled" : ""}
-                                            onclick="submitStandardBet('${match.id}', '${selectedSide}')"
-                                        >
-                                            ${existing ? "Update Bet" : "Place Bet"}
-                                        </button>
-
-                                    </div>
-
-                                    <div class="bet-limit-note">
-                                        Per-fight limit: $${bettingLimits.perFight.toLocaleString()}
-                                        • Round limit: $${bettingLimits.perRound.toLocaleString()}
-                                        ${bettingLimits.allIn ? "• All In unlocked" : ""}
-                                    </div>
-
-                                    ${
-                                        existing
-                                        ? `
-                                            <div class="status" style="margin-top:8px;">
-                                                Current wager:
-                                                $${existing.amount.toLocaleString()}
-                                                on
-                                                ${escapeHtml(bettingPlayerName(existing.backed_player_id))}
-                                                ${existing.modifier_code === "all_in" ? "• ALL IN" : ""}
-                                                •
-                                                <button
-                                                    class="secondary"
-                                                    ${ready ? "disabled" : ""}
-                                                    onclick="cancelStandardBet('${match.id}')"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                          `
-                                        : ""
-                                    }
-                                  `
-                                : `
-                                    <p class="status">
-                                        Choose a fighter, then choose your wager.
-                                    </p>
-                                  `
-                            }
-
+                            <button
+                                ${ready ? "disabled" : ""}
+                                onclick="submitStandardBet('${match.id}', '${selectedSide}')"
+                            >
+                                ${existing ? "Update Bet" : "Place Bet"}
+                            </button>
                         </div>
-                    `;
-                }
-            ).join("");
 
+                        <div class="bet-limit-note">
+                            Per-fight limit: $${bettingLimits.perFight.toLocaleString()}
+                            • Round limit: $${bettingLimits.perRound.toLocaleString()}
+                            ${bettingLimits.allIn ? "• All In unlocked" : ""}
+                        </div>
+
+                        ${existing ? `
+                            <div class="status" style="margin-top:8px;">
+                                Current wager: $${existing.amount.toLocaleString()}
+                                on ${escapeHtml(bettingPlayerName(existing.backed_player_id))}
+                                ${existing.modifier_code ? `• ${modifierLabel(existing.modifier_code)}` : ""}
+                                •
+                                <button
+                                    class="secondary"
+                                    ${ready ? "disabled" : ""}
+                                    onclick="cancelStandardBet('${match.id}')"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ` : ""}
+                    ` : `
+                        <p class="status">Choose a fighter, then choose your wager.</p>
+                    `}
+                </div>
+            `;
+        }).join("");
 
         content.innerHTML = `
             <div class="bet-summary">
-                <div class="status">
-                    Current Round Allowance
-                </div>
-
+                <div class="status">Current Round Allowance</div>
                 <strong>
-                    $${roundTotal.toLocaleString()}
-                    / $${bettingLimits.perRound.toLocaleString()} committed
+                    $${roundTotal.toLocaleString()} / $${bettingLimits.perRound.toLocaleString()} committed
                 </strong>
-
                 <div class="status" style="margin-top:5px;">
                     Per fight: $${bettingLimits.perFight.toLocaleString()}
                     ${bettingLimits.allIn ? "• All In can exceed this once per round." : ""}
                 </div>
-
                 <div class="status" style="margin-top:5px;">
-                    Stakes are held from your War Chest while wagers are active.
+                    Standard bets, hedges, props, and parlay opening stakes all count toward this round allowance.
                 </div>
             </div>
 
             <div id="bet-message" class="status" style="margin-top:10px;"></div>
 
+            ${renderAnalystOpen(ready)}
             ${cards}
+            ${renderBrokerOpen(ready)}
+            ${renderSpeculatorOpen(ready)}
 
             <div class="ready-box">
-
-                ${
-                    ready
-                    ? `
-                        <strong>✅ You are ready.</strong>
-
-                        <p class="status">
-                            Your wagers are still secret. You may reopen them until the host locks betting.
-                        </p>
-
-                        <button class="secondary" onclick="setBettingReady(false)">
-                            Edit My Bets
-                        </button>
-                      `
-                    : `
-                        <strong>Finished wagering?</strong>
-
-                        <p class="status">
-                            You may legally submit no bets at all. Mark yourself ready when you're done.
-                        </p>
-
-                        <button onclick="setBettingReady(true)">
-                            I'm Done Betting
-                        </button>
-                      `
-                }
-
+                ${ready ? `
+                    <strong>✅ You are ready.</strong>
+                    <p class="status">
+                        Your wagers are still secret. You may reopen them until the host locks betting.
+                    </p>
+                    <button class="secondary" onclick="setBettingReady(false)">
+                        Edit My Bets
+                    </button>
+                ` : `
+                    <strong>Finished wagering?</strong>
+                    <p class="status">
+                        You may legally submit no bets at all. Mark yourself ready when you're done.
+                    </p>
+                    <button onclick="setBettingReady(true)">
+                        I'm Done Betting
+                    </button>
+                `}
             </div>
         `;
-
         return;
     }
 
+    title.textContent = `Round ${eventData.current_round} Locked Pools`;
 
-    title.textContent =
-        `Round ${eventData.current_round} Locked Pools`;
+    const poolCards = roundMatches.map(match => {
+        const pool = bettingPools.find(row => row.match_id === match.id);
+        const bet = myBetForMatch(match.id);
+        const winner = match.winner_player_id;
 
+        return `
+            <div class="bet-match-card">
+                <strong>Fight ${match.match_number}</strong>
 
-    const poolCards =
-        roundMatches.map(
-            match => {
-
-                const pool =
-                    bettingPools.find(
-                        row => row.match_id === match.id
-                    );
-
-                const bet =
-                    myBetForMatch(match.id);
-
-                const winner =
-                    match.winner_player_id;
-
-                return `
-                    <div class="bet-match-card">
-
-                        <strong>
-                            Fight ${match.match_number}
-                        </strong>
-
-                        <div class="public-pool">
-                            <div class="public-pool-side">
-                                ${escapeHtml(bettingPlayerName(match.player1_id))}
-                                <strong>
-                                    $${(pool?.player1_pool ?? 1000).toLocaleString()}
-                                </strong>
-                            </div>
-
-                            <div class="public-pool-side">
-                                ${escapeHtml(bettingPlayerName(match.player2_id))}
-                                <strong>
-                                    $${(pool?.player2_pool ?? 1000).toLocaleString()}
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="status" style="margin-top:7px;">
-                            House $1,000 is included on each side.
-                        </div>
-
-                        ${
-                            bet
-                            ? `
-                                <div style="margin-top:10px;">
-                                    Your bet:
-                                    <strong>
-                                        $${bet.amount.toLocaleString()}
-                                        on
-                                        ${escapeHtml(bettingPlayerName(bet.backed_player_id))}
-                                        ${bet.modifier_code === "all_in" ? "• ALL IN" : ""}
-                                    </strong>
-
-                                    ${
-                                        bet.status === "settled"
-                                        ? `
-                                            <div class="status">
-                                                Return: $${bet.payout.toLocaleString()}
-                                            </div>
-                                          `
-                                        : ""
-                                    }
-                                </div>
-                              `
-                            : ""
-                        }
-
-                        ${
-                            match.status === "settled"
-                            ? `
-                                <div style="margin-top:10px;">
-                                    ✅ Winner:
-                                    <strong>
-                                        ${escapeHtml(bettingPlayerName(winner))}
-                                    </strong>
-                                </div>
-                              `
-                            : ""
-                        }
-
+                <div class="public-pool">
+                    <div class="public-pool-side">
+                        ${escapeHtml(bettingPlayerName(match.player1_id))}
+                        <strong>$${(pool?.player1_pool ?? 1000).toLocaleString()}</strong>
                     </div>
-                `;
-            }
-        ).join("");
+                    <div class="public-pool-side">
+                        ${escapeHtml(bettingPlayerName(match.player2_id))}
+                        <strong>$${(pool?.player2_pool ?? 1000).toLocaleString()}</strong>
+                    </div>
+                </div>
 
+                <div class="status" style="margin-top:7px;">
+                    House $1,000 is included on each side. Parlay rollovers can increase a later fight's pool after an earlier leg wins.
+                </div>
+
+                ${bet ? `
+                    <div style="margin-top:10px;">
+                        Your standard bet:
+                        <strong>
+                            $${bet.amount.toLocaleString()} on
+                            ${escapeHtml(bettingPlayerName(bet.backed_player_id))}
+                            ${bet.modifier_code ? `• ${modifierLabel(bet.modifier_code)}` : ""}
+                        </strong>
+                        ${bet.status === "settled" ? `
+                            <div class="status">Return: $${bet.payout.toLocaleString()}</div>
+                        ` : ""}
+                    </div>
+                ` : ""}
+
+                ${match.status === "settled" ? `
+                    <div style="margin-top:10px;">
+                        ✅ Winner: <strong>${escapeHtml(bettingPlayerName(winner))}</strong>
+                    </div>
+                ` : ""}
+            </div>
+        `;
+    }).join("");
 
     let reveal = "";
 
-
     if (eventData.status === "betting_locked") {
-
-        const match =
-            roundMatches.find(
-                row =>
-                    row.match_number ===
-                    eventData.current_match_number
-            );
+        const match = roundMatches.find(
+            row => row.match_number === eventData.current_match_number
+        );
 
         reveal = `
             <div class="revealed-fight">
                 <strong>
-                    Next Fight:
-                    ${escapeHtml(bettingPlayerName(match?.player1_id))}
-                    vs
-                    ${escapeHtml(bettingPlayerName(match?.player2_id))}
+                    Next Fight: ${escapeHtml(bettingPlayerName(match?.player1_id))}
+                    vs ${escapeHtml(bettingPlayerName(match?.player2_id))}
                 </strong>
-
-                <p class="status">
-                    Waiting for the host to reveal the exact armies.
-                </p>
+                <p class="status">Waiting for the host to reveal the exact armies.</p>
             </div>
         `;
     }
-
-
     else if (eventData.status === "fight") {
+        const match = roundMatches.find(
+            row => row.match_number === eventData.current_match_number
+        );
 
-        const match =
-            roundMatches.find(
-                row =>
-                    row.match_number ===
-                    eventData.current_match_number
-            );
-
-        const p1Army =
-            visibleArmySubmissions.find(
-                row => row.player_id === match?.player1_id
-            );
-
-        const p2Army =
-            visibleArmySubmissions.find(
-                row => row.player_id === match?.player2_id
-            );
-
+        const p1Army = visibleArmySubmissions.find(
+            row => row.player_id === match?.player1_id
+        );
+        const p2Army = visibleArmySubmissions.find(
+            row => row.player_id === match?.player2_id
+        );
 
         reveal = `
             <div class="revealed-fight">
-
-                <div class="status">
-                    CURRENT FIGHT — ARMIES REVEALED
-                </div>
-
+                <div class="status">CURRENT FIGHT — ARMIES REVEALED</div>
                 <h3>
                     ${escapeHtml(bettingPlayerName(match?.player1_id))}
-                    vs
-                    ${escapeHtml(bettingPlayerName(match?.player2_id))}
+                    vs ${escapeHtml(bettingPlayerName(match?.player2_id))}
                 </h3>
 
                 <div class="revealed-armies">
-
                     <div>
-                        <strong>
-                            ${escapeHtml(bettingPlayerName(match?.player1_id))}
-                        </strong>
+                        <strong>${escapeHtml(bettingPlayerName(match?.player1_id))}</strong>
                         ${renderPublicArmy(p1Army)}
                     </div>
-
                     <div>
-                        <strong>
-                            ${escapeHtml(bettingPlayerName(match?.player2_id))}
-                        </strong>
+                        <strong>${escapeHtml(bettingPlayerName(match?.player2_id))}</strong>
                         ${renderPublicArmy(p2Army)}
                     </div>
-
                 </div>
 
                 <p class="status">
                     If the fight bugs or draws, the host reruns these exact armies and all bets remain locked.
                 </p>
-
             </div>
         `;
     }
 
-
     content.innerHTML = `
         <p class="status">
-            Betting is closed. Pools cannot change for the rest of the round.
+            Betting is closed. Normal wagers, hedges, props, and parlay selections cannot be changed. Closing Line is the one exception before the selected fight's army reveal.
         </p>
-
         ${poolCards}
+        ${renderAdvancedLocked()}
         ${reveal}
     `;
 }
@@ -4797,6 +5404,26 @@ async function submitStandardBet(
     const amount =
         Number(select?.value ?? 250);
 
+    const modifierSelect =
+        document.getElementById(
+            `bet-modifier-${matchId}`
+        );
+
+    const modifier =
+        modifierSelect?.value || null;
+
+    if (
+        modifier
+        && amount > currentBettingLimits().perFight
+    ) {
+        const message = document.getElementById("bet-message");
+        if (message) {
+            message.textContent =
+                "All In cannot be combined with Insurance or No-Sweat.";
+        }
+        return;
+    }
+
     const message =
         document.getElementById(
             "bet-message"
@@ -4823,7 +5450,10 @@ async function submitStandardBet(
                     backedPlayerId,
 
                 p_amount:
-                    amount
+                    amount,
+
+                p_modifier_code:
+                    modifier
             }
         );
 
@@ -4883,6 +5513,193 @@ async function cancelStandardBet(matchId) {
 }
 
 
+async function useRecon(matchId, mode, targetPlayerId) {
+    const message = document.getElementById("bet-message");
+    if (message) message.textContent = "Requesting private intel...";
+
+    const { error } = await db.rpc(
+        "use_analyst_recon",
+        {
+            p_event_id: currentEventId,
+            p_match_id: matchId,
+            p_mode: mode,
+            p_target_player_id: targetPlayerId
+        }
+    );
+
+    if (error) {
+        if (message) message.textContent = error.message;
+        return;
+    }
+
+    await loadState();
+}
+
+
+async function placeHedgeBet(matchId) {
+    const p1 = Number(document.getElementById(`hedge-p1-${matchId}`)?.value ?? 0);
+    const p2 = Number(document.getElementById(`hedge-p2-${matchId}`)?.value ?? 0);
+    const message = document.getElementById("bet-message");
+
+    const { error } = await db.rpc(
+        "place_hedge_bet",
+        {
+            p_event_id: currentEventId,
+            p_match_id: matchId,
+            p_player1_amount: p1,
+            p_player2_amount: p2
+        }
+    );
+
+    if (error) {
+        if (message) message.textContent = error.message;
+        return;
+    }
+
+    await loadState();
+}
+
+
+async function cancelHedgeBet() {
+    const { error } = await db.rpc(
+        "cancel_hedge_bet",
+        { p_event_id: currentEventId }
+    );
+
+    if (error) {
+        window.alert(error.message);
+        return;
+    }
+
+    await loadState();
+}
+
+
+async function placePropBet() {
+    const matchId = document.getElementById("prop-match")?.value;
+    const propCode = document.getElementById("prop-code")?.value;
+    const amount = Number(document.getElementById("prop-amount")?.value ?? 250);
+    const message = document.getElementById("bet-message");
+
+    const { error } = await db.rpc(
+        "place_prop_bet",
+        {
+            p_event_id: currentEventId,
+            p_match_id: matchId,
+            p_prop_code: propCode,
+            p_amount: amount
+        }
+    );
+
+    if (error) {
+        if (message) message.textContent = error.message;
+        return;
+    }
+
+    await loadState();
+}
+
+
+async function cancelPropBet() {
+    const { error } = await db.rpc(
+        "cancel_prop_bet",
+        { p_event_id: currentEventId }
+    );
+
+    if (error) {
+        window.alert(error.message);
+        return;
+    }
+
+    await loadState();
+}
+
+
+function chooseParlaySide(matchId, playerId) {
+    pendingParlaySides[matchId] = playerId;
+    renderBetting();
+}
+
+
+function clearParlayLeg(matchId) {
+    delete pendingParlaySides[matchId];
+    renderBetting();
+}
+
+
+async function placeParlay(legCount) {
+    const selected = eligibleOtherMatches()
+        .filter(match => pendingParlaySides[match.id])
+        .sort((a,b) => a.match_number - b.match_number);
+
+    if (selected.length !== legCount) {
+        const message = document.getElementById("bet-message");
+        if (message) {
+            message.textContent = `Choose exactly ${legCount} parlay legs.`;
+        }
+        return;
+    }
+
+    const amount = Number(document.getElementById("parlay-amount")?.value ?? 250);
+    const legs = selected.map(match => ({
+        match_id: match.id,
+        backed_player_id: pendingParlaySides[match.id]
+    }));
+
+    const { error } = await db.rpc(
+        "place_parlay",
+        {
+            p_event_id: currentEventId,
+            p_legs: legs,
+            p_amount: amount
+        }
+    );
+
+    if (error) {
+        const message = document.getElementById("bet-message");
+        if (message) message.textContent = error.message;
+        return;
+    }
+
+    pendingParlaySides = {};
+    await loadState();
+}
+
+
+async function cancelParlay() {
+    const { error } = await db.rpc(
+        "cancel_parlay",
+        { p_event_id: currentEventId }
+    );
+
+    if (error) {
+        window.alert(error.message);
+        return;
+    }
+
+    pendingParlaySides = {};
+    await loadState();
+}
+
+
+async function useClosingLine(betId) {
+    const { error } = await db.rpc(
+        "use_closing_line",
+        {
+            p_event_id: currentEventId,
+            p_bet_id: betId
+        }
+    );
+
+    if (error) {
+        window.alert(error.message);
+        return;
+    }
+
+    await loadState();
+}
+
+
 async function setBettingReady(ready) {
 
     const { error } =
@@ -4937,6 +5754,10 @@ function startRealtime() {
 
     if (recruitChannel) {
         db.removeChannel(recruitChannel);
+    }
+
+    if (advancedBetChannel) {
+        db.removeChannel(advancedBetChannel);
     }
 
 
@@ -5054,6 +5875,76 @@ function startRealtime() {
                 table: "player_recruits",
                 filter:
                     `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+
+    advancedBetChannel =
+        db
+        .channel(
+            "advanced-bets-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "match_betting_pools",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "skill_intel",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "player_skill_uses",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "hedge_bets",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "prop_bets",
+                filter: `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "parlays",
+                filter: `event_id=eq.${currentEventId}`
             },
             loadState
         )
