@@ -1,39 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Portal | TABS War Chest Betting Special</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Player Portal | TABS War Chest Betting Special
+    </title>
+
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: #11151f;
-            color: white;
             font-family: Arial, Helvetica, sans-serif;
-            text-align: center;
+            background:
+                radial-gradient(
+                    circle at top,
+                    #343c50,
+                    #171b26 45%,
+                    #090b10 100%
+                );
+            color: white;
+        }
+
+        main {
+            width: min(500px, 92%);
+            margin: auto;
+            padding: 40px 0;
+        }
+
+        .eyebrow {
+            opacity: .6;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: .75rem;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            margin-bottom: 5px;
+        }
+
+        .panel {
+            margin-top: 30px;
+            padding: 24px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 16px;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        #room {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: 0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .war-chest {
+            font-size: 3rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .status {
+            opacity: .7;
         }
 
         a {
             color: white;
         }
+
     </style>
+
 </head>
 
+
 <body>
-    <main>
-        <p>DreamHarrier • Extra Life</p>
 
-        <h1>Player Portal</h1>
+<main>
 
-        <p>TABS War Chest Betting Special</p>
+    <div class="eyebrow">
+        DreamHarrier • Extra Life
+    </div>
+
+    <h1>Player Portal</h1>
+
+    <p>
+        TABS War Chest Betting Special
+    </p>
+
+
+    <section
+        id="join-panel"
+        class="panel"
+    >
+
+        <h2>Join Event</h2>
+
+
+        <label for="room">
+            Room Code
+        </label>
+
+        <input
+            id="room"
+            maxlength="6"
+            autocomplete="off"
+            placeholder="ABC123"
+        >
+
+
+        <label for="player-name">
+            Player Name
+        </label>
+
+        <input
+            id="player-name"
+            maxlength="24"
+            autocomplete="off"
+            placeholder="Your name"
+        >
+
+
+        <button id="join-event">
+            Join Event
+        </button>
+
+
+        <p
+            id="join-status"
+            class="status"
+        ></p>
+
+    </section>
+
+
+    <section
+        id="player-panel"
+        class="panel hidden"
+    >
+
+        <p class="status">
+            Connected
+        </p>
+
+        <h2 id="display-name">
+            Player
+        </h2>
+
+
+        <p>War Chest</p>
+
+        <div
+            id="war-chest"
+            class="war-chest"
+        >
+            $10,000
+        </div>
+
 
         <p>
-            <a href="../">Return Home</a>
+            Waiting for the host to begin the event.
         </p>
-    </main>
+
+    </section>
+
+
+    <p style="margin-top: 30px;">
+        <a href="../">
+            ← Return Home
+        </a>
+    </p>
+
+</main>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+<script src="../js/supabase-client.js"></script>
+
+
+<script>
+
+    let currentEventId =
+        localStorage.getItem(
+            "tabs_player_event_id"
+        );
+
+    let currentPlayerId =
+        localStorage.getItem(
+            "tabs_player_id"
+        );
+
+    let playerChannel = null;
+
+
+    async function joinEvent() {
+
+        const code =
+            document
+                .getElementById("room")
+                .value
+                .trim()
+                .toUpperCase();
+
+
+        const playerName =
+            document
+                .getElementById("player-name")
+                .value
+                .trim();
+
+
+        const status =
+            document.getElementById("join-status");
+
+
+        if (!code || !playerName) {
+
+            status.textContent =
+                "Enter a room code and player name.";
+
+            return;
+
+        }
+
+
+        status.textContent = "Joining...";
+
+
+        try {
+
+            await ensureAnonymousSession();
+
+
+            const {
+                data,
+                error
+            } = await db.rpc(
+                "join_event",
+                {
+                    p_code: code,
+                    p_display_name: playerName
+                }
+            );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            const result = data[0];
+
+
+            currentEventId =
+                result.event_id;
+
+            currentPlayerId =
+                result.player_id;
+
+
+            localStorage.setItem(
+                "tabs_player_event_id",
+                currentEventId
+            );
+
+            localStorage.setItem(
+                "tabs_player_id",
+                currentPlayerId
+            );
+
+
+            await showPlayer();
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            status.textContent =
+                error.message;
+
+        }
+
+    }
+
+
+    async function showPlayer() {
+
+        if (
+            !currentEventId ||
+            !currentPlayerId
+        ) {
+            return;
+        }
+
+
+        const {
+            data,
+            error
+        } = await db
+            .from("players")
+            .select(
+                "display_name, war_chest, wins, skill_points, debt"
+            )
+            .eq("id", currentPlayerId)
+            .maybeSingle();
+
+
+        if (error || !data) {
+
+            console.error(error);
+
+            return;
+
+        }
+
+
+        document
+            .getElementById("join-panel")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("player-panel")
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById("display-name")
+            .textContent =
+                data.display_name;
+
+
+        document
+            .getElementById("war-chest")
+            .textContent =
+                "$" +
+                data.war_chest.toLocaleString();
+
+
+        subscribeToPlayer();
+
+    }
+
+
+    function subscribeToPlayer() {
+
+        if (playerChannel) {
+
+            db.removeChannel(playerChannel);
+
+        }
+
+
+        playerChannel =
+            db
+                .channel(
+                    "my-player-" +
+                    currentPlayerId
+                )
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "UPDATE",
+                        schema: "public",
+                        table: "players",
+                        filter:
+                            `id=eq.${currentPlayerId}`
+                    },
+                    () => {
+                        showPlayer();
+                    }
+                )
+                .subscribe();
+
+    }
+
+
+    document
+        .getElementById("join-event")
+        .addEventListener(
+            "click",
+            joinEvent
+        );
+
+
+    async function initialize() {
+
+        try {
+
+            await ensureAnonymousSession();
+
+
+            if (
+                currentEventId &&
+                currentPlayerId
+            ) {
+
+                await showPlayer();
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            document
+                .getElementById("join-status")
+                .textContent =
+                    "Connection error: "
+                    + error.message;
+
+        }
+
+    }
+
+
+    initialize();
+
+</script>
+
 </body>
+
 </html>
