@@ -1,39 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Host Dashboard | TABS War Chest Betting Special</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Host Dashboard | TABS War Chest Betting Special
+    </title>
+
 
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            background: #11151f;
-            color: white;
             font-family: Arial, Helvetica, sans-serif;
-            text-align: center;
+            background:
+                radial-gradient(
+                    circle at top,
+                    #343c50,
+                    #171b26 45%,
+                    #090b10 100%
+                );
+            color: white;
+        }
+
+        main {
+            width: min(900px, 92%);
+            margin: auto;
+            padding: 50px 0;
+        }
+
+        .eyebrow {
+            opacity: .6;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: .75rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 5px;
+        }
+
+        .panel {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #room-code {
+            font-size: 3rem;
+            letter-spacing: 8px;
+            margin: 15px 0;
+        }
+
+        .player {
+            padding: 14px;
+            margin-top: 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.08);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hidden {
+            display: none;
         }
 
         a {
             color: white;
         }
+
+        .status {
+            opacity: .65;
+        }
+
     </style>
+
 </head>
 
+
 <body>
-    <main>
-        <p>DreamHarrier • Extra Life</p>
 
-        <h1>Host Dashboard</h1>
+<main>
 
-        <p>TABS War Chest Betting Special</p>
+    <div class="eyebrow">
+        DreamHarrier • Extra Life
+    </div>
+
+    <h1>Host Dashboard</h1>
+
+    <p>
+        TABS War Chest Betting Special
+    </p>
+
+
+    <section
+        id="create-panel"
+        class="panel"
+    >
+
+        <h2>Create Event</h2>
 
         <p>
-            <a href="../">Return Home</a>
+            Start a new War Chest session and generate
+            a player room code.
         </p>
-    </main>
+
+        <button id="create-event">
+            Create Event
+        </button>
+
+        <p
+            id="create-status"
+            class="status"
+        ></p>
+
+    </section>
+
+
+    <section
+        id="lobby-panel"
+        class="panel hidden"
+    >
+
+        <h2>Lobby</h2>
+
+        <p>Room Code</p>
+
+        <div id="room-code">
+            ------
+        </div>
+
+        <p>
+            Players can join from the Player Portal.
+        </p>
+
+        <h3>
+            Connected Players
+            (<span id="player-count">0</span>)
+        </h3>
+
+        <div id="player-list"></div>
+
+    </section>
+
+
+    <p style="margin-top: 30px;">
+        <a href="../">
+            ← Return Home
+        </a>
+    </p>
+
+</main>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+<script src="../js/supabase-client.js"></script>
+
+
+<script>
+
+    let currentEventId =
+        localStorage.getItem("tabs_host_event_id");
+
+    let playerChannel = null;
+
+
+    function makeRoomCode() {
+
+        const characters =
+            "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+        let code = "";
+
+        for (let i = 0; i < 6; i++) {
+
+            code += characters[
+                Math.floor(
+                    Math.random() * characters.length
+                )
+            ];
+
+        }
+
+        return code;
+
+    }
+
+
+    async function createEvent() {
+
+        const status =
+            document.getElementById("create-status");
+
+        status.textContent = "Creating event...";
+
+
+        try {
+
+            const user =
+                await ensureAnonymousSession();
+
+
+            let event = null;
+
+
+            for (let attempt = 0; attempt < 5; attempt++) {
+
+                const code = makeRoomCode();
+
+
+                const {
+                    data,
+                    error
+                } = await db
+                    .from("events")
+                    .insert({
+                        code: code,
+                        name: "TABS War Chest Betting Special",
+                        host_user_id: user.id
+                    })
+                    .select()
+                    .single();
+
+
+                if (!error) {
+
+                    event = data;
+                    break;
+
+                }
+
+
+                if (error.code !== "23505") {
+                    throw error;
+                }
+
+            }
+
+
+            if (!event) {
+                throw new Error(
+                    "Unable to generate a unique room code."
+                );
+            }
+
+
+            currentEventId = event.id;
+
+            localStorage.setItem(
+                "tabs_host_event_id",
+                event.id
+            );
+
+
+            showLobby(event);
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            status.textContent =
+                "Error: " + error.message;
+
+        }
+
+    }
+
+
+    async function loadExistingEvent() {
+
+        if (!currentEventId) {
+            return;
+        }
+
+
+        const {
+            data,
+            error
+        } = await db
+            .from("events")
+            .select("*")
+            .eq("id", currentEventId)
+            .maybeSingle();
+
+
+        if (error || !data) {
+
+            localStorage.removeItem(
+                "tabs_host_event_id"
+            );
+
+            currentEventId = null;
+
+            return;
+
+        }
+
+
+        showLobby(data);
+
+    }
+
+
+    function showLobby(event) {
+
+        document
+            .getElementById("create-panel")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("lobby-panel")
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById("room-code")
+            .textContent = event.code;
+
+
+        loadPlayers();
+
+        subscribeToPlayers();
+
+    }
+
+
+    async function loadPlayers() {
+
+        if (!currentEventId) {
+            return;
+        }
+
+
+        const {
+            data,
+            error
+        } = await db
+            .from("players")
+            .select(
+                "id, display_name, war_chest, wins, joined_at"
+            )
+            .eq("event_id", currentEventId)
+            .order("joined_at");
+
+
+        if (error) {
+
+            console.error(error);
+            return;
+
+        }
+
+
+        const list =
+            document.getElementById("player-list");
+
+
+        const count =
+            document.getElementById("player-count");
+
+
+        list.innerHTML = "";
+
+        count.textContent = data.length;
+
+
+        if (data.length === 0) {
+
+            list.innerHTML =
+                `<p class="status">
+                    Waiting for players...
+                 </p>`;
+
+            return;
+
+        }
+
+
+        for (const player of data) {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "player";
+
+
+            div.innerHTML = `
+                <strong>
+                    ${escapeHtml(player.display_name)}
+                </strong>
+
+                <span>
+                    $${player.war_chest.toLocaleString()}
+                </span>
+            `;
+
+
+            list.appendChild(div);
+
+        }
+
+    }
+
+
+    function subscribeToPlayers() {
+
+        if (playerChannel) {
+
+            db.removeChannel(playerChannel);
+
+        }
+
+
+        playerChannel =
+            db
+                .channel(
+                    "players-" + currentEventId
+                )
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "*",
+                        schema: "public",
+                        table: "players",
+                        filter:
+                            `event_id=eq.${currentEventId}`
+                    },
+                    () => {
+                        loadPlayers();
+                    }
+                )
+                .subscribe();
+
+    }
+
+
+    function escapeHtml(value) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent = value;
+
+        return div.innerHTML;
+
+    }
+
+
+    document
+        .getElementById("create-event")
+        .addEventListener(
+            "click",
+            createEvent
+        );
+
+
+    async function initialize() {
+
+        try {
+
+            await ensureAnonymousSession();
+
+            await loadExistingEvent();
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            document
+                .getElementById("create-status")
+                .textContent =
+                    "Supabase connection failed: "
+                    + error.message;
+
+        }
+
+    }
+
+
+    initialize();
+
+</script>
+
 </body>
+
 </html>
