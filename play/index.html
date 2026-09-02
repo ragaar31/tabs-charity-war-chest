@@ -3,114 +3,393 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>
-        Player Portal | TABS War Chest Betting Special
-    </title>
+<title>
+    Player Portal | TABS War Chest Betting Special
+</title>
 
+<style>
 
-    <style>
+* {
+    box-sizing: border-box;
+}
 
-        * {
-            box-sizing: border-box;
-        }
+body {
+    margin: 0;
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
-            background:
-                radial-gradient(
-                    circle at top,
-                    #343c50,
-                    #171b26 45%,
-                    #090b10 100%
-                );
-            color: white;
-        }
+    min-height: 100vh;
 
-        main {
-            width: min(500px, 92%);
-            margin: auto;
-            padding: 40px 0;
-        }
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-        .eyebrow {
-            opacity: .6;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: .75rem;
-        }
+    background:
+        radial-gradient(
+            circle at top,
+            #343c50,
+            #171b26 45%,
+            #090b10 100%
+        );
 
-        h1 {
-            font-size: 2.6rem;
-            margin-bottom: 5px;
-        }
+    color: white;
+}
 
-        .panel {
-            margin-top: 30px;
-            padding: 24px;
-            background: rgba(255,255,255,.07);
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 16px;
-        }
+main {
+    width: min(700px, 94%);
+    margin: auto;
+    padding: 35px 0 70px;
+}
 
-        label {
-            display: block;
-            margin-top: 16px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
+.eyebrow {
+    opacity: .6;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: .72rem;
+}
 
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 0;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
+h1 {
+    margin-bottom: 5px;
 
-        #room {
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
+    font-size:
+        clamp(
+            2rem,
+            9vw,
+            3.5rem
+        );
+}
 
-        button {
-            width: 100%;
-            margin-top: 20px;
-            padding: 14px;
-            border: 0;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
+.panel {
+    margin-top: 20px;
+    padding: 20px;
 
-        .hidden {
-            display: none;
-        }
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .07
+        );
 
-        .war-chest {
-            font-size: 3rem;
-            margin: 10px 0;
-            font-weight: bold;
-        }
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .15
+        );
 
-        .status {
-            opacity: .7;
-        }
+    border-radius: 15px;
+}
 
-        a {
-            color: white;
-        }
+label {
+    display: block;
 
-    </style>
+    margin:
+        15px
+        0
+        6px;
+
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 0;
+    border-radius: 8px;
+
+    font-size: 1rem;
+}
+
+button {
+    padding: 12px 16px;
+
+    border: 0;
+    border-radius: 8px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+#join-event {
+    width: 100%;
+    margin-top: 18px;
+}
+
+#room {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            1fr
+        );
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.stat {
+    padding: 14px;
+
+    text-align: center;
+
+    border-radius: 10px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .07
+        );
+}
+
+.stat strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 1.4rem;
+}
+
+.order-list {
+    display: grid;
+    gap: 7px;
+}
+
+.order-player {
+    padding: 11px;
+
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        );
+}
+
+.order-number {
+    width: 30px;
+    height: 30px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 auto;
+
+    border-radius: 50%;
+
+    background: white;
+    color: #11151f;
+
+    font-weight: bold;
+}
+
+.current {
+    padding: 18px;
+
+    margin-bottom: 15px;
+
+    text-align: center;
+
+    border-radius: 12px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .13
+        );
+
+    border:
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            .3
+        );
+}
+
+.current strong {
+    display: block;
+    font-size: 1.5rem;
+    margin-top: 5px;
+}
+
+.your-turn {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .22
+        );
+}
+
+.tier-tabs {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            5,
+            1fr
+        );
+
+    gap: 6px;
+
+    margin-top: 15px;
+}
+
+.tier-tab {
+    padding: 12px 4px;
+}
+
+.tier-tab.active {
+    outline:
+        3px solid white;
+}
+
+.unit-grid {
+    display: grid;
+    gap: 8px;
+
+    margin-top: 12px;
+}
+
+.unit-card {
+    padding: 14px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr auto;
+
+    gap: 12px;
+    align-items: center;
+
+    border-radius: 10px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .07
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .1
+        );
+}
+
+.unit-card.taken {
+    opacity: .42;
+}
+
+.unit-name {
+    font-weight: bold;
+}
+
+.unit-meta {
+    margin-top: 4px;
+
+    font-size: .8rem;
+
+    opacity: .65;
+}
+
+.roster-unit {
+    padding: 9px 0;
+
+    border-bottom:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .1
+        );
+}
+
+.limit-row {
+    margin-top: 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
+    gap: 6px;
+}
+
+.limit {
+    padding: 8px;
+
+    text-align: center;
+
+    border-radius: 7px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        );
+
+    font-size: .8rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.status {
+    opacity: .65;
+}
+
+a {
+    color: white;
+}
+
+</style>
 
 </head>
 
@@ -119,104 +398,164 @@
 
 <main>
 
-    <div class="eyebrow">
-        DreamHarrier • Extra Life
+<div class="eyebrow">
+    DreamHarrier • Extra Life
+</div>
+
+<h1>Player Portal</h1>
+
+<p class="status">
+    TABS War Chest Betting Special
+</p>
+
+
+<section
+    id="join-panel"
+    class="panel"
+>
+
+    <h2>Join Event</h2>
+
+
+    <label for="room">
+        Room Code
+    </label>
+
+    <input
+        id="room"
+        maxlength="6"
+        autocomplete="off"
+        placeholder="ABC123"
+    >
+
+
+    <label for="player-name">
+        Player Name
+    </label>
+
+    <input
+        id="player-name"
+        maxlength="24"
+        autocomplete="off"
+        placeholder="Your name"
+    >
+
+
+    <button id="join-event">
+        Join Event
+    </button>
+
+
+    <p
+        id="join-status"
+        class="status"
+    ></p>
+
+</section>
+
+
+<section
+    id="player-panel"
+    class="panel hidden"
+>
+
+    <div class="status">
+        Connected Player
     </div>
 
-    <h1>Player Portal</h1>
-
-    <p>
-        TABS War Chest Betting Special
-    </p>
+    <h2 id="display-name">
+        Player
+    </h2>
 
 
-    <section
-        id="join-panel"
-        class="panel"
-    >
+    <div class="stats">
 
-        <h2>Join Event</h2>
+        <div class="stat">
+            War Chest
 
-
-        <label for="room">
-            Room Code
-        </label>
-
-        <input
-            id="room"
-            maxlength="6"
-            autocomplete="off"
-            placeholder="ABC123"
-        >
-
-
-        <label for="player-name">
-            Player Name
-        </label>
-
-        <input
-            id="player-name"
-            maxlength="24"
-            autocomplete="off"
-            placeholder="Your name"
-        >
-
-
-        <button id="join-event">
-            Join Event
-        </button>
-
-
-        <p
-            id="join-status"
-            class="status"
-        ></p>
-
-    </section>
-
-
-    <section
-        id="player-panel"
-        class="panel hidden"
-    >
-
-        <p class="status">
-            Connected
-        </p>
-
-        <h2 id="display-name">
-            Player
-        </h2>
-
-
-        <p>War Chest</p>
-
-        <div
-            id="war-chest"
-            class="war-chest"
-        >
-            $10,000
+            <strong id="war-chest">
+                $10,000
+            </strong>
         </div>
 
 
-        <p>
-            Waiting for the host to begin the event.
-        </p>
+        <div class="stat">
+            Drafted
 
-    </section>
+            <strong id="draft-count">
+                0 / 8
+            </strong>
+        </div>
+
+    </div>
+
+</section>
 
 
-    <p style="margin-top: 30px;">
-        <a href="../">
-            ← Return Home
-        </a>
-    </p>
+<section
+    id="phase-panel"
+    class="panel hidden"
+>
+
+    <div id="phase-content"></div>
+
+</section>
+
+
+<section
+    id="roster-panel"
+    class="panel hidden"
+>
+
+    <h2>Your Faction</h2>
+
+    <div id="tier-limits"></div>
+
+    <div id="my-roster"></div>
+
+</section>
+
+
+<section
+    id="draft-board-panel"
+    class="panel hidden"
+>
+
+    <h2>Draft Board</h2>
+
+    <div id="current-drafter"></div>
+
+    <div
+        id="draft-message"
+        class="status"
+    ></div>
+
+
+    <div
+        id="tier-tabs"
+        class="tier-tabs"
+    ></div>
+
+
+    <div
+        id="unit-grid"
+        class="unit-grid"
+    ></div>
+
+</section>
+
+
+<p style="margin-top:30px;">
+    <a href="../">
+        ← Return Home
+    </a>
+</p>
 
 </main>
 
 
 <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 
 <script src="../js/supabase-client.js"></script>
@@ -224,249 +563,1268 @@
 
 <script>
 
-    let currentEventId =
-        localStorage.getItem(
-            "tabs_player_event_id"
+let currentEventId =
+    localStorage.getItem(
+        "tabs_player_event_id"
+    );
+
+let currentPlayerId =
+    localStorage.getItem(
+        "tabs_player_id"
+    );
+
+let eventData = null;
+let me = null;
+let players = [];
+let picks = [];
+let units = [];
+
+let selectedTier = "S";
+
+let eventChannel = null;
+let playerChannel = null;
+let pickChannel = null;
+
+
+const limits = {
+    S: 1,
+    A: 2,
+    B: 3,
+    C: 8,
+    D: 8
+};
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement(
+            "div"
         );
 
-    let currentPlayerId =
-        localStorage.getItem(
-            "tabs_player_id"
-        );
+    div.textContent =
+        value ?? "";
 
-    let playerChannel = null;
+    return div.innerHTML;
 
-
-    async function joinEvent() {
-
-        const code =
-            document
-                .getElementById("room")
-                .value
-                .trim()
-                .toUpperCase();
+}
 
 
-        const playerName =
-            document
-                .getElementById("player-name")
-                .value
-                .trim();
+function getCurrentDraftState() {
 
-
-        const status =
-            document.getElementById("join-status");
-
-
-        if (!code || !playerName) {
-
-            status.textContent =
-                "Enter a room code and player name.";
-
-            return;
-
-        }
-
-
-        status.textContent = "Joining...";
-
-
-        try {
-
-            await ensureAnonymousSession();
-
-
-            const {
-                data,
-                error
-            } = await db.rpc(
-                "join_event",
-                {
-                    p_code: code,
-                    p_display_name: playerName
-                }
-            );
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            const result = data[0];
-
-
-            currentEventId =
-                result.event_id;
-
-            currentPlayerId =
-                result.player_id;
-
-
-            localStorage.setItem(
-                "tabs_player_event_id",
-                currentEventId
-            );
-
-            localStorage.setItem(
-                "tabs_player_id",
-                currentPlayerId
-            );
-
-
-            await showPlayer();
-
-        }
-
-        catch (error) {
-
-            console.error(error);
-
-            status.textContent =
-                error.message;
-
-        }
-
+    if (
+        !eventData ||
+        eventData.status !==
+        "draft" ||
+        players.length === 0
+    ) {
+        return null;
     }
 
 
-    async function showPlayer() {
+    const pick =
+        eventData.draft_pick_number;
 
-        if (
-            !currentEventId ||
-            !currentPlayerId
-        ) {
-            return;
-        }
+    const count =
+        players.length;
+
+    const round =
+        Math.floor(
+            (pick - 1) / count
+        ) + 1;
+
+    const index =
+        (pick - 1) % count;
+
+    const position =
+        round % 2 === 1
+        ? index + 1
+        : count - index;
+
+    const player =
+        players.find(
+            p =>
+                p.draft_position ===
+                position
+        );
+
+
+    return {
+        pick,
+        round,
+        position,
+        player
+    };
+
+}
+
+
+async function joinEvent() {
+
+    const code =
+        document
+        .getElementById("room")
+        .value
+        .trim()
+        .toUpperCase();
+
+
+    const name =
+        document
+        .getElementById(
+            "player-name"
+        )
+        .value
+        .trim();
+
+
+    const status =
+        document
+        .getElementById(
+            "join-status"
+        );
+
+
+    if (!code || !name) {
+
+        status.textContent =
+            "Enter a room code and name.";
+
+        return;
+    }
+
+
+    status.textContent =
+        "Joining...";
+
+
+    try {
+
+        await ensureAnonymousSession();
 
 
         const {
             data,
             error
-        } = await db
-            .from("players")
-            .select(
-                "display_name, war_chest, wins, skill_points, debt"
-            )
-            .eq("id", currentPlayerId)
-            .maybeSingle();
+        } = await db.rpc(
+            "join_event",
+            {
+                p_code: code,
+                p_display_name: name
+            }
+        );
 
 
-        if (error || !data) {
-
-            console.error(error);
-
-            return;
-
+        if (error) {
+            throw error;
         }
 
 
-        document
-            .getElementById("join-panel")
-            .classList.add("hidden");
+        const result =
+            data[0];
 
 
-        document
-            .getElementById("player-panel")
-            .classList.remove("hidden");
+        currentEventId =
+            result.event_id;
+
+        currentPlayerId =
+            result.player_id;
 
 
-        document
-            .getElementById("display-name")
-            .textContent =
-                data.display_name;
+        localStorage.setItem(
+            "tabs_player_event_id",
+            currentEventId
+        );
+
+        localStorage.setItem(
+            "tabs_player_id",
+            currentPlayerId
+        );
 
 
-        document
-            .getElementById("war-chest")
-            .textContent =
-                "$" +
-                data.war_chest.toLocaleString();
+        await loadState();
+
+        startRealtime();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            error.message;
+
+    }
+
+}
 
 
-        subscribeToPlayer();
+async function loadState() {
+
+    if (
+        !currentEventId ||
+        !currentPlayerId
+    ) {
+        return;
+    }
+
+
+    const meResult =
+        await db
+        .from("players")
+        .select("*")
+        .eq(
+            "id",
+            currentPlayerId
+        )
+        .maybeSingle();
+
+
+    if (
+        meResult.error ||
+        !meResult.data
+    ) {
+
+        console.error(
+            meResult.error
+        );
+
+        return;
+    }
+
+
+    me =
+        meResult.data;
+
+
+    const eventResult =
+        await db
+        .from("events")
+        .select("*")
+        .eq(
+            "id",
+            currentEventId
+        )
+        .maybeSingle();
+
+
+    if (eventResult.error) {
+
+        console.error(
+            eventResult.error
+        );
+
+        return;
+    }
+
+
+    eventData =
+        eventResult.data;
+
+
+    const playerResult =
+        await db
+        .from("players")
+        .select("*")
+        .eq(
+            "event_id",
+            currentEventId
+        )
+        .order("joined_at");
+
+
+    players =
+        playerResult.data ?? [];
+
+
+    const pickResult =
+        await db
+        .from("draft_picks")
+        .select(`
+            pick_number,
+            player_id,
+            unit_id,
+            units (
+                name,
+                cost,
+                faction,
+                tier
+            )
+        `)
+        .eq(
+            "event_id",
+            currentEventId
+        )
+        .order(
+            "pick_number"
+        );
+
+
+    picks =
+        pickResult.data ?? [];
+
+
+    if (units.length === 0) {
+
+        const unitResult =
+            await db
+            .from("units")
+            .select("*")
+            .order("sort_order");
+
+
+        if (unitResult.error) {
+
+            console.error(
+                unitResult.error
+            );
+
+            return;
+        }
+
+
+        units =
+            unitResult.data ?? [];
 
     }
 
 
-    function subscribeToPlayer() {
+    render();
 
-        if (playerChannel) {
-
-            db.removeChannel(playerChannel);
-
-        }
+}
 
 
-        playerChannel =
-            db
-                .channel(
-                    "my-player-" +
-                    currentPlayerId
-                )
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "UPDATE",
-                        schema: "public",
-                        table: "players",
-                        filter:
-                            `id=eq.${currentPlayerId}`
-                    },
-                    () => {
-                        showPlayer();
-                    }
-                )
-                .subscribe();
+function render() {
+
+    document
+        .getElementById(
+            "join-panel"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "player-panel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "phase-panel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "display-name"
+        )
+        .textContent =
+            me.display_name;
+
+
+    document
+        .getElementById(
+            "war-chest"
+        )
+        .textContent =
+            "$" +
+            me.war_chest
+            .toLocaleString();
+
+
+    const myPicks =
+        picks.filter(
+            p =>
+                p.player_id ===
+                currentPlayerId
+        );
+
+
+    document
+        .getElementById(
+            "draft-count"
+        )
+        .textContent =
+            `${myPicks.length} / 8`;
+
+
+    renderPhase();
+
+    renderRoster();
+
+    renderDraftBoard();
+
+}
+
+
+function renderPhase() {
+
+    const container =
+        document.getElementById(
+            "phase-content"
+        );
+
+
+    if (
+        eventData.status ===
+        "lobby"
+    ) {
+
+        container.innerHTML = `
+            <h2>Lobby Open</h2>
+
+            <p>
+                Waiting for the host
+                to lock the lobby.
+            </p>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "locked"
+    ) {
+
+        container.innerHTML = `
+            <h2>Lobby Locked</h2>
+
+            <p>
+                All players are in.
+                Draft order is next.
+            </p>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft_order"
+    ) {
+
+        const ordered =
+            [...players]
+            .sort(
+                (a,b) =>
+                    a.draft_position -
+                    b.draft_position
+            );
+
+
+        container.innerHTML = `
+            <h2>Draft Order</h2>
+
+            <div class="order-list">
+
+                ${
+                    ordered.map(
+                        player => `
+                            <div
+                                class="
+                                    order-player
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        order-number
+                                    "
+                                >
+                                    ${
+                                        player
+                                        .draft_position
+                                    }
+                                </span>
+
+                                <strong>
+                                    ${
+                                        escapeHtml(
+                                            player
+                                            .display_name
+                                        )
+                                    }
+                                </strong>
+
+                            </div>
+                        `
+                    ).join("")
+                }
+
+            </div>
+
+            <p class="status">
+                The host will begin
+                the snake draft shortly.
+            </p>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft"
+    ) {
+
+        const state =
+            getCurrentDraftState();
+
+
+        container.innerHTML = `
+            <h2>
+                Draft Round
+                ${state.round}
+                of 8
+            </h2>
+
+            <p>
+                Pick
+                ${state.pick}
+            </p>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft_complete"
+    ) {
+
+        container.innerHTML = `
+            <h2>
+                Draft Complete
+            </h2>
+
+            <p>
+                Your faction is locked.
+            </p>
+        `;
+
+    }
+
+}
+
+
+function renderRoster() {
+
+    const panel =
+        document.getElementById(
+            "roster-panel"
+        );
+
+
+    if (
+        ![
+            "draft",
+            "draft_complete"
+        ].includes(
+            eventData.status
+        )
+    ) {
+
+        panel.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    const myPicks =
+        picks.filter(
+            p =>
+                p.player_id ===
+                currentPlayerId
+        );
+
+
+    const counts = {
+        S: 0,
+        A: 0,
+        B: 0,
+        C: 0,
+        D: 0
+    };
+
+
+    for (
+        const pick of myPicks
+    ) {
+
+        counts[
+            pick.units.tier
+        ]++;
 
     }
 
 
     document
-        .getElementById("join-event")
-        .addEventListener(
-            "click",
-            joinEvent
+        .getElementById(
+            "tier-limits"
+        )
+        .innerHTML = `
+            <div class="limit-row">
+
+                <div class="limit">
+                    S
+                    <strong>
+                        ${counts.S}/1
+                    </strong>
+                </div>
+
+                <div class="limit">
+                    A
+                    <strong>
+                        ${counts.A}/2
+                    </strong>
+                </div>
+
+                <div class="limit">
+                    B
+                    <strong>
+                        ${counts.B}/3
+                    </strong>
+                </div>
+
+                <div class="limit">
+                    C/D
+                    <strong>
+                        ${
+                            counts.C +
+                            counts.D
+                        }
+                    </strong>
+                </div>
+
+            </div>
+        `;
+
+
+    const roster =
+        document.getElementById(
+            "my-roster"
         );
 
 
-    async function initialize() {
+    if (
+        myPicks.length === 0
+    ) {
 
-        try {
+        roster.innerHTML = `
+            <p class="status">
+                No units drafted yet.
+            </p>
+        `;
 
-            await ensureAnonymousSession();
+        return;
+    }
 
 
-            if (
-                currentEventId &&
+    roster.innerHTML =
+        myPicks.map(
+            pick => `
+                <div
+                    class="
+                        roster-unit
+                    "
+                >
+                    <strong>
+                        ${
+                            pick.units.tier
+                        }
+                        —
+                        ${
+                            escapeHtml(
+                                pick.units
+                                .name
+                            )
+                        }
+                    </strong>
+
+                    <div class="status">
+                        ${
+                            pick.units
+                            .faction
+                        }
+                        •
+                        ${
+                            pick.units
+                            .cost
+                            .toLocaleString()
+                        }
+                    </div>
+                </div>
+            `
+        )
+        .join("");
+
+}
+
+
+function renderDraftBoard() {
+
+    const panel =
+        document.getElementById(
+            "draft-board-panel"
+        );
+
+
+    if (
+        eventData.status !==
+        "draft"
+    ) {
+
+        panel.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    const state =
+        getCurrentDraftState();
+
+
+    const isMyTurn =
+        state.player?.id ===
+        currentPlayerId;
+
+
+    const current =
+        document.getElementById(
+            "current-drafter"
+        );
+
+
+    current.className =
+        "current" +
+        (
+            isMyTurn
+            ? " your-turn"
+            : ""
+        );
+
+
+    current.innerHTML = `
+        <div>
+            ${
+                isMyTurn
+                ? "YOUR TURN"
+                : "CURRENT PICK"
+            }
+        </div>
+
+        <strong>
+            ${
+                escapeHtml(
+                    state.player
+                    ?.display_name
+                    ??
+                    "Loading..."
+                )
+            }
+        </strong>
+
+        <div>
+            Round
+            ${state.round}
+            •
+            Pick
+            ${state.pick}
+        </div>
+    `;
+
+
+    renderTierTabs();
+
+    renderUnits(
+        isMyTurn
+    );
+
+}
+
+
+function renderTierTabs() {
+
+    const container =
+        document.getElementById(
+            "tier-tabs"
+        );
+
+
+    container.innerHTML =
+        ["S","A","B","C","D"]
+        .map(
+            tier => `
+                <button
+                    class="
+                        tier-tab
+                        ${
+                            selectedTier ===
+                            tier
+                            ? "active"
+                            : ""
+                        }
+                    "
+                    onclick="
+                        selectTier(
+                            '${tier}'
+                        )
+                    "
+                >
+                    ${tier}
+                </button>
+            `
+        )
+        .join("");
+
+}
+
+
+function selectTier(
+    tier
+) {
+
+    selectedTier =
+        tier;
+
+    renderDraftBoard();
+
+}
+
+
+function renderUnits(
+    isMyTurn
+) {
+
+    const grid =
+        document.getElementById(
+            "unit-grid"
+        );
+
+
+    const drafted =
+        new Map();
+
+    for (
+        const pick of picks
+    ) {
+
+        drafted.set(
+            pick.unit_id,
+            pick.player_id
+        );
+
+    }
+
+
+    const myPicks =
+        picks.filter(
+            p =>
+                p.player_id ===
                 currentPlayerId
-            ) {
+        );
 
-                await showPlayer();
+
+    const counts = {
+        S: 0,
+        A: 0,
+        B: 0,
+        C: 0,
+        D: 0
+    };
+
+
+    for (
+        const pick of myPicks
+    ) {
+
+        counts[
+            pick.units.tier
+        ]++;
+
+    }
+
+
+    const tierMaxed =
+        counts[selectedTier]
+        >=
+        limits[selectedTier];
+
+
+    const visible =
+        units
+        .filter(
+            unit =>
+                unit.tier ===
+                selectedTier
+        )
+        .sort(
+            (a,b) =>
+                a.sort_order -
+                b.sort_order
+        );
+
+
+    grid.innerHTML =
+        visible.map(
+            unit => {
+
+                const ownerId =
+                    drafted.get(
+                        unit.id
+                    );
+
+                const owner =
+                    ownerId
+                    ? players.find(
+                        p =>
+                            p.id ===
+                            ownerId
+                    )
+                    : null;
+
+
+                const mine =
+                    ownerId ===
+                    currentPlayerId;
+
+
+                const unavailable =
+                    Boolean(ownerId);
+
+
+                const disabled =
+                    !isMyTurn
+                    ||
+                    unavailable
+                    ||
+                    tierMaxed
+                    ||
+                    myPicks.length >= 8;
+
+
+                let label =
+                    "Draft";
+
+
+                if (mine) {
+
+                    label =
+                        "Yours";
+
+                }
+
+                else if (owner) {
+
+                    label =
+                        `Taken`;
+
+                }
+
+                else if (
+                    tierMaxed
+                ) {
+
+                    label =
+                        "Tier Full";
+
+                }
+
+
+                return `
+                    <div
+                        class="
+                            unit-card
+                            ${
+                                unavailable
+                                ? "taken"
+                                : ""
+                            }
+                        "
+                    >
+
+                        <div>
+
+                            <div
+                                class="
+                                    unit-name
+                                "
+                            >
+                                ${
+                                    escapeHtml(
+                                        unit.name
+                                    )
+                                }
+                            </div>
+
+                            <div
+                                class="
+                                    unit-meta
+                                "
+                            >
+                                ${
+                                    unit.faction
+                                }
+                                •
+                                ${
+                                    unit.cost
+                                    .toLocaleString()
+                                }
+                                points
+
+                                ${
+                                    owner &&
+                                    !mine
+                                    ? `
+                                        •
+                                        Drafted by
+                                        ${
+                                            escapeHtml(
+                                                owner
+                                                .display_name
+                                            )
+                                        }
+                                      `
+                                    : ""
+                                }
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            ${
+                                disabled
+                                ? "disabled"
+                                : ""
+                            }
+                            onclick="
+                                makePick(
+                                    '${unit.id}'
+                                )
+                            "
+                        >
+                            ${label}
+                        </button>
+
+                    </div>
+                `;
 
             }
+        )
+        .join("");
 
+}
+
+
+async function makePick(
+    unitId
+) {
+
+    const message =
+        document.getElementById(
+            "draft-message"
+        );
+
+
+    message.textContent =
+        "Submitting pick...";
+
+
+    const {
+        error
+    } = await db.rpc(
+        "submit_draft_pick",
+        {
+            p_event_id:
+                currentEventId,
+
+            p_unit_id:
+                unitId
         }
+    );
 
-        catch (error) {
 
-            console.error(error);
+    if (error) {
 
-            document
-                .getElementById("join-status")
-                .textContent =
-                    "Connection error: "
-                    + error.message;
+        console.error(error);
+
+        message.textContent =
+            error.message;
+
+        return;
+    }
+
+
+    message.textContent =
+        "Pick confirmed.";
+
+}
+
+
+function startRealtime() {
+
+    if (!currentEventId) {
+        return;
+    }
+
+
+    if (eventChannel) {
+        db.removeChannel(
+            eventChannel
+        );
+    }
+
+    if (playerChannel) {
+        db.removeChannel(
+            playerChannel
+        );
+    }
+
+    if (pickChannel) {
+        db.removeChannel(
+            pickChannel
+        );
+    }
+
+
+    eventChannel =
+        db
+        .channel(
+            "player-event-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "events",
+                filter:
+                    `id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    playerChannel =
+        db
+        .channel(
+            "player-roster-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "players",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    pickChannel =
+        db
+        .channel(
+            "player-draft-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table:
+                    "draft_picks",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+}
+
+
+document
+    .getElementById(
+        "join-event"
+    )
+    .addEventListener(
+        "click",
+        joinEvent
+    );
+
+
+async function initialize() {
+
+    try {
+
+        await ensureAnonymousSession();
+
+
+        if (
+            currentEventId &&
+            currentPlayerId
+        ) {
+
+            await loadState();
+
+            startRealtime();
 
         }
 
     }
 
+    catch (error) {
 
-    initialize();
+        console.error(error);
+
+        document
+            .getElementById(
+                "join-status"
+            )
+            .textContent =
+                error.message;
+
+    }
+
+}
+
+
+initialize();
 
 </script>
 
 </body>
-
 </html>
