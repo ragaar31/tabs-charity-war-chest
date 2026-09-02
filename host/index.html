@@ -3,100 +3,225 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>
-        Host Dashboard | TABS War Chest Betting Special
-    </title>
+<title>
+    Host Dashboard | TABS War Chest Betting Special
+</title>
 
+<style>
 
-    <style>
+* {
+    box-sizing: border-box;
+}
 
-        * {
-            box-sizing: border-box;
-        }
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
-            background:
-                radial-gradient(
-                    circle at top,
-                    #343c50,
-                    #171b26 45%,
-                    #090b10 100%
-                );
-            color: white;
-        }
+    background:
+        radial-gradient(
+            circle at top,
+            #343c50,
+            #171b26 45%,
+            #090b10 100%
+        );
 
-        main {
-            width: min(900px, 92%);
-            margin: auto;
-            padding: 50px 0;
-        }
+    color: white;
+}
 
-        .eyebrow {
-            opacity: .6;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: .75rem;
-        }
+main {
+    width: min(1100px, 94%);
+    margin: auto;
+    padding: 45px 0 70px;
+}
 
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 5px;
-        }
+.eyebrow {
+    opacity: .6;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: .75rem;
+}
 
-        .panel {
-            margin-top: 30px;
-            padding: 25px;
-            background: rgba(255,255,255,.07);
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 16px;
-        }
+h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    margin: 8px 0 4px;
+}
 
-        button {
-            padding: 12px 20px;
-            border: 0;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+.subtitle {
+    opacity: .7;
+}
 
-        #room-code {
-            font-size: 3rem;
-            letter-spacing: 8px;
-            margin: 15px 0;
-        }
+.panel {
+    margin-top: 24px;
+    padding: 24px;
 
-        .player {
-            padding: 14px;
-            margin-top: 8px;
-            border-radius: 8px;
-            background: rgba(255,255,255,.08);
-            display: flex;
-            justify-content: space-between;
-        }
+    background: rgba(255,255,255,.07);
 
-        .hidden {
-            display: none;
-        }
+    border:
+        1px solid
+        rgba(255,255,255,.15);
 
-        a {
-            color: white;
-        }
+    border-radius: 16px;
+}
 
-        .status {
-            opacity: .65;
-        }
+button {
+    padding: 12px 18px;
 
-    </style>
+    border: 0;
+    border-radius: 8px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button.secondary {
+    background: #343b4d;
+    color: white;
+}
+
+button.danger {
+    background: #6d2932;
+    color: white;
+}
+
+button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+#room-code {
+    font-size: 2.8rem;
+    letter-spacing: 8px;
+    font-weight: bold;
+}
+
+.player-row {
+    padding: 13px;
+    margin-top: 8px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(140px, 1fr)
+        auto
+        auto;
+
+    gap: 12px;
+    align-items: center;
+
+    background: rgba(255,255,255,.07);
+
+    border-radius: 9px;
+}
+
+.order-number {
+    width: 35px;
+    height: 35px;
+
+    display: inline-grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: white;
+    color: #11151f;
+
+    font-weight: bold;
+}
+
+.current-drafter {
+    padding: 22px;
+    margin-top: 18px;
+
+    text-align: center;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.12);
+
+    border:
+        2px solid
+        rgba(255,255,255,.35);
+}
+
+.current-drafter strong {
+    display: block;
+    margin-top: 6px;
+
+    font-size: 2rem;
+}
+
+.rosters {
+    margin-top: 20px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(230px,1fr)
+        );
+
+    gap: 12px;
+}
+
+.roster {
+    padding: 16px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    border-radius: 12px;
+}
+
+.roster h3 {
+    margin-top: 0;
+}
+
+.roster-unit {
+    margin-top: 6px;
+    font-size: .9rem;
+}
+
+.tier {
+    display: inline-block;
+
+    min-width: 24px;
+
+    text-align: center;
+    font-weight: bold;
+
+    margin-right: 6px;
+}
+
+.status {
+    opacity: .65;
+}
+
+.hidden {
+    display: none !important;
+}
+
+a {
+    color: white;
+}
+
+</style>
 
 </head>
 
@@ -105,79 +230,102 @@
 
 <main>
 
-    <div class="eyebrow">
-        DreamHarrier • Extra Life
-    </div>
+<div class="eyebrow">
+    DreamHarrier • Extra Life
+</div>
 
-    <h1>Host Dashboard</h1>
+<h1>Host Dashboard</h1>
+
+<p class="subtitle">
+    TABS War Chest Betting Special
+</p>
+
+
+<section
+    id="create-panel"
+    class="panel hidden"
+>
+
+    <h2>Create Event</h2>
 
     <p>
-        TABS War Chest Betting Special
+        Start a new War Chest session.
     </p>
 
+    <button id="create-event">
+        Create Event
+    </button>
 
-    <section
-        id="create-panel"
-        class="panel"
-    >
-
-        <h2>Create Event</h2>
-
-        <p>
-            Start a new War Chest session and generate
-            a player room code.
-        </p>
-
-        <button id="create-event">
-            Create Event
-        </button>
-
-        <p
-            id="create-status"
-            class="status"
-        ></p>
-
-    </section>
+</section>
 
 
-    <section
-        id="lobby-panel"
-        class="panel hidden"
-    >
+<section
+    id="event-panel"
+    class="panel hidden"
+>
 
-        <h2>Lobby</h2>
+    <div id="lobby-info">
 
-        <p>Room Code</p>
+        <div class="status">
+            Room Code
+        </div>
 
         <div id="room-code">
             ------
         </div>
 
-        <p>
-            Players can join from the Player Portal.
-        </p>
-
-        <h3>
-            Connected Players
-            (<span id="player-count">0</span>)
-        </h3>
-
-        <div id="player-list"></div>
-
-    </section>
+    </div>
 
 
-    <p style="margin-top: 30px;">
-        <a href="../">
-            ← Return Home
-        </a>
-    </p>
+    <h2 id="phase-title">
+        Lobby
+    </h2>
+
+
+    <div id="host-actions"></div>
+
+
+    <p
+        id="host-message"
+        class="status"
+    ></p>
+
+
+    <h3>
+        Players
+        (<span id="player-count">0</span>)
+    </h3>
+
+    <div id="player-list"></div>
+
+</section>
+
+
+<section
+    id="draft-panel"
+    class="panel hidden"
+>
+
+    <h2>Snake Draft</h2>
+
+    <div id="draft-status"></div>
+
+    <div id="rosters" class="rosters"></div>
+
+</section>
+
+
+<p style="margin-top:30px;">
+    <a href="../">
+        ← Return Home
+    </a>
+</p>
 
 </main>
 
 
 <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 
 <script src="../js/supabase-client.js"></script>
@@ -185,110 +333,175 @@
 
 <script>
 
-    let currentEventId =
-        localStorage.getItem("tabs_host_event_id");
+let currentEventId =
+    localStorage.getItem(
+        "tabs_host_event_id"
+    );
 
-    let playerChannel = null;
+let eventData = null;
+let players = [];
+let picks = [];
+
+let eventChannel = null;
+let playerChannel = null;
+let pickChannel = null;
 
 
-    function makeRoomCode() {
+function escapeHtml(value) {
 
-        const characters =
-            "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const div =
+        document.createElement("div");
 
-        let code = "";
+    div.textContent =
+        value ?? "";
 
-        for (let i = 0; i < 6; i++) {
+    return div.innerHTML;
 
-            code += characters[
-                Math.floor(
-                    Math.random() * characters.length
-                )
-            ];
+}
 
-        }
 
-        return code;
+function makeRoomCode() {
+
+    const chars =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    let code = "";
+
+    for (let i = 0; i < 6; i++) {
+
+        code += chars[
+            Math.floor(
+                Math.random() *
+                chars.length
+            )
+        ];
 
     }
 
+    return code;
 
-    async function createEvent() {
+}
 
-    const status =
-        document.getElementById("create-status");
 
-    status.textContent = "Creating event...";
+function getCurrentDraftState() {
 
+    if (
+        !eventData ||
+        eventData.status !== "draft" ||
+        players.length === 0
+    ) {
+        return null;
+    }
+
+    const pick =
+        eventData.draft_pick_number;
+
+    const count =
+        players.length;
+
+    const round =
+        Math.floor(
+            (pick - 1) / count
+        ) + 1;
+
+    const index =
+        (pick - 1) % count;
+
+    const position =
+        round % 2 === 1
+            ? index + 1
+            : count - index;
+
+    const player =
+        players.find(
+            p =>
+                p.draft_position ===
+                position
+        );
+
+    return {
+        pick,
+        round,
+        position,
+        player
+    };
+
+}
+
+
+async function createEvent() {
+
+    setMessage("Creating event...");
 
     try {
 
         const user =
             await ensureAnonymousSession();
 
+        let created = null;
 
-        let event = null;
+        for (
+            let attempt = 0;
+            attempt < 5;
+            attempt++
+        ) {
 
+            const id =
+                crypto.randomUUID();
 
-        for (let attempt = 0; attempt < 5; attempt++) {
-
-            const code = makeRoomCode();
-
-            const eventId = crypto.randomUUID();
-
+            const code =
+                makeRoomCode();
 
             const {
                 error
             } = await db
                 .from("events")
                 .insert({
-                    id: eventId,
-                    code: code,
-                    name: "TABS War Chest Betting Special",
-                    host_user_id: user.id
+                    id,
+                    code,
+                    name:
+                        "TABS War Chest Betting Special",
+                    host_user_id:
+                        user.id
                 });
-
 
             if (!error) {
 
-                event = {
-                    id: eventId,
-                    code: code,
-                    name: "TABS War Chest Betting Special",
-                    host_user_id: user.id
+                created = {
+                    id,
+                    code
                 };
 
                 break;
-
             }
 
-
-            if (error.code !== "23505") {
+            if (
+                error.code !== "23505"
+            ) {
                 throw error;
             }
 
         }
 
-
-        if (!event) {
+        if (!created) {
 
             throw new Error(
-                "Unable to generate a unique room code."
+                "Unable to create event."
             );
 
         }
 
-
-        currentEventId = event.id;
-
+        currentEventId =
+            created.id;
 
         localStorage.setItem(
             "tabs_host_event_id",
-            event.id
+            currentEventId
         );
 
+        await loadState();
 
-        showLobby(event);
+        startRealtime();
 
     }
 
@@ -296,232 +509,909 @@
 
         console.error(error);
 
-        status.textContent =
-            "Error: " + error.message;
+        setMessage(
+            "Error: " + error.message
+        );
 
     }
 
 }
 
 
-    async function loadExistingEvent() {
+async function loadState() {
 
-        if (!currentEventId) {
-            return;
-        }
+    if (!currentEventId) {
+
+        document
+            .getElementById(
+                "create-panel"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+        return;
+    }
 
 
-        const {
-            data,
-            error
-        } = await db
+    const eventResult =
+        await db
             .from("events")
             .select("*")
-            .eq("id", currentEventId)
+            .eq(
+                "id",
+                currentEventId
+            )
             .maybeSingle();
 
 
-        if (error || !data) {
+    if (
+        eventResult.error ||
+        !eventResult.data
+    ) {
 
-            localStorage.removeItem(
-                "tabs_host_event_id"
+        console.error(
+            eventResult.error
+        );
+
+        localStorage.removeItem(
+            "tabs_host_event_id"
+        );
+
+        currentEventId = null;
+
+        document
+            .getElementById(
+                "create-panel"
+            )
+            .classList.remove(
+                "hidden"
             );
 
-            currentEventId = null;
-
-            return;
-
-        }
-
-
-        showLobby(data);
-
+        return;
     }
 
 
-    function showLobby(event) {
-
-        document
-            .getElementById("create-panel")
-            .classList.add("hidden");
+    eventData =
+        eventResult.data;
 
 
-        document
-            .getElementById("lobby-panel")
-            .classList.remove("hidden");
-
-
-        document
-            .getElementById("room-code")
-            .textContent = event.code;
-
-
-        loadPlayers();
-
-        subscribeToPlayers();
-
-    }
-
-
-    async function loadPlayers() {
-
-        if (!currentEventId) {
-            return;
-        }
-
-
-        const {
-            data,
-            error
-        } = await db
+    const playerResult =
+        await db
             .from("players")
-            .select(
-                "id, display_name, war_chest, wins, joined_at"
+            .select("*")
+            .eq(
+                "event_id",
+                currentEventId
             )
-            .eq("event_id", currentEventId)
-            .order("joined_at");
+            .order(
+                "joined_at"
+            );
 
 
-        if (error) {
+    if (playerResult.error) {
 
-            console.error(error);
-            return;
+        console.error(
+            playerResult.error
+        );
 
-        }
-
-
-        const list =
-            document.getElementById("player-list");
-
-
-        const count =
-            document.getElementById("player-count");
-
-
-        list.innerHTML = "";
-
-        count.textContent = data.length;
-
-
-        if (data.length === 0) {
-
-            list.innerHTML =
-                `<p class="status">
-                    Waiting for players...
-                 </p>`;
-
-            return;
-
-        }
-
-
-        for (const player of data) {
-
-            const div =
-                document.createElement("div");
-
-            div.className = "player";
-
-
-            div.innerHTML = `
-                <strong>
-                    ${escapeHtml(player.display_name)}
-                </strong>
-
-                <span>
-                    $${player.war_chest.toLocaleString()}
-                </span>
-            `;
-
-
-            list.appendChild(div);
-
-        }
-
+        return;
     }
 
 
-    function subscribeToPlayers() {
-
-        if (playerChannel) {
-
-            db.removeChannel(playerChannel);
-
-        }
+    players =
+        playerResult.data ?? [];
 
 
-        playerChannel =
-            db
-                .channel(
-                    "players-" + currentEventId
+    const pickResult =
+        await db
+            .from("draft_picks")
+            .select(`
+                pick_number,
+                player_id,
+                unit_id,
+                units (
+                    name,
+                    cost,
+                    faction,
+                    tier
                 )
-                .on(
-                    "postgres_changes",
-                    {
-                        event: "*",
-                        schema: "public",
-                        table: "players",
-                        filter:
-                            `event_id=eq.${currentEventId}`
-                    },
-                    () => {
-                        loadPlayers();
-                    }
-                )
-                .subscribe();
+            `)
+            .eq(
+                "event_id",
+                currentEventId
+            )
+            .order(
+                "pick_number"
+            );
 
+
+    if (pickResult.error) {
+
+        console.error(
+            pickResult.error
+        );
+
+        return;
     }
 
 
-    function escapeHtml(value) {
+    picks =
+        pickResult.data ?? [];
 
-        const div =
-            document.createElement("div");
 
-        div.textContent = value;
+    render();
 
-        return div.innerHTML;
+}
 
-    }
 
+function render() {
 
     document
-        .getElementById("create-event")
-        .addEventListener(
-            "click",
-            createEvent
+        .getElementById(
+            "create-panel"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+    document
+        .getElementById(
+            "event-panel"
+        )
+        .classList.remove(
+            "hidden"
         );
 
 
-    async function initialize() {
+    document
+        .getElementById(
+            "room-code"
+        )
+        .textContent =
+            eventData.code;
 
-        try {
 
-            await ensureAnonymousSession();
+    document
+        .getElementById(
+            "player-count"
+        )
+        .textContent =
+            players.length;
 
-            await loadExistingEvent();
 
+    renderActions();
+    renderPlayers();
+    renderDraft();
+
+}
+
+
+function renderActions() {
+
+    const title =
+        document.getElementById(
+            "phase-title"
+        );
+
+    const actions =
+        document.getElementById(
+            "host-actions"
+        );
+
+
+    actions.innerHTML = "";
+
+
+    if (
+        eventData.status ===
+        "lobby"
+    ) {
+
+        title.textContent =
+            "Lobby Open";
+
+        actions.innerHTML = `
+            <div class="actions">
+
+                <button
+                    onclick="lockLobby()"
+                >
+                    Lock Lobby
+                </button>
+
+            </div>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "locked"
+    ) {
+
+        title.textContent =
+            "Lobby Locked";
+
+        actions.innerHTML = `
+            <div class="actions">
+
+                <button
+                    onclick="
+                        randomizeOrder()
+                    "
+                >
+                    Determine Draft Order
+                </button>
+
+            </div>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft_order"
+    ) {
+
+        title.textContent =
+            "Draft Order";
+
+        actions.innerHTML = `
+            <div class="actions">
+
+                <button
+                    class="secondary"
+                    onclick="
+                        randomizeOrder()
+                    "
+                >
+                    Reroll Order
+                </button>
+
+                <button
+                    onclick="
+                        beginDraft()
+                    "
+                >
+                    Begin Draft
+                </button>
+
+            </div>
+        `;
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft"
+    ) {
+
+        title.textContent =
+            "Draft In Progress";
+
+    }
+
+
+    else if (
+        eventData.status ===
+        "draft_complete"
+    ) {
+
+        title.textContent =
+            "Draft Complete";
+
+    }
+
+}
+
+
+function renderPlayers() {
+
+    const list =
+        document.getElementById(
+            "player-list"
+        );
+
+
+    let displayPlayers =
+        [...players];
+
+
+    if (
+        eventData.status !==
+        "lobby" &&
+        displayPlayers.some(
+            p =>
+                p.draft_position
+        )
+    ) {
+
+        displayPlayers.sort(
+            (a,b) =>
+                a.draft_position -
+                b.draft_position
+        );
+
+    }
+
+
+    if (
+        displayPlayers.length === 0
+    ) {
+
+        list.innerHTML =
+            `<p class="status">
+                Waiting for players...
+             </p>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        displayPlayers.map(
+            player => {
+
+                const position =
+                    player.draft_position
+                    ? `
+                        <span
+                            class="
+                                order-number
+                            "
+                        >
+                            ${
+                                player
+                                .draft_position
+                            }
+                        </span>
+                    `
+                    : `<span></span>`;
+
+
+                const remove =
+                    eventData.status ===
+                    "lobby"
+                    ? `
+                        <button
+                            class="danger"
+                            onclick="
+                                removePlayer(
+                                    '${player.id}'
+                                )
+                            "
+                        >
+                            Remove
+                        </button>
+                    `
+                    : `<span></span>`;
+
+
+                return `
+                    <div
+                        class="player-row"
+                    >
+
+                        <strong>
+                            ${
+                                escapeHtml(
+                                    player
+                                    .display_name
+                                )
+                            }
+                        </strong>
+
+                        ${position}
+
+                        ${remove}
+
+                    </div>
+                `;
+
+            }
+        )
+        .join("");
+
+}
+
+
+function renderDraft() {
+
+    const panel =
+        document.getElementById(
+            "draft-panel"
+        );
+
+    const status =
+        document.getElementById(
+            "draft-status"
+        );
+
+
+    if (
+        ![
+            "draft",
+            "draft_complete"
+        ].includes(
+            eventData.status
+        )
+    ) {
+
+        panel.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    panel.classList.remove(
+        "hidden"
+    );
+
+
+    if (
+        eventData.status ===
+        "draft_complete"
+    ) {
+
+        status.innerHTML = `
+            <div
+                class="current-drafter"
+            >
+                <div>
+                    Draft Complete
+                </div>
+
+                <strong>
+                    All factions locked.
+                </strong>
+            </div>
+        `;
+
+    }
+
+    else {
+
+        const state =
+            getCurrentDraftState();
+
+
+        status.innerHTML = `
+            <div
+                class="current-drafter"
+            >
+
+                <div>
+                    Round
+                    ${state.round}
+                    of 8
+                    •
+                    Pick
+                    ${state.pick}
+                </div>
+
+                <strong>
+                    ${
+                        escapeHtml(
+                            state
+                            .player
+                            ?.display_name
+                            ??
+                            "Loading..."
+                        )
+                    }
+                </strong>
+
+                <div>
+                    is on the clock
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    renderRosters();
+
+}
+
+
+function renderRosters() {
+
+    const container =
+        document.getElementById(
+            "rosters"
+        );
+
+
+    const ordered =
+        [...players]
+        .sort(
+            (a,b) =>
+                (a.draft_position ?? 999)
+                -
+                (b.draft_position ?? 999)
+        );
+
+
+    container.innerHTML =
+        ordered.map(
+            player => {
+
+                const playerPicks =
+                    picks.filter(
+                        pick =>
+                            pick.player_id ===
+                            player.id
+                    );
+
+
+                const units =
+                    playerPicks.length
+                    ? playerPicks.map(
+                        pick => `
+                            <div
+                                class="
+                                    roster-unit
+                                "
+                            >
+                                <span
+                                    class="tier"
+                                >
+                                    ${
+                                        pick.units
+                                        .tier
+                                    }
+                                </span>
+
+                                ${
+                                    escapeHtml(
+                                        pick.units
+                                        .name
+                                    )
+                                }
+
+                                —
+                                ${
+                                    pick.units
+                                    .cost
+                                    .toLocaleString()
+                                }
+                            </div>
+                        `
+                    ).join("")
+                    : `
+                        <div
+                            class="status"
+                        >
+                            No picks yet.
+                        </div>
+                    `;
+
+
+                return `
+                    <div class="roster">
+
+                        <h3>
+                            ${
+                                escapeHtml(
+                                    player
+                                    .display_name
+                                )
+                            }
+                        </h3>
+
+                        <div class="status">
+                            ${
+                                playerPicks
+                                .length
+                            }
+                            / 8 units
+                        </div>
+
+                        ${units}
+
+                    </div>
+                `;
+
+            }
+        )
+        .join("");
+
+}
+
+
+async function removePlayer(
+    playerId
+) {
+
+    if (
+        eventData.status !==
+        "lobby"
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } = await db
+        .from("players")
+        .delete()
+        .eq(
+            "id",
+            playerId
+        );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+    }
+
+}
+
+
+async function lockLobby() {
+
+    setMessage(
+        "Locking lobby..."
+    );
+
+
+    const {
+        error
+    } = await db.rpc(
+        "lock_lobby",
+        {
+            p_event_id:
+                currentEventId
         }
+    );
 
-        catch (error) {
 
-            console.error(error);
+    if (error) {
 
-            document
-                .getElementById("create-status")
-                .textContent =
-                    "Supabase connection failed: "
-                    + error.message;
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Lobby locked."
+    );
+
+}
+
+
+async function randomizeOrder() {
+
+    setMessage(
+        "Determining draft order..."
+    );
+
+
+    const {
+        error
+    } = await db.rpc(
+        "randomize_draft_order",
+        {
+            p_event_id:
+                currentEventId
+        }
+    );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Draft order determined."
+    );
+
+}
+
+
+async function beginDraft() {
+
+    setMessage(
+        "Starting draft..."
+    );
+
+
+    const {
+        error
+    } = await db.rpc(
+        "begin_draft",
+        {
+            p_event_id:
+                currentEventId
+        }
+    );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Draft started."
+    );
+
+}
+
+
+function setMessage(
+    message
+) {
+
+    document
+        .getElementById(
+            "host-message"
+        )
+        .textContent =
+            message;
+
+}
+
+
+function startRealtime() {
+
+    if (!currentEventId) {
+        return;
+    }
+
+
+    if (eventChannel) {
+        db.removeChannel(
+            eventChannel
+        );
+    }
+
+    if (playerChannel) {
+        db.removeChannel(
+            playerChannel
+        );
+    }
+
+    if (pickChannel) {
+        db.removeChannel(
+            pickChannel
+        );
+    }
+
+
+    eventChannel =
+        db
+        .channel(
+            "event-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "events",
+                filter:
+                    `id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    playerChannel =
+        db
+        .channel(
+            "players-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "players",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
+    pickChannel =
+        db
+        .channel(
+            "draft-picks-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table:
+                    "draft_picks",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+}
+
+
+document
+    .getElementById(
+        "create-event"
+    )
+    .addEventListener(
+        "click",
+        createEvent
+    );
+
+
+async function initialize() {
+
+    try {
+
+        await ensureAnonymousSession();
+
+        await loadState();
+
+        if (currentEventId) {
+
+            startRealtime();
 
         }
 
     }
 
+    catch (error) {
 
-    initialize();
+        console.error(error);
+
+        setMessage(
+            error.message
+        );
+
+    }
+
+}
+
+
+initialize();
 
 </script>
 
 </body>
-
 </html>
