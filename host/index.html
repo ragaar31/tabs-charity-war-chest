@@ -250,6 +250,71 @@ button:disabled {
     background: rgba(255,255,255,.08);
 }
 
+
+.betting-ready-grid,
+.pool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.ready-card,
+.pool-card {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.07);
+}
+
+.ready-card.ready {
+    border: 1px solid rgba(255,255,255,.32);
+}
+
+.pool-card.current-fight {
+    border: 2px solid rgba(255,255,255,.45);
+}
+
+.pool-side {
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 9px;
+    background: rgba(0,0,0,.16);
+}
+
+.pool-amount {
+    display: block;
+    margin-top: 4px;
+    font-size: 1.7rem;
+    font-weight: bold;
+}
+
+.fight-control {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.09);
+}
+
+.fight-armies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.winner-choice {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.result-line {
+    margin-top: 8px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255,255,255,.09);
+}
+
 .hidden { display: none !important; }
 
 a { color: white; }
@@ -343,6 +408,15 @@ a { color: white; }
 </section>
 
 
+<section id="betting-host-panel" class="panel hidden">
+
+    <h2 id="betting-host-title">Betting</h2>
+
+    <div id="betting-host-content"></div>
+
+</section>
+
+
 <p style="margin-top:30px;">
     <a href="../">← Return Home</a>
 </p>
@@ -364,6 +438,8 @@ let picks = [];
 let matches = [];
 let roundStates = [];
 let armySubmissions = [];
+let bettingPools = [];
+let bets = [];
 
 let eventChannel = null;
 let playerChannel = null;
@@ -788,6 +864,43 @@ async function loadState() {
         armyResult.data ?? [];
 
 
+    const poolResult =
+        await db
+            .from("match_betting_pools")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number");
+
+
+    if (poolResult.error) {
+        console.error(poolResult.error);
+        return;
+    }
+
+
+    bettingPools =
+        poolResult.data ?? [];
+
+
+    const betResult =
+        await db
+            .from("bets")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("round_number")
+            .order("created_at");
+
+
+    if (betResult.error) {
+        console.error(betResult.error);
+        return;
+    }
+
+
+    bets =
+        betResult.data ?? [];
+
+
     render();
 }
 
@@ -821,6 +934,7 @@ function render() {
     renderShopHost();
     renderRound();
     renderArmyHost();
+    renderBettingHost();
 }
 
 
@@ -954,6 +1068,45 @@ function renderActions() {
 
         title.textContent =
             `Round ${eventData.current_round} Army Build`;
+    }
+
+
+    else if (
+        eventData.status ===
+        "betting_open"
+    ) {
+
+        title.textContent =
+            `Round ${eventData.current_round} Betting Open`;
+    }
+
+
+    else if (
+        eventData.status ===
+        "betting_locked"
+    ) {
+
+        title.textContent =
+            `Round ${eventData.current_round} Pools Locked`;
+    }
+
+
+    else if (
+        eventData.status === "fight"
+    ) {
+
+        title.textContent =
+            `Round ${eventData.current_round} Fight ${eventData.current_match_number}`;
+    }
+
+
+    else if (
+        eventData.status ===
+        "regular_complete"
+    ) {
+
+        title.textContent =
+            "Regular Season Complete";
     }
 }
 
@@ -1820,11 +1973,10 @@ function renderArmyHost() {
                 </strong>
 
                 <p class="status">
-                    The next event phase is Betting.
-                    We will activate this button in the next milestone.
+                    Every army is locked. Open the round-wide betting window when everyone is ready.
                 </p>
 
-                <button disabled>
+                <button onclick="beginBetting()">
                     Begin Betting
                 </button>
 
@@ -1885,6 +2037,734 @@ async function reopenArmy(
     await loadState();
 }
 
+
+
+function currentRoundMatches() {
+    return matches.filter(
+        match =>
+            match.round_number ===
+            eventData.current_round
+    );
+}
+
+
+function currentFightMatch() {
+    return matches.find(
+        match =>
+            match.round_number ===
+            eventData.current_round
+            &&
+            match.match_number ===
+            eventData.current_match_number
+    ) ?? null;
+}
+
+
+function playerName(playerId) {
+    return players.find(
+        player => player.id === playerId
+    )?.display_name ?? "Player";
+}
+
+
+function renderHostArmySheet(submission) {
+
+    if (!submission) {
+        return `
+            <p class="status">
+                Army submission not found.
+            </p>
+        `;
+    }
+
+
+    const zones = {
+        frontline: [],
+        midrange: [],
+        backline: []
+    };
+
+
+    for (
+        const line of
+        submission.army_lines ?? []
+    ) {
+        zones[line.zone].push(line);
+    }
+
+
+    const zoneHtml =
+        [
+            ["frontline", "FRONTLINE"],
+            ["midrange", "MID-RANGE"],
+            ["backline", "BACKLINE"]
+        ]
+        .map(
+            ([key, label]) => {
+
+                if (zones[key].length === 0) {
+                    return "";
+                }
+
+
+                return `
+                    <div class="army-zone">
+
+                        <div class="army-zone-title">
+                            ${label}
+                        </div>
+
+                        ${
+                            zones[key]
+                            .map(
+                                line => `
+                                    <div class="army-line">
+                                        ${line.quantity}×
+                                        ${escapeHtml(line.units.name)}
+                                    </div>
+                                `
+                            )
+                            .join("")
+                        }
+
+                    </div>
+                `;
+            }
+        )
+        .join("");
+
+
+    return `
+        <div class="army-sheet">
+            ${zoneHtml}
+
+            <div class="army-total">
+                ${submission.total_cost.toLocaleString()}
+                /
+                ${submission.final_army_budget.toLocaleString()}
+                points
+            </div>
+        </div>
+    `;
+}
+
+
+function renderBettingHost() {
+
+    const panel =
+        document.getElementById(
+            "betting-host-panel"
+        );
+
+    const title =
+        document.getElementById(
+            "betting-host-title"
+        );
+
+    const content =
+        document.getElementById(
+            "betting-host-content"
+        );
+
+
+    const bettingPhases = [
+        "betting_open",
+        "betting_locked",
+        "fight",
+        "regular_complete"
+    ];
+
+
+    if (!bettingPhases.includes(eventData.status)) {
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    if (eventData.status === "regular_complete") {
+
+        title.textContent =
+            "Regular Season Complete";
+
+        const standings =
+            [...players]
+            .sort(
+                (a,b) =>
+                    b.war_chest - a.war_chest
+                    ||
+                    b.wins - a.wins
+            );
+
+
+        content.innerHTML = `
+            <p>
+                All three regular-season rounds are complete.
+                Final War setup will be the next milestone.
+            </p>
+
+            <div class="betting-ready-grid">
+                ${
+                    standings.map(
+                        (player, index) => `
+                            <div class="ready-card">
+                                <strong>
+                                    #${index + 1}
+                                    ${escapeHtml(player.display_name)}
+                                </strong>
+
+                                <div class="money">
+                                    $${player.war_chest.toLocaleString()}
+                                </div>
+
+                                <div class="status">
+                                    ${player.wins} regular-season wins
+                                    •
+                                    ${player.skill_points} SP
+                                </div>
+                            </div>
+                        `
+                    ).join("")
+                }
+            </div>
+        `;
+
+        return;
+    }
+
+
+    title.textContent =
+        `Round ${eventData.current_round} Betting`;
+
+
+    if (eventData.status === "betting_open") {
+
+        const readyCount =
+            players.filter(
+                player =>
+                    player.betting_ready_round ===
+                    eventData.current_round
+            ).length;
+
+
+        content.innerHTML = `
+            <p class="status">
+                Wagers are secret. Players may bet on any fight except their own,
+                up to $1,000 per fight and $2,000 total this round.
+            </p>
+
+            <div class="betting-ready-grid">
+                ${
+                    players.map(
+                        player => {
+                            const ready =
+                                player.betting_ready_round ===
+                                eventData.current_round;
+
+                            return `
+                                <div class="ready-card ${ready ? "ready" : ""}">
+                                    <strong>
+                                        ${escapeHtml(player.display_name)}
+                                    </strong>
+
+                                    <div style="margin-top:8px;">
+                                        ${
+                                            ready
+                                            ? "✅ Ready"
+                                            : "⏳ Betting"
+                                        }
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    ).join("")
+                }
+            </div>
+
+            <div class="next-phase">
+                <strong>
+                    ${readyCount} / ${players.length} players ready
+                </strong>
+
+                <p class="status">
+                    Locking freezes every wager and reveals only the aggregate pools.
+                </p>
+
+                <button onclick="lockBetting()">
+                    Lock Betting & Reveal Pools
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const roundMatches =
+        currentRoundMatches();
+
+    const currentMatch =
+        currentFightMatch();
+
+
+    const poolCards =
+        roundMatches.map(
+            match => {
+
+                const pool =
+                    bettingPools.find(
+                        row => row.match_id === match.id
+                    );
+
+                const isCurrent =
+                    currentMatch?.id === match.id;
+
+                const winnerName =
+                    match.winner_player_id
+                    ? playerName(match.winner_player_id)
+                    : null;
+
+                return `
+                    <div class="pool-card ${isCurrent ? "current-fight" : ""}">
+
+                        <div class="status">
+                            Fight ${match.match_number}
+                            ${isCurrent ? " • CURRENT" : ""}
+                        </div>
+
+                        <div class="pool-side">
+                            <strong>
+                                ${escapeHtml(playerName(match.player1_id))}
+                            </strong>
+
+                            <span class="pool-amount">
+                                $${(pool?.player1_pool ?? 1000).toLocaleString()}
+                            </span>
+                        </div>
+
+                        <div class="pool-side">
+                            <strong>
+                                ${escapeHtml(playerName(match.player2_id))}
+                            </strong>
+
+                            <span class="pool-amount">
+                                $${(pool?.player2_pool ?? 1000).toLocaleString()}
+                            </span>
+                        </div>
+
+                        <div class="status" style="margin-top:8px;">
+                            Each side includes the House's $1,000 seed.
+                        </div>
+
+                        ${
+                            match.status === "settled"
+                            ? `
+                                <div class="result-line">
+                                    ✅ Winner:
+                                    <strong>${escapeHtml(winnerName)}</strong>
+                                </div>
+                              `
+                            : ""
+                        }
+
+                    </div>
+                `;
+            }
+        ).join("");
+
+
+    let currentControl = "";
+
+
+    if (eventData.status === "betting_locked") {
+
+        currentControl = `
+            <div class="fight-control">
+                <div class="status">
+                    Current Fight
+                </div>
+
+                <h3>
+                    ${escapeHtml(playerName(currentMatch?.player1_id))}
+                    vs
+                    ${escapeHtml(playerName(currentMatch?.player2_id))}
+                </h3>
+
+                <p>
+                    Pools are public. Exact armies are still hidden from players.
+                </p>
+
+                <button onclick="revealCurrentArmies()">
+                    Reveal Armies
+                </button>
+            </div>
+        `;
+    }
+
+
+    else if (eventData.status === "fight") {
+
+        const p1Submission =
+            armySubmissions.find(
+                row =>
+                    row.round_number ===
+                    eventData.current_round
+                    &&
+                    row.player_id ===
+                    currentMatch?.player1_id
+            );
+
+        const p2Submission =
+            armySubmissions.find(
+                row =>
+                    row.round_number ===
+                    eventData.current_round
+                    &&
+                    row.player_id ===
+                    currentMatch?.player2_id
+            );
+
+        const winnerRecorded =
+            currentMatch?.status ===
+            "winner_recorded";
+
+
+        currentControl = `
+            <div class="fight-control">
+
+                <div class="status">
+                    Fight ${currentMatch?.match_number}
+                </div>
+
+                <h3>
+                    ${escapeHtml(playerName(currentMatch?.player1_id))}
+                    vs
+                    ${escapeHtml(playerName(currentMatch?.player2_id))}
+                </h3>
+
+                <div class="fight-armies">
+
+                    <div>
+                        <strong>
+                            ${escapeHtml(playerName(currentMatch?.player1_id))}
+                        </strong>
+
+                        ${renderHostArmySheet(p1Submission)}
+                    </div>
+
+                    <div>
+                        <strong>
+                            ${escapeHtml(playerName(currentMatch?.player2_id))}
+                        </strong>
+
+                        ${renderHostArmySheet(p2Submission)}
+                    </div>
+
+                </div>
+
+                <div class="winner-choice">
+
+                    <button
+                        class="${
+                            currentMatch?.winner_player_id ===
+                            currentMatch?.player1_id
+                            ? "secondary"
+                            : ""
+                        }"
+                        onclick="recordWinner('${currentMatch?.player1_id}')"
+                    >
+                        ${escapeHtml(playerName(currentMatch?.player1_id))} Wins
+                    </button>
+
+                    <button
+                        class="${
+                            currentMatch?.winner_player_id ===
+                            currentMatch?.player2_id
+                            ? "secondary"
+                            : ""
+                        }"
+                        onclick="recordWinner('${currentMatch?.player2_id}')"
+                    >
+                        ${escapeHtml(playerName(currentMatch?.player2_id))} Wins
+                    </button>
+
+                </div>
+
+                ${
+                    winnerRecorded
+                    ? `
+                        <div class="next-phase">
+                            <strong>
+                                Winner recorded:
+                                ${escapeHtml(playerName(currentMatch.winner_player_id))}
+                            </strong>
+
+                            <p class="status">
+                                Settling pays winning wagers, awards the fighter +$500 and +1 Skill Point,
+                                then advances to the next fight or Shop phase.
+                            </p>
+
+                            <button onclick="settleFight()">
+                                Settle Fight
+                            </button>
+                        </div>
+                      `
+                    : `
+                        <p class="status">
+                            If TABS bugs or draws, rerun the exact fight and leave this screen unchanged.
+                        </p>
+                      `
+                }
+
+            </div>
+        `;
+    }
+
+
+    const settledBets =
+        bets.filter(
+            bet =>
+                bet.round_number ===
+                eventData.current_round
+                &&
+                bet.status === "settled"
+        );
+
+
+    const payoutSummary =
+        settledBets.length
+        ? `
+            <div class="next-phase">
+                <strong>Settled wager returns</strong>
+
+                ${
+                    settledBets.map(
+                        bet => `
+                            <div class="result-line">
+                                ${escapeHtml(playerName(bet.bettor_player_id))}:
+                                $${bet.amount.toLocaleString()}
+                                on
+                                ${escapeHtml(playerName(bet.backed_player_id))}
+                                →
+                                <strong>
+                                    $${bet.payout.toLocaleString()} return
+                                </strong>
+                            </div>
+                        `
+                    ).join("")
+                }
+            </div>
+          `
+        : "";
+
+
+    content.innerHTML = `
+        <p class="status">
+            Pools are locked for the entire round. Fight armies reveal one matchup at a time.
+        </p>
+
+        <div class="pool-grid">
+            ${poolCards}
+        </div>
+
+        ${currentControl}
+        ${payoutSummary}
+    `;
+}
+
+
+async function beginBetting() {
+
+    setMessage("Opening betting...");
+
+    const { error } =
+        await db.rpc(
+            "begin_betting",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+        setMessage(error.message);
+        return;
+    }
+
+
+    setMessage(
+        "Betting is open for the entire round."
+    );
+
+    await loadState();
+}
+
+
+async function lockBetting() {
+
+    const readyCount =
+        players.filter(
+            player =>
+                player.betting_ready_round ===
+                eventData.current_round
+        ).length;
+
+
+    if (
+        readyCount < players.length
+        &&
+        !window.confirm(
+            `Only ${readyCount} of ${players.length} players marked themselves ready. Lock betting anyway?`
+        )
+    ) {
+        return;
+    }
+
+
+    setMessage("Locking wagers...");
+
+    const { error } =
+        await db.rpc(
+            "lock_betting",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+        setMessage(error.message);
+        return;
+    }
+
+
+    setMessage(
+        "Betting locked. House-seeded pools revealed."
+    );
+
+    await loadState();
+}
+
+
+async function revealCurrentArmies() {
+
+    setMessage("Revealing current armies...");
+
+    const { error } =
+        await db.rpc(
+            "reveal_current_match_armies",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+        setMessage(error.message);
+        return;
+    }
+
+
+    setMessage("Armies revealed. Run the fight in TABS.");
+    await loadState();
+}
+
+
+async function recordWinner(playerId) {
+
+    setMessage("Recording winner...");
+
+    const { error } =
+        await db.rpc(
+            "record_current_match_winner",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_winner_player_id:
+                    playerId
+            }
+        );
+
+
+    if (error) {
+        setMessage(error.message);
+        return;
+    }
+
+
+    setMessage(
+        `${playerName(playerId)} recorded as winner. Confirm with Settle Fight.`
+    );
+
+    await loadState();
+}
+
+
+async function settleFight() {
+
+    const match =
+        currentFightMatch();
+
+
+    if (
+        !match?.winner_player_id
+        ||
+        !window.confirm(
+            `Settle this fight with ${playerName(match.winner_player_id)} as the winner? This pays wagers and awards the battle reward.`
+        )
+    ) {
+        return;
+    }
+
+
+    setMessage("Settling fight...");
+
+    const { data, error } =
+        await db.rpc(
+            "settle_current_match",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+        setMessage(error.message);
+        return;
+    }
+
+
+    if (data?.next_status === "next_round_shop") {
+        setMessage(
+            `Fight settled. Round complete — Round ${data.next_round} Shop is now open.`
+        );
+    }
+
+    else if (
+        data?.next_status ===
+        "regular_complete"
+    ) {
+        setMessage(
+            "Fight settled. The regular season is complete."
+        );
+    }
+
+    else {
+        setMessage(
+            "Fight settled. Next fight is ready for army reveal."
+        );
+    }
+
+
+    await loadState();
+}
 
 
 async function closeShopAndLockBudgets() {
