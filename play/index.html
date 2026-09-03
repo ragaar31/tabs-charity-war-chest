@@ -448,10 +448,17 @@ select {
 
 .bet-choice {
     min-height: 48px;
+    transition: .15s ease;
 }
 
 .bet-choice.selected {
-    outline: 3px solid white;
+    background: #2f855a;
+    color: white;
+    outline: 2px solid #9ae6b4;
+}
+
+.bet-choice.selection-disabled {
+    opacity: .32;
 }
 
 .bet-controls {
@@ -734,6 +741,51 @@ select {
     background: rgba(255,255,255,.06);
 }
 
+
+.parlay-match.pending-selected,
+.hedge-match.pending-selected {
+    border: 1px solid #9ae6b4;
+    background: rgba(47,133,90,.18);
+}
+
+.parlay-match.pending-disabled,
+.hedge-match.pending-disabled {
+    opacity: .38;
+}
+
+.hedge-match {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+}
+
+.special-choice-toggle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.special-choice-toggle button.selected {
+    background: #2f855a;
+    color: white;
+    outline: 2px solid #9ae6b4;
+}
+
+.bet-total-preview {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.09);
+    font-weight: bold;
+}
+
+@media (max-width: 520px) {
+    .special-choice-toggle {
+        grid-template-columns: 1fr;
+    }
+}
+
 .parlay-leg-status {
     margin-top: 5px;
     font-size: .85rem;
@@ -986,6 +1038,9 @@ let myHedgeBets = [];
 let myPropBets = [];
 let myParlays = [];
 let pendingParlaySides = {};
+let pendingParlayLegCount = 2;
+let pendingHedgeMatchId = null;
+let pendingHedgeAmounts = {};
 
 let armyDraft = {
     use_reinforcements: false,
@@ -4819,6 +4874,118 @@ function renderAnalystOpen(ready) {
 }
 
 
+function hedgeDraftForMatch(matchId, maxCombined) {
+
+    if (!pendingHedgeAmounts[matchId]) {
+
+        const first =
+            Math.min(
+                500,
+                Math.max(
+                    250,
+                    maxCombined - 250
+                )
+            );
+
+        const second =
+            Math.min(
+                500,
+                Math.max(
+                    250,
+                    maxCombined - first
+                )
+            );
+
+        pendingHedgeAmounts[matchId] = {
+            p1: first,
+            p2: second
+        };
+    }
+
+    return pendingHedgeAmounts[matchId];
+}
+
+
+function hedgeAmountOptions(maxValue, selected) {
+
+    const values = [];
+
+    for (
+        let value = 250;
+        value <= maxValue;
+        value += 250
+    ) {
+        values.push(value);
+    }
+
+    return values.map(
+        value => `
+            <option
+                value="${value}"
+                ${value === selected ? "selected" : ""}
+            >
+                $${value.toLocaleString()}
+            </option>
+        `
+    ).join("");
+}
+
+
+function chooseHedgeMatch(matchId) {
+    pendingHedgeMatchId = matchId;
+    renderBetting();
+}
+
+
+function clearHedgeDraft() {
+    pendingHedgeMatchId = null;
+    renderBetting();
+}
+
+
+function updateHedgeAmount(matchId, side, value) {
+
+    const limits =
+        currentBettingLimits();
+
+    const maxCombined =
+        Math.min(
+            limits.perFight,
+            Math.max(
+                0,
+                limits.perRound -
+                myRoundBetTotal()
+            ),
+            me.war_chest
+        );
+
+    const draft =
+        hedgeDraftForMatch(
+            matchId,
+            maxCombined
+        );
+
+    draft[side] = Number(value);
+
+    const otherSide =
+        side === "p1"
+        ? "p2"
+        : "p1";
+
+    const otherMax =
+        Math.max(
+            250,
+            maxCombined - draft[side]
+        );
+
+    if (draft[otherSide] > otherMax) {
+        draft[otherSide] = otherMax;
+    }
+
+    renderBetting();
+}
+
+
 function renderHedgeSetup(ready) {
 
     if (!hasSkill("hedge_fund")) {
@@ -4857,10 +5024,7 @@ function renderHedgeSetup(ready) {
                         Fight ${match?.match_number}
                     </strong>
 
-                    <div
-                        class="status"
-                        style="margin-top:5px;"
-                    >
+                    <div class="status" style="margin-top:5px;">
                         $${hedge.player1_amount.toLocaleString()}
                         on
                         ${escapeHtml(
@@ -4899,14 +5063,28 @@ function renderHedgeSetup(ready) {
     }
 
 
-    const amountOptions = [];
+    const maxCombined =
+        Math.min(
+            limits.perFight,
+            Math.max(
+                0,
+                limits.perRound -
+                myRoundBetTotal()
+            ),
+            me.war_chest
+        );
 
-    for (
-        let amount = 250;
-        amount <= limits.perFight;
-        amount += 250
-    ) {
-        amountOptions.push(amount);
+
+    if (maxCombined < 500) {
+
+        return `
+            <div class="advanced-betting">
+                <h3>🛡 Hedge Fund</h3>
+                <p class="status">
+                    You need at least $500 of remaining betting allowance and available War Chest to split a hedge ($250 per side minimum).
+                </p>
+            </div>
+        `;
     }
 
 
@@ -4935,11 +5113,20 @@ function renderHedgeSetup(ready) {
                         )
                     );
 
+                const isSelected =
+                    pendingHedgeMatchId ===
+                    match.id;
+
+                const anotherSelected =
+                    pendingHedgeMatchId
+                    &&
+                    !isSelected;
+
 
                 if (unavailable) {
 
                     return `
-                        <div class="advanced-card">
+                        <div class="hedge-match pending-disabled">
 
                             <strong>
                                 Fight ${match.match_number}
@@ -4959,9 +5146,7 @@ function renderHedgeSetup(ready) {
                                 )}
                             </div>
 
-                            <div
-                                class="special-reserved-badge"
-                            >
+                            <div class="special-reserved-badge">
                                 ${
                                     standardBet
                                     ? "NORMAL BET ALREADY PLACED"
@@ -4969,31 +5154,83 @@ function renderHedgeSetup(ready) {
                                 }
                             </div>
 
-                            <p class="status">
+                        </div>
+                    `;
+                }
+
+
+                if (!isSelected) {
+
+                    return `
+                        <div class="hedge-match ${anotherSelected ? "pending-disabled" : ""}">
+
+                            <strong>
+                                Fight ${match.match_number}
+                            </strong>
+
+                            <div class="status">
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        match.player1_id
+                                    )
+                                )}
+                                vs
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        match.player2_id
+                                    )
+                                )}
+                            </div>
+
+                            <button
+                                class="secondary"
+                                ${ready ? "disabled" : ""}
+                                onclick="chooseHedgeMatch('${match.id}')"
+                            >
                                 ${
-                                    standardBet
-                                    ? "Cancel the normal wager first if you want to use Hedge Fund on this fight."
-                                    : "This fight is already reserved by your parlay."
+                                    anotherSelected
+                                    ? "Choose Instead"
+                                    : "Choose This Fight"
                                 }
-                            </p>
+                            </button>
 
                         </div>
                     `;
                 }
 
 
+                const draft =
+                    hedgeDraftForMatch(
+                        match.id,
+                        maxCombined
+                    );
+
+                const p1Max =
+                    Math.max(
+                        250,
+                        maxCombined - draft.p2
+                    );
+
+                const p2Max =
+                    Math.max(
+                        250,
+                        maxCombined - draft.p1
+                    );
+
+                const combined =
+                    draft.p1 + draft.p2;
+
+
                 return `
-                    <div class="advanced-card">
+                    <div class="hedge-match pending-selected">
 
                         <strong>
-                            Hedge Fight
-                            ${match.match_number}
+                            Fight ${match.match_number} Selected
                         </strong>
 
                         <div class="status">
-                            Combined amount must stay within your
-                            $${limits.perFight.toLocaleString()}
-                            per-fight limit.
+                            Choose how to split up to
+                            $${maxCombined.toLocaleString()}.
                         </div>
 
                         <div class="advanced-form-row">
@@ -5006,27 +5243,17 @@ function renderHedgeSetup(ready) {
                                 )}
 
                                 <select
-                                    id="hedge-p1-${match.id}"
                                     ${ready ? "disabled" : ""}
+                                    onchange="updateHedgeAmount(
+                                        '${match.id}',
+                                        'p1',
+                                        this.value
+                                    )"
                                 >
-                                    ${
-                                        amountOptions
-                                        .map(
-                                            value => `
-                                                <option
-                                                    value="${value}"
-                                                    ${
-                                                        value === 500
-                                                        ? "selected"
-                                                        : ""
-                                                    }
-                                                >
-                                                    $${value.toLocaleString()}
-                                                </option>
-                                            `
-                                        )
-                                        .join("")
-                                    }
+                                    ${hedgeAmountOptions(
+                                        p1Max,
+                                        draft.p1
+                                    )}
                                 </select>
                             </label>
 
@@ -5039,36 +5266,43 @@ function renderHedgeSetup(ready) {
                                 )}
 
                                 <select
-                                    id="hedge-p2-${match.id}"
                                     ${ready ? "disabled" : ""}
+                                    onchange="updateHedgeAmount(
+                                        '${match.id}',
+                                        'p2',
+                                        this.value
+                                    )"
                                 >
-                                    ${
-                                        amountOptions
-                                        .map(
-                                            value => `
-                                                <option
-                                                    value="${value}"
-                                                    ${
-                                                        value === 500
-                                                        ? "selected"
-                                                        : ""
-                                                    }
-                                                >
-                                                    $${value.toLocaleString()}
-                                                </option>
-                                            `
-                                        )
-                                        .join("")
-                                    }
+                                    ${hedgeAmountOptions(
+                                        p2Max,
+                                        draft.p2
+                                    )}
                                 </select>
                             </label>
 
+                        </div>
+
+                        <div class="bet-total-preview">
+                            Hedge Total:
+                            $${combined.toLocaleString()}
+                            / $${maxCombined.toLocaleString()}
+                        </div>
+
+                        <div class="advanced-form-row">
 
                             <button
                                 ${ready ? "disabled" : ""}
                                 onclick="placeHedgeBet('${match.id}')"
                             >
-                                Reserve Fight with Hedge
+                                Reserve Hedge
+                            </button>
+
+                            <button
+                                class="secondary"
+                                ${ready ? "disabled" : ""}
+                                onclick="clearHedgeDraft()"
+                            >
+                                Choose Another Fight
                             </button>
 
                         </div>
@@ -5091,7 +5325,7 @@ function renderHedgeSetup(ready) {
             </h3>
 
             <p class="status">
-                Choose one fight to split a single wager across both fighters. Once placed, that fight is reserved and cannot also receive one of your normal winner bets.
+                First choose the fight you want to hedge. Then choose one side's amount; the other side automatically limits itself to legal $250 increments so the combined wager can never exceed your current cap.
             </p>
 
             <div class="advanced-grid">
@@ -5100,6 +5334,46 @@ function renderHedgeSetup(ready) {
 
         </div>
     `;
+}
+
+
+function setParlayLegCount(count) {
+
+    const allowed =
+        hasSkill("moonshot")
+        ? [2, 3]
+        : [2];
+
+    if (!allowed.includes(count)) {
+        return;
+    }
+
+    pendingParlayLegCount = count;
+
+    const selectedMatches =
+        eligibleOtherMatches()
+        .filter(
+            match =>
+                pendingParlaySides[
+                    match.id
+                ]
+        )
+        .sort(
+            (a,b) =>
+                a.match_number -
+                b.match_number
+        );
+
+    for (
+        const match of
+        selectedMatches.slice(count)
+    ) {
+        delete pendingParlaySides[
+            match.id
+        ];
+    }
+
+    renderBetting();
 }
 
 
@@ -5175,10 +5449,7 @@ function renderParlaySetup(ready) {
                         ).join("")
                     }
 
-                    <div
-                        class="status"
-                        style="margin-top:6px;"
-                    >
+                    <div class="status" style="margin-top:6px;">
                         Opening stake:
                         $${parlay.starting_amount.toLocaleString()}
                     </div>
@@ -5211,17 +5482,40 @@ function renderParlaySetup(ready) {
 
         return `
             <div class="advanced-betting">
-
                 <h3>🎲 Parlay License</h3>
-
                 <p class="status">
                     You need at least two fights this round that do not involve you. With this attendance/matchup structure, a parlay is unavailable this round.
                 </p>
-
             </div>
         `;
     }
 
+
+    if (
+        !hasSkill("moonshot")
+        &&
+        pendingParlayLegCount !== 2
+    ) {
+        pendingParlayLegCount = 2;
+    }
+
+
+    const selectedMatches =
+        others
+        .filter(
+            match =>
+                pendingParlaySides[
+                    match.id
+                ]
+        )
+        .sort(
+            (a,b) =>
+                a.match_number -
+                b.match_number
+        );
+
+    const selectedCount =
+        selectedMatches.length;
 
     const maxAmount =
         Math.min(
@@ -5230,9 +5524,9 @@ function renderParlaySetup(ready) {
                 0,
                 limits.perRound -
                 myRoundBetTotal()
-            )
+            ),
+            me.war_chest
         );
-
 
     const wagerValues = [];
 
@@ -5262,8 +5556,40 @@ function renderParlaySetup(ready) {
             </h3>
 
             <p class="status">
-                Choose winners in fight order. Every fight included here becomes reserved and cannot also receive one of your normal winner bets.
+                Choose exactly ${pendingParlayLegCount} fights. Once you reach that number, every other fight is disabled automatically.
             </p>
+
+            ${
+                hasSkill("moonshot")
+                ? `
+                    <div class="special-choice-toggle">
+
+                        <button
+                            class="${pendingParlayLegCount === 2 ? "selected" : "secondary"}"
+                            ${ready ? "disabled" : ""}
+                            onclick="setParlayLegCount(2)"
+                        >
+                            2-Leg Parlay
+                        </button>
+
+                        <button
+                            class="${pendingParlayLegCount === 3 ? "selected" : "secondary"}"
+                            ${ready || others.length < 3 ? "disabled" : ""}
+                            onclick="setParlayLegCount(3)"
+                        >
+                            3-Leg Moonshot
+                        </button>
+
+                    </div>
+                  `
+                : ""
+            }
+
+            <div class="bet-total-preview">
+                Legs Selected:
+                ${selectedCount}
+                / ${pendingParlayLegCount}
+            </div>
 
             ${
                 others.map(
@@ -5291,53 +5617,62 @@ function renderParlaySetup(ready) {
                             reservation.type ===
                             "hedge";
 
-                        const unavailable =
+                        const externallyUnavailable =
                             Boolean(
                                 standardBet
                                 ||
                                 hedgeReserved
                             );
 
+                        const capReached =
+                            selectedCount >=
+                            pendingParlayLegCount;
+
+                        const selectionDisabled =
+                            !selected
+                            &&
+                            capReached;
+
+                        const cardClass =
+                            selected
+                            ? "pending-selected"
+                            : (
+                                externallyUnavailable
+                                || selectionDisabled
+                                ? "pending-disabled"
+                                : ""
+                            );
+
 
                         return `
-                            <div class="parlay-match">
+                            <div class="parlay-match ${cardClass}">
 
                                 <strong>
-                                    Fight
-                                    ${match.match_number}
+                                    Fight ${match.match_number}
                                 </strong>
 
                                 ${
-                                    unavailable
+                                    externallyUnavailable
                                     ? `
-                                        <div
-                                            class="special-reserved-badge"
-                                        >
+                                        <div class="special-reserved-badge">
                                             ${
                                                 standardBet
                                                 ? "NORMAL BET ALREADY PLACED"
                                                 : "HEDGE FUND"
                                             }
                                         </div>
-
-                                        <p class="status">
-                                            ${
-                                                standardBet
-                                                ? "Cancel the normal wager first if you want this fight in your parlay."
-                                                : "This fight is already reserved by Hedge Fund."
-                                            }
-                                        </p>
+                                      `
+                                    : selectionDisabled
+                                    ? `
+                                        <div class="special-reserved-badge">
+                                            ${pendingParlayLegCount} LEGS ALREADY SELECTED
+                                        </div>
                                       `
                                     : `
                                         <div class="bet-choice-grid">
 
                                             <button
-                                                class="bet-choice ${
-                                                    selected ===
-                                                    match.player1_id
-                                                    ? "selected"
-                                                    : ""
-                                                }"
+                                                class="bet-choice ${selected === match.player1_id ? "selected" : ""}"
                                                 ${ready ? "disabled" : ""}
                                                 onclick="chooseParlaySide(
                                                     '${match.id}',
@@ -5351,14 +5686,8 @@ function renderParlaySetup(ready) {
                                                 )}
                                             </button>
 
-
                                             <button
-                                                class="bet-choice ${
-                                                    selected ===
-                                                    match.player2_id
-                                                    ? "selected"
-                                                    : ""
-                                                }"
+                                                class="bet-choice ${selected === match.player2_id ? "selected" : ""}"
                                                 ${ready ? "disabled" : ""}
                                                 onclick="chooseParlaySide(
                                                     '${match.id}',
@@ -5380,9 +5709,7 @@ function renderParlaySetup(ready) {
                                                 <button
                                                     class="secondary"
                                                     ${ready ? "disabled" : ""}
-                                                    onclick="clearParlayLeg(
-                                                        '${match.id}'
-                                                    )"
+                                                    onclick="clearParlayLeg('${match.id}')"
                                                 >
                                                     Clear Leg
                                                 </button>
@@ -5428,35 +5755,20 @@ function renderParlaySetup(ready) {
                         ready
                         ||
                         wagerValues.length === 0
+                        ||
+                        selectedCount !== pendingParlayLegCount
                         ? "disabled"
                         : ""
                     }
-                    onclick="placeParlay(2)"
+                    onclick="placeParlay(${pendingParlayLegCount})"
                 >
-                    Reserve 2-Leg Parlay
+                    Reserve
+                    ${
+                        pendingParlayLegCount === 3
+                        ? "Moonshot"
+                        : "Parlay"
+                    }
                 </button>
-
-
-                ${
-                    hasSkill("moonshot")
-                    ? `
-                        <button
-                            ${
-                                ready
-                                ||
-                                wagerValues.length === 0
-                                ||
-                                others.length < 3
-                                ? "disabled"
-                                : ""
-                            }
-                            onclick="placeParlay(3)"
-                        >
-                            Reserve 3-Leg Moonshot
-                        </button>
-                      `
-                    : ""
-                }
 
             </div>
 
@@ -6598,9 +6910,35 @@ async function useRecon(matchId, mode, targetPlayerId) {
 
 
 async function placeHedgeBet(matchId) {
-    const p1 = Number(document.getElementById(`hedge-p1-${matchId}`)?.value ?? 0);
-    const p2 = Number(document.getElementById(`hedge-p2-${matchId}`)?.value ?? 0);
-    const message = document.getElementById("bet-message");
+
+    const limits =
+        currentBettingLimits();
+
+    const maxCombined =
+        Math.min(
+            limits.perFight,
+            Math.max(
+                0,
+                limits.perRound -
+                myRoundBetTotal()
+            ),
+            me.war_chest
+        );
+
+    const draft =
+        hedgeDraftForMatch(
+            matchId,
+            maxCombined
+        );
+
+    const p1 = draft.p1;
+    const p2 = draft.p2;
+
+    const message =
+        document.getElementById(
+            "bet-message"
+        );
+
 
     const { error } = await db.rpc(
         "place_hedge_bet",
@@ -6612,10 +6950,18 @@ async function placeHedgeBet(matchId) {
         }
     );
 
+
     if (error) {
-        if (message) message.textContent = error.message;
+        if (message) {
+            message.textContent =
+                error.message;
+        }
         return;
     }
+
+
+    pendingHedgeMatchId = null;
+    pendingHedgeAmounts = {};
 
     await loadState();
 }
@@ -6631,6 +6977,9 @@ async function cancelHedgeBet() {
         window.alert(error.message);
         return;
     }
+
+    pendingHedgeMatchId = null;
+    pendingHedgeAmounts = {};
 
     await loadState();
 }
@@ -6677,7 +7026,31 @@ async function cancelPropBet() {
 
 
 function chooseParlaySide(matchId, playerId) {
-    pendingParlaySides[matchId] = playerId;
+
+    const alreadySelected =
+        Boolean(
+            pendingParlaySides[
+                matchId
+            ]
+        );
+
+    const selectedCount =
+        Object.keys(
+            pendingParlaySides
+        ).length;
+
+    if (
+        !alreadySelected
+        &&
+        selectedCount >=
+        pendingParlayLegCount
+    ) {
+        return;
+    }
+
+    pendingParlaySides[matchId] =
+        playerId;
+
     renderBetting();
 }
 
@@ -6723,6 +7096,7 @@ async function placeParlay(legCount) {
     }
 
     pendingParlaySides = {};
+    pendingParlayLegCount = 2;
     await loadState();
 }
 
@@ -6739,6 +7113,7 @@ async function cancelParlay() {
     }
 
     pendingParlaySides = {};
+    pendingParlayLegCount = 2;
     await loadState();
 }
 
