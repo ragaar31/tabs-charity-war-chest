@@ -106,18 +106,18 @@ body::before {
     flex: 0 0 auto;
     border-radius: 50%;
     background: var(--player-color);
-    box-shadow: 0 0 12px rgba(var(--player-rgb), .65);
+    box-shadow: none;
 }
 
 /* Player theme */
 body {
     background:
-        radial-gradient(
-            circle at top,
-            rgba(var(--player-rgb), .24),
-            #171b26 45%,
-            #090b10 100%
-        );
+        linear-gradient(
+            180deg,
+            rgba(var(--player-rgb), .055),
+            transparent 210px
+        ),
+        #151923;
 }
 
 .panel {
@@ -148,7 +148,7 @@ select:focus {
 
 #display-name,
 .stat strong {
-    color: var(--player-color);
+    color: white;
 }
 
 .current {
@@ -1079,6 +1079,406 @@ select {
 .hidden { display: none !important; }
 .status { opacity: .68; }
 a { color: white; }
+
+/* =========================================================
+   FOCUS MODE
+   ========================================================= */
+
+body {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(var(--player-rgb), .055),
+            transparent 210px
+        ),
+        #151923;
+}
+
+body::before {
+    height: 4px;
+    box-shadow: none;
+}
+
+main {
+    max-width: 760px;
+}
+
+header {
+    margin-bottom: 18px;
+}
+
+header h1 {
+    font-size: clamp(2.25rem, 9vw, 4rem);
+    margin-bottom: 8px;
+}
+
+header .subtitle {
+    margin-top: 0;
+}
+
+.panel {
+    box-shadow: none;
+    border-color: rgba(255,255,255,.14);
+}
+
+#player-panel {
+    position: sticky;
+    top: 4px;
+    z-index: 50;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: rgba(21,25,35,.94);
+    backdrop-filter: blur(14px);
+    border-color: rgba(var(--player-rgb), .30);
+}
+
+.focus-header-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.focus-player-block {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.focus-player-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.focus-player-name strong {
+    color: white;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.focus-phase-label {
+    margin-top: 2px;
+    color: rgba(255,255,255,.62);
+    font-size: .76rem;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+}
+
+.player-identity-dot {
+    width: 12px;
+    height: 12px;
+    box-shadow: none;
+}
+
+.my-stats-button {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    background: rgba(255,255,255,.055);
+    border-color: rgba(var(--player-rgb), .46);
+}
+
+.focus-task-nav {
+    display: flex;
+    gap: 7px;
+    padding: 0 0 10px;
+}
+
+.focus-task-nav.hidden {
+    display: none;
+}
+
+.focus-task-nav button {
+    flex: 1 1 0;
+    padding: 10px 8px;
+    background: rgba(255,255,255,.04);
+    border-color: rgba(255,255,255,.12);
+}
+
+.focus-task-nav button.active {
+    background: rgba(var(--player-rgb), .16);
+    border-color: rgba(var(--player-rgb), .58);
+    outline: 1px solid rgba(var(--player-rgb), .35);
+}
+
+#phase-panel.focus-passive {
+    text-align: center;
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+}
+
+#phase-panel.focus-passive h2 {
+    margin-top: 0;
+    font-size: 1.75rem;
+}
+
+#phase-panel.focus-passive p {
+    color: rgba(255,255,255,.68);
+}
+
+/* Color is identity/selection, not text meaning. */
+#display-name,
+.stat strong,
+#war-chest,
+#skill-points {
+    color: white !important;
+}
+
+.player-identity-dot {
+    background: var(--player-color);
+}
+
+.bet-choice.selected,
+.special-choice-toggle button.selected,
+.color-choice.selected {
+    background: rgba(var(--player-rgb), .18);
+    color: white;
+    border-color: var(--player-color);
+    outline: 2px solid var(--player-color);
+}
+
+.current.your-turn {
+    background: rgba(var(--player-rgb), .10);
+    border-color: rgba(var(--player-rgb), .45);
+}
+
+button {
+    background: rgba(255,255,255,.055);
+    border-color: rgba(255,255,255,.16);
+}
+
+button:hover:not(:disabled) {
+    background: rgba(var(--player-rgb), .12);
+    border-color: rgba(var(--player-rgb), .42);
+}
+
+button:not(.secondary):not(.leave-event-button).focus-primary,
+.ready-box button:not(.secondary),
+.army-totals button:not(.secondary) {
+    background: rgba(var(--player-rgb), .17);
+    border-color: rgba(var(--player-rgb), .55);
+}
+
+/* Join palette */
+.color-grid {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+}
+
+.color-choice {
+    min-height: 62px;
+}
+
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    box-shadow: none;
+}
+
+/* My Stats full-screen drawer */
+.stats-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    background: rgba(5,7,11,.72);
+    backdrop-filter: blur(6px);
+}
+
+.stats-overlay.open {
+    display: block;
+}
+
+.stats-drawer {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: min(520px, 100%);
+    height: 100%;
+    overflow-y: auto;
+    background: #181d28;
+    border-left: 3px solid var(--player-color);
+    padding: 18px;
+}
+
+.stats-drawer-header {
+    position: sticky;
+    top: -18px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -18px -18px 16px;
+    padding: 16px 18px;
+    background: rgba(24,29,40,.97);
+    border-bottom: 1px solid rgba(255,255,255,.10);
+}
+
+.stats-drawer-header h2 {
+    flex: 1 1 auto;
+    margin: 0;
+}
+
+.stats-close {
+    padding: 8px 11px;
+}
+
+.stats-hero {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stats-hero-card {
+    padding: 13px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.055);
+    border-top: 3px solid rgba(var(--player-rgb), .55);
+}
+
+.stats-hero-card span {
+    display: block;
+    font-size: .76rem;
+    color: rgba(255,255,255,.62);
+}
+
+.stats-hero-card strong {
+    display: block;
+    margin-top: 3px;
+    color: white;
+    font-size: 1.3rem;
+}
+
+.stats-section {
+    margin-top: 18px;
+}
+
+.stats-section h3 {
+    margin-bottom: 8px;
+}
+
+.stats-chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.stats-chip {
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.065);
+    border: 1px solid rgba(255,255,255,.10);
+    font-size: .77rem;
+}
+
+.stats-list-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,.075);
+}
+
+.stats-list-row:last-child {
+    border-bottom: 0;
+}
+
+/* Shop/skill focus */
+#shop-panel,
+#skill-tree-panel {
+    margin-top: 0;
+}
+
+.skill-branches {
+    grid-template-columns: 1fr;
+}
+
+.quartermaster-branch {
+    grid-column: auto;
+}
+
+.quartermaster-node-grid {
+    grid-template-columns: 1fr;
+}
+
+/* One-fight betting */
+.bet-focus-nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.bet-focus-nav .focus-counter {
+    text-align: center;
+    font-size: .78rem;
+    color: rgba(255,255,255,.64);
+}
+
+.bet-focus-nav button {
+    padding: 8px 10px;
+}
+
+.bet-match-card {
+    margin-top: 8px;
+}
+
+.bet-summary.compact {
+    padding: 10px 12px;
+}
+
+.focus-waiting {
+    min-height: 240px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.focus-waiting strong {
+    display: block;
+    font-size: 1.35rem;
+    margin-bottom: 5px;
+}
+
+/* Remove obsolete page footer in focus mode */
+body.player-connected main > p:last-of-type {
+    display: none;
+}
+
+@media (max-width: 560px) {
+    main {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    header {
+        padding-top: 22px;
+    }
+
+    header .eyebrow {
+        font-size: .68rem;
+        letter-spacing: .22em;
+    }
+
+    header h1 {
+        font-size: 2.55rem;
+    }
+
+    .stats-drawer {
+        width: 100%;
+    }
+
+    .stats-hero {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .shop-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 </style>
 </head>
 
@@ -1154,37 +1554,76 @@ a { color: white; }
 
 <section id="player-panel" class="panel hidden">
 
-    <div class="status">Connected Player</div>
+    <div class="focus-header-row">
 
-    <div class="player-identity">
-        <span class="player-identity-dot"></span>
-        <h2 id="display-name">Player</h2>
-    </div>
+        <div class="focus-player-block">
 
-    <div class="stats">
+            <div class="focus-player-name">
+                <span class="player-identity-dot"></span>
 
-        <div class="stat">
-            War Chest
-            <strong id="war-chest">$10,000</strong>
+                <strong id="display-name">
+                    Player
+                </strong>
+            </div>
+
+            <div
+                id="focus-phase-label"
+                class="focus-phase-label"
+            >
+                Waiting
+            </div>
+
         </div>
 
-        <div class="stat">
-            Skill Points
-            <strong id="skill-points">0</strong>
-        </div>
-
-    </div>
-
-    <div class="player-actions">
         <button
-            class="leave-event-button"
-            onclick="leaveEvent()"
+            class="my-stats-button"
+            onclick="openMyStats()"
         >
-            Leave Event
+            My Stats
         </button>
+
     </div>
 
 </section>
+
+
+<div
+    id="stats-overlay"
+    class="stats-overlay"
+    onclick="handleStatsOverlayClick(event)"
+>
+
+    <aside
+        class="stats-drawer"
+        onclick="event.stopPropagation()"
+    >
+
+        <div class="stats-drawer-header">
+
+            <span class="player-identity-dot"></span>
+
+            <h2>My Stats</h2>
+
+            <button
+                class="secondary stats-close"
+                onclick="closeMyStats()"
+            >
+                Close
+            </button>
+
+        </div>
+
+        <div id="stats-drawer-content"></div>
+
+    </aside>
+
+</div>
+
+
+<section
+    id="focus-task-nav"
+    class="focus-task-nav hidden"
+></section>
 
 
 <section id="phase-panel" class="panel hidden">
@@ -1233,9 +1672,7 @@ a { color: white; }
 
     <div id="shop-grid" class="shop-grid"></div>
 
-    <h3>Your Consumables</h3>
-
-    <div id="inventory"></div>
+    <div id="inventory" class="hidden"></div>
 
 </section>
 
@@ -1324,7 +1761,13 @@ let myParlays = [];
 let pendingParlaySides = {};
 let pendingParlayLegCount = 2;
 let pendingHedgeMatchId = null;
-const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A", "rgb": "255,77,90"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D", "rgb": "255,138,61"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C", "rgb": "242,201,76"}, {"code": "lime", "label": "Lime", "hex": "#A3E635", "rgb": "163,230,53"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583", "rgb": "50,213,131"}, {"code": "teal", "label": "Teal", "hex": "#14B8A6", "rgb": "20,184,166"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE", "rgb": "34,211,238"}, {"code": "sky", "label": "Sky", "hex": "#38BDF8", "rgb": "56,189,248"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6", "rgb": "59,130,246"}, {"code": "indigo", "label": "Indigo", "hex": "#6366F1", "rgb": "99,102,241"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6", "rgb": "139,92,246"}, {"code": "purple", "label": "Purple", "hex": "#C05CFF", "rgb": "192,92,255"}, {"code": "magenta", "label": "Magenta", "hex": "#EC4899", "rgb": "236,72,153"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8", "rgb": "255,122,184"}, {"code": "copper", "label": "Copper", "hex": "#C98245", "rgb": "201,130,69"}, {"code": "silver", "label": "Silver", "hex": "#B8C4D6", "rgb": "184,196,214"}];
+const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A", "rgb": "255,77,90"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D", "rgb": "255,138,61"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C", "rgb": "242,201,76"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583", "rgb": "50,213,131"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE", "rgb": "34,211,238"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6", "rgb": "59,130,246"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6", "rgb": "139,92,246"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8", "rgb": "255,122,184"}];
+
+let shopFocusView = "shop";
+let skillFocusBranch = "high_roller";
+let bettingFocusView = "winner";
+let bettingFocusIndex = 0;
+let statsDrawerOpen = false;
 
 let selectedJoinColor = null;
 let colorAvailability = new Map();
@@ -1755,6 +2198,694 @@ async function loadColorAvailability() {
         status.textContent =
             error.message;
     }
+}
+
+
+
+function focusPhaseLabel() {
+
+    const round =
+        eventData.current_round
+        ? `Round ${eventData.current_round}`
+        : "";
+
+
+    switch (eventData.status) {
+
+        case "lobby":
+            return "Lobby";
+
+        case "locked":
+            return "Lobby Locked";
+
+        case "draft_order":
+            return "Draft Order";
+
+        case "draft":
+            return "Draft";
+
+        case "draft_complete":
+            return "Draft Complete";
+
+        case "shop":
+            return `${round} • Shop`;
+
+        case "army_build":
+            return `${round} • Build Army`;
+
+        case "betting_open":
+            return `${round} • Betting`;
+
+        case "betting_locked":
+            return `${round} • Pools Locked`;
+
+        case "fight":
+            return `${round} • Fight ${eventData.current_match_number}`;
+
+        case "regular_complete":
+            return "Final Skill Allocation";
+
+        case "final_war_build":
+            return `Final War • Stage ${eventData.final_war_current_stage} Build`;
+
+        case "final_war_ready":
+            return `Final War • Stage ${eventData.final_war_current_stage} Ready`;
+
+        case "final_war_fight":
+            return `Final War • Stage ${eventData.final_war_current_stage} Fight`;
+
+        case "final_war_complete":
+            return "Final War Complete";
+
+        default:
+            return "TABS War Chest";
+    }
+}
+
+
+function openMyStats() {
+    statsDrawerOpen = true;
+    renderMyStats();
+}
+
+
+function closeMyStats() {
+    statsDrawerOpen = false;
+
+    document
+        .getElementById("stats-overlay")
+        ?.classList.remove("open");
+}
+
+
+function handleStatsOverlayClick() {
+    closeMyStats();
+}
+
+
+function currentStandingRank() {
+
+    const standings =
+        [...players]
+        .sort(
+            (a,b) =>
+                b.war_chest - a.war_chest
+                ||
+                b.wins - a.wins
+        );
+
+
+    return (
+        standings.findIndex(
+            player =>
+                player.id === currentPlayerId
+        )
+        + 1
+    );
+}
+
+
+function currentRelevantArmyBudget() {
+
+    if (
+        [
+            "final_war_build",
+            "final_war_ready",
+            "final_war_fight",
+            "final_war_complete"
+        ].includes(eventData.status)
+    ) {
+        return (
+            myFinalWarEntry()
+            ?.frozen_budget
+            ?? null
+        );
+    }
+
+
+    if (
+        eventData.status ===
+        "army_build"
+    ) {
+        return Number(
+            me.locked_army_budget
+            ?? projectedArmyBudget()
+        );
+    }
+
+
+    if (
+        eventData.status ===
+        "shop"
+    ) {
+        return projectedArmyBudget();
+    }
+
+
+    return null;
+}
+
+
+function renderMyStats() {
+
+    const overlay =
+        document.getElementById(
+            "stats-overlay"
+        );
+
+    const content =
+        document.getElementById(
+            "stats-drawer-content"
+        );
+
+
+    if (
+        !overlay
+        ||
+        !content
+        ||
+        !me
+    ) {
+        return;
+    }
+
+
+    overlay.classList.toggle(
+        "open",
+        statsDrawerOpen
+    );
+
+
+    if (!statsDrawerOpen) {
+        return;
+    }
+
+
+    const myPicks =
+        picks
+        .filter(
+            pick =>
+                pick.player_id ===
+                currentPlayerId
+        );
+
+
+    const ownedSkills =
+        playerSkills
+        .filter(
+            skill =>
+                skill.player_id ===
+                currentPlayerId
+        )
+        .map(
+            skill => {
+
+                const node =
+                    skillNodes.find(
+                        row =>
+                            row.code ===
+                            skill.node_code
+                    );
+
+                return (
+                    node?.display_name
+                    ?? skill.node_code
+                );
+            }
+        );
+
+
+    const budget =
+        currentRelevantArmyBudget();
+
+
+    const color =
+        playerColorMeta(
+            me.color_code
+        );
+
+
+    const itemRows =
+        items
+        .filter(
+            item =>
+                item.quantity > 0
+        );
+
+
+    content.innerHTML = `
+        <div class="stats-hero">
+
+            <div class="stats-hero-card">
+                <span>War Chest</span>
+                <strong>
+                    $${me.war_chest.toLocaleString()}
+                </strong>
+            </div>
+
+            <div class="stats-hero-card">
+                <span>Standing</span>
+                <strong>
+                    #${currentStandingRank()}
+                </strong>
+            </div>
+
+            <div class="stats-hero-card">
+                <span>Record</span>
+                <strong>
+                    ${me.wins} Win${me.wins === 1 ? "" : "s"}
+                </strong>
+            </div>
+
+            <div class="stats-hero-card">
+                <span>Skill Points</span>
+                <strong>
+                    ${me.skill_points} SP
+                </strong>
+            </div>
+
+            ${
+                budget !== null
+                ? `
+                    <div class="stats-hero-card">
+                        <span>
+                            ${
+                                eventData.status
+                                .startsWith("final_war")
+                                ? "Final War Budget"
+                                : "Army Budget"
+                            }
+                        </span>
+
+                        <strong>
+                            ${Number(budget).toLocaleString()}
+                        </strong>
+                    </div>
+                  `
+                : ""
+            }
+
+            <div class="stats-hero-card">
+                <span>Player Color</span>
+                <strong>
+                    ${escapeHtml(color.label)}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="stats-section">
+
+            <h3>Your Faction</h3>
+
+            ${
+                myPicks.length
+                ? `
+                    <div class="stats-chip-wrap">
+                        ${
+                            myPicks.map(
+                                pick => `
+                                    <span class="stats-chip">
+                                        ${pick.units.tier}
+                                        •
+                                        ${escapeHtml(pick.units.name)}
+                                    </span>
+                                `
+                            ).join("")
+                        }
+                    </div>
+                  `
+                : `
+                    <p class="status">
+                        No units drafted yet.
+                    </p>
+                  `
+            }
+
+            ${
+                myRecruits.length
+                ? `
+                    <h3 style="margin-top:14px;">
+                        Permanent Recruits
+                    </h3>
+
+                    <div class="stats-chip-wrap">
+                        ${
+                            myRecruits.map(
+                                recruit => `
+                                    <span class="stats-chip">
+                                        ${escapeHtml(recruit.units.name)}
+                                    </span>
+                                `
+                            ).join("")
+                        }
+                    </div>
+                  `
+                : ""
+            }
+
+        </div>
+
+
+        <div class="stats-section">
+
+            <h3>Skills</h3>
+
+            ${
+                ownedSkills.length
+                ? `
+                    <div class="stats-chip-wrap">
+                        ${
+                            ownedSkills.map(
+                                name => `
+                                    <span class="stats-chip">
+                                        ${escapeHtml(name)}
+                                    </span>
+                                `
+                            ).join("")
+                        }
+                    </div>
+                  `
+                : `
+                    <p class="status">
+                        No skills unlocked.
+                    </p>
+                  `
+            }
+
+        </div>
+
+
+        <div class="stats-section">
+
+            <h3>Consumables</h3>
+
+            ${
+                itemRows.length
+                ? itemRows.map(
+                    item => `
+                        <div class="stats-list-row">
+                            <span>
+                                ${escapeHtml(
+                                    itemNames[item.item_code]
+                                    ?? item.item_code
+                                )}
+                            </span>
+
+                            <strong>
+                                × ${item.quantity}
+                            </strong>
+                        </div>
+                    `
+                ).join("")
+                : `
+                    <p class="status">
+                        No consumables.
+                    </p>
+                  `
+            }
+
+        </div>
+
+
+        ${
+            me.debt > 0
+            ? `
+                <div class="stats-section">
+                    <h3>House Debt</h3>
+                    <div class="stats-list-row">
+                        <span>Outstanding</span>
+                        <strong>
+                            $${me.debt.toLocaleString()}
+                        </strong>
+                    </div>
+                </div>
+              `
+            : ""
+        }
+
+
+        <div class="stats-section">
+
+            <button
+                class="leave-event-button"
+                onclick="leaveEvent()"
+            >
+                Leave Event
+            </button>
+
+        </div>
+    `;
+}
+
+
+function setShopFocusView(view) {
+
+    shopFocusView =
+        view === "skills"
+        ? "skills"
+        : "shop";
+
+
+    applyFocusMode();
+}
+
+
+function setBettingFocusView(view) {
+
+    bettingFocusView =
+        view === "prop"
+        ? "prop"
+        : "winner";
+
+
+    renderBetting();
+    applyFocusMode();
+}
+
+
+function bettableRoundMatches() {
+
+    return bettingRoundMatches()
+        .filter(
+            match =>
+                match.player1_id !==
+                    currentPlayerId
+                &&
+                match.player2_id !==
+                    currentPlayerId
+        );
+}
+
+
+function changeBettingFight(delta) {
+
+    const matches =
+        bettableRoundMatches();
+
+
+    if (!matches.length) {
+        bettingFocusIndex = 0;
+        return;
+    }
+
+
+    bettingFocusIndex =
+        Math.max(
+            0,
+            Math.min(
+                matches.length - 1,
+                bettingFocusIndex + delta
+            )
+        );
+
+
+    renderBetting();
+}
+
+
+function focusWaitingStatus() {
+
+    switch (eventData.status) {
+
+        case "lobby":
+        case "locked":
+        case "draft_order":
+        case "draft_complete":
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+
+function applyFocusMode() {
+
+    if (!eventData || !me) {
+        return;
+    }
+
+
+    document.body.classList.add(
+        "player-connected"
+    );
+
+
+    document
+        .getElementById(
+            "focus-phase-label"
+        )
+        .textContent =
+            focusPhaseLabel();
+
+
+    const panelIds = [
+        "phase-panel",
+        "roster-panel",
+        "draft-board-panel",
+        "shop-panel",
+        "skill-tree-panel",
+        "match-panel",
+        "army-builder-panel",
+        "betting-panel",
+        "final-war-panel"
+    ];
+
+
+    for (const id of panelIds) {
+
+        document
+            .getElementById(id)
+            ?.classList.add("hidden");
+    }
+
+
+    const nav =
+        document.getElementById(
+            "focus-task-nav"
+        );
+
+
+    nav.classList.add("hidden");
+    nav.innerHTML = "";
+
+
+    if (focusWaitingStatus()) {
+
+        const phase =
+            document.getElementById(
+                "phase-panel"
+            );
+
+        phase.classList.remove("hidden");
+        phase.classList.add("focus-passive");
+
+        renderMyStats();
+        return;
+    }
+
+
+    document
+        .getElementById("phase-panel")
+        ?.classList.remove("focus-passive");
+
+
+    if (eventData.status === "draft") {
+
+        document
+            .getElementById(
+                "draft-board-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    else if (eventData.status === "shop") {
+
+        nav.classList.remove("hidden");
+
+        nav.innerHTML = `
+            <button
+                class="${shopFocusView === "shop" ? "active" : ""}"
+                onclick="setShopFocusView('shop')"
+            >
+                Shop
+            </button>
+
+            <button
+                class="${shopFocusView === "skills" ? "active" : ""}"
+                onclick="setShopFocusView('skills')"
+            >
+                Skills
+            </button>
+        `;
+
+
+        document
+            .getElementById(
+                shopFocusView === "skills"
+                ? "skill-tree-panel"
+                : "shop-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    else if (eventData.status === "army_build") {
+
+        document
+            .getElementById(
+                "army-builder-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    else if (
+        [
+            "betting_open",
+            "betting_locked",
+            "fight"
+        ].includes(eventData.status)
+    ) {
+
+        document
+            .getElementById(
+                "betting-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    else if (
+        eventData.status ===
+        "regular_complete"
+    ) {
+
+        document
+            .getElementById(
+                "skill-tree-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    else if (
+        eventData.status
+        .startsWith("final_war")
+    ) {
+
+        document
+            .getElementById(
+                "final-war-panel"
+            )
+            .classList.remove("hidden");
+    }
+
+
+    renderMyStats();
 }
 
 
@@ -2522,19 +3653,6 @@ function render() {
             me.display_name;
 
 
-    document
-        .getElementById("war-chest")
-        .textContent =
-            "$" +
-            me.war_chest.toLocaleString();
-
-
-    document
-        .getElementById("skill-points")
-        .textContent =
-            me.skill_points;
-
-
     renderPhase();
     renderRoster();
     renderDraftBoard();
@@ -2544,6 +3662,8 @@ function render() {
     renderArmyBuilder();
     renderBetting();
     renderFinalWar();
+
+    applyFocusMode();
 }
 
 
@@ -3595,6 +4715,24 @@ function eligiblePermanentRecruits(nodeCode) {
 }
 
 
+
+function setSkillFocusBranch(branchCode) {
+
+    if (
+        Object.prototype.hasOwnProperty.call(
+            skillBranchMeta,
+            branchCode
+        )
+    ) {
+        skillFocusBranch =
+            branchCode;
+    }
+
+    renderSkillTree();
+    applyFocusMode();
+}
+
+
 function renderSkillTree() {
 
     const panel =
@@ -3626,6 +4764,11 @@ function renderSkillTree() {
 
     const branches =
         Object.keys(skillBranchMeta)
+        .filter(
+            branchCode =>
+                branchCode ===
+                skillFocusBranch
+        )
         .map(
             branchCode => {
 
@@ -3784,6 +4927,27 @@ function renderSkillTree() {
         <div class="skill-points-summary">
             <span>Skill Points Available</span>
             <strong>${me.skill_points} SP</strong>
+        </div>
+
+        <div
+            class="focus-task-nav"
+            style="padding-bottom:12px;"
+        >
+            ${
+                Object.entries(skillBranchMeta)
+                .map(
+                    ([code, meta]) => `
+                        <button
+                            class="${skillFocusBranch === code ? "active" : ""}"
+                            onclick="setSkillFocusBranch('${code}')"
+                        >
+                            ${meta.icon}
+                            ${meta.name}
+                        </button>
+                    `
+                )
+                .join("")
+            }
         </div>
 
         <div id="skill-message" class="status"></div>
@@ -7233,34 +8397,56 @@ function renderBetting() {
             currentBettingLimits();
 
 
-        const cards = roundMatches.map(match => {
-            const ownFight =
-                match.player1_id === currentPlayerId
-                || match.player2_id === currentPlayerId;
+        const bettableMatches =
+            bettableRoundMatches();
 
-            const existing = myBetForMatch(match.id);
+
+        if (
+            bettingFocusIndex >=
+            bettableMatches.length
+        ) {
+            bettingFocusIndex =
+                Math.max(
+                    0,
+                    bettableMatches.length - 1
+                );
+        }
+
+
+        const focusedMatch =
+            bettableMatches[
+                bettingFocusIndex
+            ]
+            ?? null;
+
+
+        let cards = "";
+
+
+        if (focusedMatch) {
+
+            const match =
+                focusedMatch;
+
+            const existing =
+                myBetForMatch(
+                    match.id
+                );
+
             const selectedSide =
                 pendingBetSides[match.id]
                 ?? existing?.backed_player_id
                 ?? null;
 
-            const options = wagerOptionsForMatch(match.id);
-            const amount = existing?.amount ?? options[0] ?? 250;
+            const options =
+                wagerOptionsForMatch(
+                    match.id
+                );
 
-            if (ownFight) {
-                return `
-                    <div class="bet-match-card">
-                        <strong>
-                            ${escapeHtml(bettingPlayerName(match.player1_id))}
-                            vs ${escapeHtml(bettingPlayerName(match.player2_id))}
-                        </strong>
-                        <p class="status">
-                            This is your fight — you cannot wager on it.
-                        </p>
-                    </div>
-                `;
-            }
-
+            const amount =
+                existing?.amount
+                ?? options[0]
+                ?? 250;
 
             const specialReservation =
                 specialReservationForMatch(
@@ -7270,7 +8456,7 @@ function renderBetting() {
 
             if (specialReservation) {
 
-                return `
+                cards = `
                     <div
                         class="
                             bet-match-card
@@ -7282,14 +8468,12 @@ function renderBetting() {
                             Fight ${match.match_number}
                         </strong>
 
-                        <div
-                            class="special-reserved-badge"
-                        >
+                        <div class="special-reserved-badge">
                             ${specialReservation.label.toUpperCase()}
                         </div>
 
                         <p class="status">
-                            This fight is already committed through your ${specialReservation.label} and cannot also receive a normal winner bet.
+                            This fight is already committed through your ${specialReservation.label}.
                         </p>
 
                     </div>
@@ -7297,125 +8481,281 @@ function renderBetting() {
             }
 
 
-            return `
-                <div class="bet-match-card">
-                    <strong>Fight ${match.match_number}</strong>
+            else {
 
-                    <div class="bet-choice-grid">
-                        <button
-                            class="bet-choice ${selectedSide === match.player1_id ? "selected" : ""}"
-                            ${ready ? "disabled" : ""}
-                            onclick="chooseBetSide('${match.id}', '${match.player1_id}')"
-                        >
-                            ${escapeHtml(bettingPlayerName(match.player1_id))}
-                        </button>
+                cards = `
+                    <div class="bet-match-card">
 
-                        <button
-                            class="bet-choice ${selectedSide === match.player2_id ? "selected" : ""}"
-                            ${ready ? "disabled" : ""}
-                            onclick="chooseBetSide('${match.id}', '${match.player2_id}')"
-                        >
-                            ${escapeHtml(bettingPlayerName(match.player2_id))}
-                        </button>
-                    </div>
+                        <strong>
+                            Fight ${match.match_number}
+                        </strong>
 
-                    ${selectedSide ? `
-                        <div class="bet-controls">
-                            <select id="bet-amount-${match.id}" ${ready ? "disabled" : ""}>
-                                ${options.map(value => `
-                                    <option value="${value}" ${value === amount ? "selected" : ""}>
-                                        $${value.toLocaleString()}
-                                        ${value > bettingLimits.perFight ? " — ALL IN" : ""}
-                                    </option>
-                                `).join("")}
-                            </select>
-
-                            ${hasSkill("insurance") || hasSkill("no_sweat") ? `
-                                <select
-                                    id="bet-modifier-${match.id}"
-                                    class="modifier-select"
-                                    ${ready ? "disabled" : ""}
-                                >
-                                    ${standardModifierOptions(existing)}
-                                </select>
-                            ` : ""}
+                        <div class="bet-choice-grid">
 
                             <button
+                                class="bet-choice ${
+                                    selectedSide ===
+                                    match.player1_id
+                                    ? "selected"
+                                    : ""
+                                }"
                                 ${ready ? "disabled" : ""}
-                                onclick="submitStandardBet('${match.id}', '${selectedSide}')"
+                                onclick="chooseBetSide(
+                                    '${match.id}',
+                                    '${match.player1_id}'
+                                )"
                             >
-                                ${existing ? "Update Bet" : "Place Bet"}
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        match.player1_id
+                                    )
+                                )}
                             </button>
+
+                            <button
+                                class="bet-choice ${
+                                    selectedSide ===
+                                    match.player2_id
+                                    ? "selected"
+                                    : ""
+                                }"
+                                ${ready ? "disabled" : ""}
+                                onclick="chooseBetSide(
+                                    '${match.id}',
+                                    '${match.player2_id}'
+                                )"
+                            >
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        match.player2_id
+                                    )
+                                )}
+                            </button>
+
                         </div>
 
-                        <div class="bet-limit-note">
-                            Per-fight limit: $${bettingLimits.perFight.toLocaleString()}
-                            • Round limit: $${bettingLimits.perRound.toLocaleString()}
-                            ${bettingLimits.allIn ? "• All In unlocked" : ""}
-                        </div>
+                        ${
+                            selectedSide
+                            ? `
+                                <div class="bet-controls">
 
-                        ${existing ? `
-                            <div class="status" style="margin-top:8px;">
-                                Current wager: $${existing.amount.toLocaleString()}
-                                on ${escapeHtml(bettingPlayerName(existing.backed_player_id))}
-                                ${existing.modifier_code ? `• ${modifierLabel(existing.modifier_code)}` : ""}
-                                •
-                                <button
-                                    class="secondary"
-                                    ${ready ? "disabled" : ""}
-                                    onclick="cancelStandardBet('${match.id}')"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        ` : ""}
-                    ` : `
-                        <p class="status">Choose a fighter, then choose your wager.</p>
-                    `}
+                                    <select
+                                        id="bet-amount-${match.id}"
+                                        ${ready ? "disabled" : ""}
+                                    >
+                                        ${
+                                            options.map(
+                                                value => `
+                                                    <option
+                                                        value="${value}"
+                                                        ${
+                                                            value === amount
+                                                            ? "selected"
+                                                            : ""
+                                                        }
+                                                    >
+                                                        $${value.toLocaleString()}
+                                                        ${
+                                                            value >
+                                                            bettingLimits.perFight
+                                                            ? " — ALL IN"
+                                                            : ""
+                                                        }
+                                                    </option>
+                                                `
+                                            ).join("")
+                                        }
+                                    </select>
+
+                                    ${
+                                        hasSkill("insurance")
+                                        ||
+                                        hasSkill("no_sweat")
+                                        ? `
+                                            <select
+                                                id="bet-modifier-${match.id}"
+                                                class="modifier-select"
+                                                ${ready ? "disabled" : ""}
+                                            >
+                                                ${standardModifierOptions(existing)}
+                                            </select>
+                                          `
+                                        : ""
+                                    }
+
+                                    <button
+                                        class="focus-primary"
+                                        ${ready ? "disabled" : ""}
+                                        onclick="submitStandardBet(
+                                            '${match.id}',
+                                            '${selectedSide}'
+                                        )"
+                                    >
+                                        ${existing ? "Update Bet" : "Place Bet"}
+                                    </button>
+
+                                </div>
+
+                                ${
+                                    existing
+                                    ? `
+                                        <div
+                                            class="status"
+                                            style="margin-top:8px;"
+                                        >
+                                            Current:
+                                            $${existing.amount.toLocaleString()}
+                                            on
+                                            ${escapeHtml(
+                                                bettingPlayerName(
+                                                    existing.backed_player_id
+                                                )
+                                            )}
+
+                                            <button
+                                                class="secondary"
+                                                ${ready ? "disabled" : ""}
+                                                onclick="cancelStandardBet('${match.id}')"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                      `
+                                    : ""
+                                }
+                              `
+                            : `
+                                <p class="status">
+                                    Choose a fighter.
+                                </p>
+                              `
+                        }
+
+                    </div>
+                `;
+            }
+        }
+
+
+        const fightNav =
+            bettableMatches.length > 1
+            ? `
+                <div class="bet-focus-nav">
+
+                    <button
+                        class="secondary"
+                        ${bettingFocusIndex <= 0 ? "disabled" : ""}
+                        onclick="changeBettingFight(-1)"
+                    >
+                        ←
+                    </button>
+
+                    <div class="focus-counter">
+                        Fight
+                        ${bettingFocusIndex + 1}
+                        of
+                        ${bettableMatches.length}
+                    </div>
+
+                    <button
+                        class="secondary"
+                        ${
+                            bettingFocusIndex >=
+                            bettableMatches.length - 1
+                            ? "disabled"
+                            : ""
+                        }
+                        onclick="changeBettingFight(1)"
+                    >
+                        →
+                    </button>
+
                 </div>
-            `;
-        }).join("");
+              `
+            : "";
+
+        const betModeNav =
+            hasSkill("prop_bettor")
+            ? `
+                <div class="focus-task-nav">
+
+                    <button
+                        class="${bettingFocusView === "winner" ? "active" : ""}"
+                        onclick="setBettingFocusView('winner')"
+                    >
+                        Winner Bets
+                    </button>
+
+                    <button
+                        class="${bettingFocusView === "prop" ? "active" : ""}"
+                        onclick="setBettingFocusView('prop')"
+                    >
+                        Prop Bet
+                    </button>
+
+                </div>
+              `
+            : "";
+
 
         content.innerHTML = `
-            <div class="bet-summary">
-                <div class="status">Current Round Allowance</div>
+            <div class="bet-summary compact">
                 <strong>
-                    $${roundTotal.toLocaleString()} / $${bettingLimits.perRound.toLocaleString()} committed
+                    $${roundTotal.toLocaleString()}
+                    /
+                    $${bettingLimits.perRound.toLocaleString()}
+                    committed
                 </strong>
-                <div class="status" style="margin-top:5px;">
-                    Per fight: $${bettingLimits.perFight.toLocaleString()}
-                    ${bettingLimits.allIn ? "• All In can exceed this once per round." : ""}
-                </div>
-                <div class="status" style="margin-top:5px;">
-                    Standard bets, hedges, props, and parlay opening stakes all count toward this round allowance.
+
+                <div class="status">
+                    Round betting allowance
                 </div>
             </div>
 
-            <div id="bet-message" class="status" style="margin-top:10px;"></div>
+            <div
+                id="bet-message"
+                class="status"
+                style="margin-top:8px;"
+            ></div>
 
             ${renderSpecialBetSummary(ready)}
 
+            ${betModeNav}
+
             ${
-                hasSpecialBetSetupSkills()
-                ? ""
-                : renderAnalystOpen(ready)
+                bettingFocusView === "prop"
+                && hasSkill("prop_bettor")
+                ? renderSpeculatorOpen(ready)
+                : `
+                    ${
+                        hasSpecialBetSetupSkills()
+                        ? ""
+                        : renderAnalystOpen(ready)
+                    }
+
+                    ${fightNav}
+                    ${cards}
+                    ${renderBrokerOpen(ready)}
+                  `
             }
-
-            ${cards}
-
-            ${renderBrokerOpen(ready)}
-
-            ${renderSpeculatorOpen(ready)}
 
             <div class="ready-box">
                 ${ready ? `
-                    <strong>✅ You are ready.</strong>
-                    <p class="status">
-                        Your wagers are still secret. You may reopen them until the host locks betting.
-                    </p>
-                    <button class="secondary" onclick="setBettingReady(false)">
-                        Edit My Bets
-                    </button>
+                    <div class="focus-waiting">
+                        <div>
+                            <strong>✅ Betting Complete</strong>
+                            <p class="status">
+                                Waiting for the host to lock the pools.
+                            </p>
+
+                            <button
+                                class="secondary"
+                                onclick="setBettingReady(false)"
+                            >
+                                Edit My Bets
+                            </button>
+                        </div>
+                    </div>
                 ` : `
                     <strong>Finished wagering?</strong>
                     <p class="status">
@@ -7432,52 +8772,123 @@ function renderBetting() {
 
     title.textContent = `Round ${eventData.current_round} Locked Pools`;
 
-    const poolCards = roundMatches.map(match => {
-        const pool = bettingPools.find(row => row.match_id === match.id);
-        const bet = myBetForMatch(match.id);
-        const winner = match.winner_player_id;
+    const currentLockedMatch =
+        roundMatches.find(
+            row =>
+                row.match_number ===
+                eventData.current_match_number
+        )
+        ?? roundMatches[0]
+        ?? null;
 
-        return `
+
+    let poolCards = "";
+
+
+    if (currentLockedMatch) {
+
+        const match =
+            currentLockedMatch;
+
+        const pool =
+            bettingPools.find(
+                row =>
+                    row.match_id ===
+                    match.id
+            );
+
+        const bet =
+            myBetForMatch(
+                match.id
+            );
+
+        const winner =
+            match.winner_player_id;
+
+
+        poolCards = `
             <div class="bet-match-card">
-                <strong>Fight ${match.match_number}</strong>
+
+                <strong>
+                    Fight ${match.match_number}
+                </strong>
 
                 <div class="public-pool">
-                    <div class="public-pool-side">
-                        ${escapeHtml(bettingPlayerName(match.player1_id))}
-                        <strong>$${(pool?.player1_pool ?? 1000).toLocaleString()}</strong>
-                    </div>
-                    <div class="public-pool-side">
-                        ${escapeHtml(bettingPlayerName(match.player2_id))}
-                        <strong>$${(pool?.player2_pool ?? 1000).toLocaleString()}</strong>
-                    </div>
-                </div>
 
-                <div class="status" style="margin-top:7px;">
-                    A $1,000 House subsidy is included on each side, but it does not own a payout share. Player wagers determine ownership. Parlay rollovers can increase a later fight's pool after an earlier leg wins.
-                </div>
-
-                ${bet ? `
-                    <div style="margin-top:10px;">
-                        Your standard bet:
+                    <div class="public-pool-side">
+                        ${escapeHtml(
+                            bettingPlayerName(
+                                match.player1_id
+                            )
+                        )}
                         <strong>
-                            $${bet.amount.toLocaleString()} on
-                            ${escapeHtml(bettingPlayerName(bet.backed_player_id))}
-                            ${bet.modifier_code ? `• ${modifierLabel(bet.modifier_code)}` : ""}
+                            $${(pool?.player1_pool ?? 1000).toLocaleString()}
                         </strong>
-                        ${bet.status === "settled" ? `
-                            <div class="status">Return: $${bet.payout.toLocaleString()}</div>
-                        ` : ""}
                     </div>
-                ` : ""}
 
-                ${match.status === "settled" ? `
-                    <div style="margin-top:10px;">
-                        ✅ Winner: <strong>${escapeHtml(bettingPlayerName(winner))}</strong>
+                    <div class="public-pool-side">
+                        ${escapeHtml(
+                            bettingPlayerName(
+                                match.player2_id
+                            )
+                        )}
+                        <strong>
+                            $${(pool?.player2_pool ?? 1000).toLocaleString()}
+                        </strong>
                     </div>
-                ` : ""}
+
+                </div>
+
+                ${
+                    bet
+                    ? `
+                        <div style="margin-top:10px;">
+                            Your bet:
+                            <strong>
+                                $${bet.amount.toLocaleString()}
+                                on
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        bet.backed_player_id
+                                    )
+                                )}
+                            </strong>
+
+                            ${
+                                bet.status === "settled"
+                                ? `
+                                    <div class="status">
+                                        Return:
+                                        $${bet.payout.toLocaleString()}
+                                    </div>
+                                  `
+                                : ""
+                            }
+                        </div>
+                      `
+                    : ""
+                }
+
+                ${
+                    match.status === "settled"
+                    ? `
+                        <div style="margin-top:10px;">
+                            ✅ Winner:
+                            <strong>
+                                ${escapeHtml(
+                                    bettingPlayerName(
+                                        winner
+                                    )
+                                )}
+                            </strong>
+                        </div>
+                      `
+                    : ""
+                }
+
             </div>
         `;
-    }).join("");
+    }
 
     let reveal = "";
 
@@ -7535,9 +8946,6 @@ function renderBetting() {
     }
 
     content.innerHTML = `
-        <p class="status">
-            Betting is closed. Normal wagers, hedges, props, and parlay selections cannot be changed. Closing Line is the one exception before the selected fight's army reveal.
-        </p>
         ${poolCards}
         ${renderAdvancedLocked()}
         ${reveal}
