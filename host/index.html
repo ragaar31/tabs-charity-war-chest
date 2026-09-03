@@ -2647,6 +2647,16 @@ function scheduleChaosResolution() {
     }
 
 
+    const delay =
+        key.startsWith("draft:")
+        ? Math.round(
+            1800
+            +
+            Math.random() * 1500
+          )
+        : 450;
+
+
     chaosResolveTimer =
         setTimeout(
             () => {
@@ -2655,7 +2665,7 @@ function scheduleChaosResolution() {
                     key
                 );
             },
-            450
+            delay
         );
 }
 
