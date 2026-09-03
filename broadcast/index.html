@@ -1,0 +1,3093 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    Broadcast | TABS War Chest Betting Special
+</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-client.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #090c13;
+    --panel: rgba(27,32,45,.92);
+    --panel-soft: rgba(255,255,255,.055);
+    --line: rgba(255,255,255,.12);
+    --text: #f7f8fb;
+    --muted: rgba(247,248,251,.62);
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+body {
+    background:
+        radial-gradient(
+            circle at 50% -15%,
+            rgba(86,105,150,.26),
+            transparent 38%
+        ),
+        linear-gradient(
+            180deg,
+            #111724,
+            #080b11 72%
+        );
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.setup-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 40px;
+    background: #0b0f18;
+}
+
+.setup-card {
+    width: min(620px, 92vw);
+    padding: 34px;
+    border-radius: 22px;
+    background: #1b2130;
+    border: 1px solid var(--line);
+    text-align: center;
+}
+
+.setup-card h1 {
+    margin: 0 0 8px;
+    font-size: 3rem;
+}
+
+.setup-card p {
+    color: var(--muted);
+}
+
+.setup-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.setup-row input {
+    min-width: 0;
+    padding: 15px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #101521;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+}
+
+.setup-row button {
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.25);
+    background: #f3f4f7;
+    color: #11151e;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.setup-message {
+    min-height: 1.4em;
+    margin-top: 12px;
+    color: #ffb8b8;
+}
+
+.broadcast-shell {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: 86px minmax(0,1fr) 60px;
+}
+
+.show-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 30px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(8,11,17,.76);
+}
+
+.brand {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    min-width: 0;
+}
+
+.brand strong {
+    font-size: 1.22rem;
+    letter-spacing: .12em;
+}
+
+.brand span {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .13em;
+    font-size: .72rem;
+}
+
+.phase-chip {
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.055);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: 800;
+    font-size: .75rem;
+}
+
+.stage {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    padding: 26px 30px;
+}
+
+.scene {
+    position: absolute;
+    inset: 26px 30px;
+    opacity: 0;
+    transform: translateY(18px) scale(.99);
+    pointer-events: none;
+    transition:
+        opacity 360ms ease,
+        transform 360ms ease;
+}
+
+.scene.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.show-footer {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    padding: 0 30px;
+    border-top: 1px solid var(--line);
+    background: rgba(8,11,17,.82);
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.show-footer strong {
+    color: white;
+}
+
+.footer-status {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.scene-title {
+    margin: 0;
+    font-size: clamp(2.4rem, 4vw, 4.8rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+}
+
+.scene-kicker {
+    margin-bottom: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-weight: 800;
+    font-size: .76rem;
+}
+
+.scene-subtitle {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 1.1rem;
+}
+
+.cast-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.player-card {
+    --player: #7c8aa6;
+    position: relative;
+    min-width: 0;
+    padding: 18px;
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--player) 11%, transparent),
+            rgba(255,255,255,.045) 48%
+        );
+    border: 1px solid rgba(255,255,255,.11);
+    overflow: hidden;
+}
+
+.player-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--player);
+}
+
+.player-card .rank {
+    color: var(--muted);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+}
+
+.player-card .name {
+    margin-top: 5px;
+    font-size: 1.25rem;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-card .money {
+    margin-top: 10px;
+    font-size: 1.75rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.player-card .meta {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .8rem;
+}
+
+.player-card.ready {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 65%,
+            white 8%
+        );
+}
+
+.player-card.ready::after {
+    content: "READY";
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: var(--player);
+    font-size: .66rem;
+    letter-spacing: .1em;
+    font-weight: 900;
+}
+
+.hero-split {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 130px minmax(0,1fr);
+    align-items: stretch;
+    gap: 18px;
+}
+
+.fighter-panel {
+    --player: #7c8aa6;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 24px;
+    border-radius: 20px;
+    background:
+        linear-gradient(
+            155deg,
+            color-mix(in srgb, var(--player) 14%, transparent),
+            rgba(255,255,255,.045)
+        );
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow:
+        inset 0 4px 0
+        color-mix(in srgb, var(--player) 80%, transparent);
+}
+
+.fighter-panel .fighter-name {
+    font-size: clamp(2rem, 3.3vw, 4.1rem);
+    font-weight: 950;
+    line-height: 1;
+}
+
+.fighter-panel .fighter-money {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+.vs {
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+    font-weight: 1000;
+    color: rgba(255,255,255,.35);
+}
+
+.army-zones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 9px;
+    margin-top: 18px;
+    min-height: 0;
+}
+
+.army-zone {
+    min-width: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,.16);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.army-zone h4 {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: .66rem;
+    letter-spacing: .12em;
+}
+
+.army-unit {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: .78rem;
+}
+
+.army-unit span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.army-total {
+    margin-top: auto;
+    padding-top: 14px;
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.pool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.pool-card {
+    --p1: #7c8aa6;
+    --p2: #7c8aa6;
+    padding: 18px;
+    border-radius: 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+}
+
+.pool-card.current {
+    outline: 2px solid rgba(255,255,255,.26);
+}
+
+.pool-title {
+    color: var(--muted);
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.pool-sides {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.pool-side {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.045);
+}
+
+.pool-side.one {
+    border-top: 4px solid var(--p1);
+}
+
+.pool-side.two {
+    border-top: 4px solid var(--p2);
+}
+
+.pool-side .pool-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 800;
+}
+
+.pool-side .pool-money {
+    margin-top: 5px;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+.draft-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1.9fr;
+    gap: 18px;
+    height: 100%;
+}
+
+.draft-hero {
+    --player: #7c8aa6;
+    padding: 26px;
+    border-radius: 20px;
+    background:
+        linear-gradient(
+            155deg,
+            color-mix(in srgb, var(--player) 17%, transparent),
+            rgba(255,255,255,.045)
+        );
+    border: 1px solid var(--line);
+}
+
+.draft-hero .on-clock {
+    margin-top: 12px;
+    font-size: clamp(2.4rem, 4vw, 4.6rem);
+    line-height: .98;
+    font-weight: 950;
+}
+
+.last-pick {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(0,0,0,.16);
+}
+
+.draft-rosters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    align-content: start;
+}
+
+.draft-player {
+    --player: #7c8aa6;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    border-left: 4px solid var(--player);
+}
+
+.draft-player .draft-name {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 850;
+}
+
+.draft-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+}
+
+.draft-tag {
+    padding: 4px 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.07);
+    color: rgba(255,255,255,.78);
+    font-size: .64rem;
+}
+
+.leaderboard {
+    display: grid;
+    gap: 9px;
+    margin-top: 20px;
+}
+
+.leader-row {
+    --player: #7c8aa6;
+    display: grid;
+    grid-template-columns: 60px minmax(0,1fr) 140px 120px;
+    align-items: center;
+    gap: 14px;
+    min-height: 58px;
+    padding: 9px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    border-left: 5px solid var(--player);
+    transition:
+        transform 500ms ease,
+        background 300ms ease;
+}
+
+.leader-rank {
+    font-size: 1.45rem;
+    font-weight: 950;
+}
+
+.leader-name {
+    font-size: 1.05rem;
+    font-weight: 850;
+}
+
+.leader-money {
+    text-align: right;
+    font-size: 1.45rem;
+    font-weight: 950;
+    font-variant-numeric: tabular-nums;
+}
+
+.leader-record {
+    text-align: right;
+    color: var(--muted);
+}
+
+.final-seeds {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.final-seed {
+    --player: #7c8aa6;
+    padding: 18px;
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            155deg,
+            color-mix(in srgb, var(--player) 14%, transparent),
+            rgba(255,255,255,.045)
+        );
+    border-top: 5px solid var(--player);
+}
+
+.final-seed .seed-num {
+    color: var(--muted);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+}
+
+.final-seed .seed-name {
+    margin-top: 5px;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.final-seed .seed-budget {
+    margin-top: 8px;
+    font-size: 1.5rem;
+    font-weight: 950;
+}
+
+.bracket-history {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.bracket-row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.045);
+}
+
+.bracket-row .winner {
+    font-weight: 900;
+}
+
+.champion-scene {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.champion-card {
+    --player: #7c8aa6;
+    width: min(900px, 86%);
+    padding: 48px;
+    border-radius: 26px;
+    background:
+        radial-gradient(
+            circle at top,
+            color-mix(in srgb, var(--player) 30%, transparent),
+            transparent 55%
+        ),
+        rgba(255,255,255,.055);
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--player) 70%,
+            white 12%
+        );
+    animation: championPulse 2.6s ease-in-out infinite;
+}
+
+.champion-card .crown {
+    font-size: 4rem;
+}
+
+.champion-card .champ-name {
+    margin-top: 12px;
+    font-size: clamp(3rem, 7vw, 7rem);
+    font-weight: 1000;
+    line-height: .9;
+}
+
+.champion-card .champ-label {
+    margin-top: 16px;
+    letter-spacing: .16em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+@keyframes championPulse {
+    50% {
+        box-shadow:
+            0 0 70px
+            color-mix(
+                in srgb,
+                var(--player) 28%,
+                transparent
+            );
+    }
+}
+
+/* Payout overlay */
+.payout-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    padding: 34px;
+    opacity: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(47,64,100,.36),
+            rgba(7,9,14,.96) 62%
+        );
+    transition: opacity 250ms ease;
+}
+
+.payout-overlay.active {
+    opacity: 1;
+}
+
+.payout-board {
+    width: min(1320px, 96%);
+}
+
+.payout-heading {
+    text-align: center;
+}
+
+.payout-heading h2 {
+    margin: 0;
+    font-size: 3.4rem;
+}
+
+.payout-heading p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.payout-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.payout-player {
+    --player: #7c8aa6;
+    position: relative;
+    min-height: 142px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.055);
+    border-top: 5px solid var(--player);
+    overflow: hidden;
+}
+
+.payout-player .p-name {
+    font-weight: 900;
+}
+
+.payout-player .p-delta {
+    margin-top: 8px;
+    font-size: 1.8rem;
+    font-weight: 1000;
+}
+
+.payout-player .p-total {
+    margin-top: 3px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.payout-player.positive {
+    animation: payoutWin .8s ease both;
+}
+
+.payout-player.negative {
+    animation: payoutLoss .8s ease both;
+}
+
+.payout-player.positive::after {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: -16px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--player);
+    opacity: .3;
+    filter: blur(13px);
+    animation: energySurge 1.2s ease infinite;
+}
+
+@keyframes payoutWin {
+    from {
+        transform: scale(.92);
+        opacity: .4;
+    }
+    55% {
+        transform: scale(1.035);
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes payoutLoss {
+    from {
+        transform: translateY(-4px);
+    }
+    50% {
+        transform: translateY(2px);
+        opacity: .64;
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes energySurge {
+    50% {
+        opacity: .75;
+        transform: scaleX(1.15);
+    }
+}
+
+.winner-banner {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+}
+
+.winner-banner-inner {
+    --player: #7c8aa6;
+    padding: 28px 54px;
+    border-radius: 20px;
+    text-align: center;
+    background:
+        linear-gradient(
+            150deg,
+            color-mix(in srgb, var(--player) 26%, #111722),
+            #111722
+        );
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--player) 70%,
+            white 8%
+        );
+    box-shadow:
+        0 20px 90px rgba(0,0,0,.6);
+    animation: winnerIn 420ms cubic-bezier(.2,.9,.2,1);
+}
+
+.winner-banner-inner small {
+    display: block;
+    color: var(--muted);
+    letter-spacing: .18em;
+    font-weight: 900;
+}
+
+.winner-banner-inner strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 4rem;
+}
+
+@keyframes winnerIn {
+    from {
+        transform: scale(.65);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-aspect-ratio: 4/3) {
+    .cast-grid,
+    .payout-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .final-seeds {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <section
+        id="setup-screen"
+        class="setup-screen"
+    >
+        <div class="setup-card">
+
+            <h1>TABS War Chest</h1>
+
+            <p>
+                Broadcast Viewer
+            </p>
+
+            <div class="setup-row">
+
+                <input
+                    id="room-code"
+                    maxlength="6"
+                    placeholder="ROOM CODE"
+                >
+
+                <button onclick="connectBroadcast()">
+                    Connect
+                </button>
+
+            </div>
+
+            <div
+                id="setup-message"
+                class="setup-message"
+            ></div>
+
+        </div>
+    </section>
+
+
+    <section
+        id="broadcast-shell"
+        class="broadcast-shell hidden"
+    >
+
+        <header class="show-header">
+
+            <div class="brand">
+                <strong>TABS WAR CHEST</strong>
+                <span>
+                    DreamHarrier • Extra Life
+                </span>
+            </div>
+
+            <div
+                id="phase-chip"
+                class="phase-chip"
+            >
+                Connecting
+            </div>
+
+        </header>
+
+
+        <main class="stage">
+
+            <section
+                id="scene"
+                class="scene active"
+            ></section>
+
+            <div
+                id="winner-banner"
+                class="winner-banner hidden"
+            ></div>
+
+        </main>
+
+
+        <footer class="show-footer">
+
+            <strong id="footer-room">
+                ROOM ------
+            </strong>
+
+            <div
+                id="footer-status"
+                class="footer-status"
+            >
+                Waiting for event state…
+            </div>
+
+            <span>
+                Benefiting Extra Life
+            </span>
+
+        </footer>
+
+    </section>
+
+
+    <section
+        id="payout-overlay"
+        class="payout-overlay"
+    ></section>
+
+</div>
+
+
+<script>
+const PLAYER_COLORS = {
+    scarlet: "#FF4D5A",
+    tangerine: "#FF8A3D",
+    gold: "#F2C94C",
+    emerald: "#32D583",
+    cyan: "#22D3EE",
+    blue: "#3B82F6",
+    violet: "#8B5CF6",
+    pink: "#FF7AB8"
+};
+
+
+let roomCode = null;
+let state = null;
+let previousState = null;
+let pollTimer = null;
+let pollBusy = false;
+
+let firstState = true;
+let lastSettlementId = null;
+let payoutTimer = null;
+
+let lastWinnerKey = null;
+let winnerTimer = null;
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        value ?? "";
+
+    return div.innerHTML;
+}
+
+
+function playerById(id) {
+
+    return (
+        state?.players?.find(
+            player =>
+                player.id === id
+        )
+        ?? null
+    );
+}
+
+
+function playerName(id) {
+
+    return (
+        playerById(id)
+        ?.display_name
+        ?? "Player"
+    );
+}
+
+
+function playerColor(id) {
+
+    const code =
+        playerById(id)
+        ?.color_code;
+
+    return (
+        PLAYER_COLORS[code]
+        ?? "#8B97AE"
+    );
+}
+
+
+function money(value) {
+
+    const number =
+        Number(value ?? 0);
+
+    return (
+        "$"
+        +
+        Math.round(number)
+        .toLocaleString()
+    );
+}
+
+
+function signedMoney(value) {
+
+    const number =
+        Math.round(
+            Number(value ?? 0)
+        );
+
+    if (number === 0) {
+        return "$0";
+    }
+
+    return (
+        number > 0
+        ? `+${money(number)}`
+        : `-${money(Math.abs(number))}`
+    );
+}
+
+
+function standings() {
+
+    return [...(state?.players ?? [])]
+        .sort(
+            (a,b) =>
+                b.war_chest - a.war_chest
+                ||
+                b.wins - a.wins
+                ||
+                a.display_name.localeCompare(
+                    b.display_name
+                )
+        );
+}
+
+
+function currentMatch() {
+
+    const event =
+        state?.event;
+
+    if (!event) {
+        return null;
+    }
+
+    return (
+        state.matches?.find(
+            match =>
+                match.round_number ===
+                    event.current_round
+                &&
+                match.match_number ===
+                    event.current_match_number
+        )
+        ?? null
+    );
+}
+
+
+function currentFinalMatch() {
+
+    const stage =
+        state?.event
+        ?.final_war_current_stage;
+
+    return (
+        state?.final_war_matches
+        ?.find(
+            match =>
+                match.stage_number ===
+                stage
+        )
+        ?? null
+    );
+}
+
+
+function armyFor(playerId) {
+
+    return (
+        state?.current_armies
+        ?.find(
+            army =>
+                army.player_id ===
+                playerId
+        )
+        ?? null
+    );
+}
+
+
+function finalArmyFor(playerId) {
+
+    return (
+        state?.final_war_armies
+        ?.find(
+            army =>
+                army.player_id ===
+                playerId
+        )
+        ?? null
+    );
+}
+
+
+async function ensureBroadcastSession() {
+
+    const sessionResult =
+        await db.auth.getSession();
+
+    if (
+        sessionResult.data
+        ?.session
+    ) {
+        return;
+    }
+
+
+    const { error } =
+        await db.auth
+            .signInAnonymously();
+
+
+    if (error) {
+        throw error;
+    }
+}
+
+
+function roomFromUrl() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return (
+        params.get("room")
+        ?.trim()
+        .toUpperCase()
+        ?? ""
+    );
+}
+
+
+async function connectBroadcast() {
+
+    const input =
+        document.getElementById(
+            "room-code"
+        );
+
+    const message =
+        document.getElementById(
+            "setup-message"
+        );
+
+
+    const code =
+        input.value
+            .trim()
+            .toUpperCase();
+
+
+    if (code.length !== 6) {
+
+        message.textContent =
+            "Enter the 6-character room code.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "Connecting…";
+
+
+    try {
+
+        await ensureBroadcastSession();
+
+
+        roomCode = code;
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+        url.searchParams.set(
+            "room",
+            roomCode
+        );
+
+        history.replaceState(
+            null,
+            "",
+            url
+        );
+
+
+        await refreshState(true);
+
+
+        document
+            .getElementById(
+                "setup-screen"
+            )
+            .classList.add("hidden");
+
+
+        document
+            .getElementById(
+                "broadcast-shell"
+            )
+            .classList.remove("hidden");
+
+
+        startPolling();
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            error.message;
+    }
+}
+
+
+function startPolling() {
+
+    clearInterval(
+        pollTimer
+    );
+
+
+    pollTimer =
+        setInterval(
+            () =>
+                refreshState(false),
+            900
+        );
+}
+
+
+async function refreshState(
+    initial = false
+) {
+
+    if (
+        pollBusy
+        ||
+        !roomCode
+    ) {
+        return;
+    }
+
+
+    pollBusy = true;
+
+
+    try {
+
+        const { data, error } =
+            await db.rpc(
+                "get_broadcast_state",
+                {
+                    p_code:
+                        roomCode
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        previousState =
+            state;
+
+        state =
+            data;
+
+
+        if (initial || firstState) {
+
+            lastSettlementId =
+                state.latest_settlement
+                ?.match_id
+                ?? null;
+
+            firstState = false;
+        }
+
+
+        renderBroadcast();
+
+
+        maybeShowWinner();
+        maybeShowPayout();
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        document
+            .getElementById(
+                "footer-status"
+            )
+            .textContent =
+                `Broadcast data error: ${error.message}`;
+    }
+
+    finally {
+
+        pollBusy = false;
+    }
+}
+
+
+function phaseLabel() {
+
+    const event =
+        state.event;
+
+    const round =
+        event.current_round
+        ? `ROUND ${event.current_round}`
+        : "";
+
+
+    switch (event.status) {
+
+        case "lobby":
+            return "LOBBY";
+
+        case "locked":
+        case "draft_order":
+            return "DRAFT SETUP";
+
+        case "draft":
+            return "DRAFT";
+
+        case "draft_complete":
+            return "DRAFT COMPLETE";
+
+        case "shop":
+            return `${round} SHOP`;
+
+        case "army_build":
+            return `${round} ARMY BUILD`;
+
+        case "betting_open":
+            return `${round} BETTING`;
+
+        case "betting_locked":
+            return `${round} POOLS LOCKED`;
+
+        case "fight":
+            return `${round} • FIGHT ${event.current_match_number}`;
+
+        case "regular_complete":
+            return "REGULAR SEASON COMPLETE";
+
+        case "final_war_build":
+            return `FINAL WAR • STAGE ${event.final_war_current_stage}`;
+
+        case "final_war_ready":
+            return `FINAL WAR • STAGE ${event.final_war_current_stage}`;
+
+        case "final_war_fight":
+            return `FINAL WAR • STAGE ${event.final_war_current_stage}`;
+
+        case "final_war_complete":
+            return "FINAL WAR COMPLETE";
+
+        default:
+            return String(event.status)
+                .replaceAll("_"," ")
+                .toUpperCase();
+    }
+}
+
+
+function renderBroadcast() {
+
+    if (!state?.event) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "phase-chip"
+        )
+        .textContent =
+            phaseLabel();
+
+
+    document
+        .getElementById(
+            "footer-room"
+        )
+        .textContent =
+            `ROOM ${state.event.code}`;
+
+
+    document
+        .getElementById(
+            "footer-status"
+        )
+        .textContent =
+            footerStatus();
+
+
+    const scene =
+        document.getElementById(
+            "scene"
+        );
+
+
+    scene.innerHTML =
+        renderScene();
+}
+
+
+function footerStatus() {
+
+    const event =
+        state.event;
+
+
+    switch (event.status) {
+
+        case "lobby":
+            return `${state.players.length} / 8 players connected`;
+
+        case "draft":
+            return `Pick ${event.draft_pick_number}`;
+
+        case "shop":
+            return "Players are shopping and allocating skills";
+
+        case "army_build":
+            return `${state.army_submission_players.length} / ${state.players.length} armies submitted`;
+
+        case "betting_open": {
+            const ready =
+                state.players.filter(
+                    player =>
+                        player.betting_ready_round ===
+                        event.current_round
+                ).length;
+
+            return `${ready} / ${state.players.length} players ready`;
+        }
+
+        case "betting_locked":
+            return "Betting locked • current matchup awaiting army reveal";
+
+        case "fight": {
+            const match =
+                currentMatch();
+
+            return match?.winner_player_id
+                ? `${playerName(match.winner_player_id)} recorded as winner`
+                : "Armies revealed • battle live";
+        }
+
+        case "regular_complete":
+            return "Final Skill Allocation";
+
+        case "final_war_build":
+            return `${state.final_submission_players.length} / 2 Final War armies submitted`;
+
+        case "final_war_ready":
+            return "Final War armies ready for reveal";
+
+        case "final_war_fight":
+            return "Final War battle live";
+
+        case "final_war_complete":
+            return "Champion crowned";
+
+        default:
+            return "TABS War Chest Betting Special";
+    }
+}
+
+
+function renderScene() {
+
+    const status =
+        state.event.status;
+
+
+    if (status === "lobby") {
+        return renderLobby();
+    }
+
+
+    if (
+        status === "locked"
+        ||
+        status === "draft_order"
+    ) {
+        return renderCastIntro();
+    }
+
+
+    if (status === "draft") {
+        return renderDraft();
+    }
+
+
+    if (
+        status === "draft_complete"
+        ||
+        status === "shop"
+        ||
+        status === "army_build"
+        ||
+        status === "regular_complete"
+    ) {
+        return renderStandingsPrep();
+    }
+
+
+    if (status === "betting_open") {
+        return renderBettingOpen();
+    }
+
+
+    if (status === "betting_locked") {
+        return renderPools();
+    }
+
+
+    if (status === "fight") {
+
+        const match =
+            currentMatch();
+
+        if (match?.winner_player_id) {
+            return renderFightResult();
+        }
+
+        return renderArmyReveal(
+            match,
+            state.current_armies,
+            false
+        );
+    }
+
+
+    if (
+        status === "final_war_build"
+        ||
+        status === "final_war_ready"
+    ) {
+        return renderFinalBracket();
+    }
+
+
+    if (status === "final_war_fight") {
+
+        return renderArmyReveal(
+            currentFinalMatch(),
+            state.final_war_armies,
+            true
+        );
+    }
+
+
+    if (status === "final_war_complete") {
+        return renderChampion();
+    }
+
+
+    return renderStandings();
+}
+
+
+function renderLobby() {
+
+    return `
+        <div class="scene-kicker">
+            DreamHarrier presents
+        </div>
+
+        <h1 class="scene-title">
+            TABS War Chest
+        </h1>
+
+        <div class="scene-subtitle">
+            Players are joining the betting special.
+        </div>
+
+        ${renderCastGrid(
+            state.players,
+            false
+        )}
+    `;
+}
+
+
+function renderCastIntro() {
+
+    return `
+        <div class="scene-kicker">
+            The field is set
+        </div>
+
+        <h1 class="scene-title">
+            Meet the Gamblers
+        </h1>
+
+        <div class="scene-subtitle">
+            Eight colors. Eight War Chests. One Final War champion.
+        </div>
+
+        ${renderCastGrid(
+            state.players,
+            false
+        )}
+    `;
+}
+
+
+function renderCastGrid(
+    players,
+    useMoney = true
+) {
+
+    return `
+        <div class="cast-grid">
+
+            ${
+                players.map(
+                    player => `
+                        <div
+                            class="player-card"
+                            style="
+                                --player:
+                                ${playerColor(player.id)};
+                            "
+                        >
+
+                            <div class="rank">
+                                ${
+                                    player.is_bot
+                                    ? "CHAOS GAMBLER"
+                                    : "PLAYER"
+                                }
+                            </div>
+
+                            <div class="name">
+                                ${escapeHtml(player.display_name)}
+                            </div>
+
+                            ${
+                                useMoney
+                                ? `
+                                    <div class="money">
+                                        ${money(player.war_chest)}
+                                    </div>
+
+                                    <div class="meta">
+                                        ${player.wins} win${player.wins === 1 ? "" : "s"}
+                                    </div>
+                                  `
+                                : `
+                                    <div class="meta">
+                                        ${
+                                            player.draft_position
+                                            ? `Draft position #${player.draft_position}`
+                                            : "Waiting for draft order"
+                                        }
+                                    </div>
+                                  `
+                            }
+
+                        </div>
+                    `
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function currentDraftPlayer() {
+
+    const event =
+        state.event;
+
+    const count =
+        state.players.length;
+
+
+    if (
+        !count
+        ||
+        !event.draft_pick_number
+    ) {
+        return null;
+    }
+
+
+    const pick =
+        event.draft_pick_number;
+
+    const round =
+        Math.floor(
+            (pick - 1) / count
+        ) + 1;
+
+    const index =
+        (pick - 1) % count;
+
+    const position =
+        round % 2 === 1
+        ? index + 1
+        : count - index;
+
+
+    return (
+        state.players.find(
+            player =>
+                player.draft_position ===
+                position
+        )
+        ?? null
+    );
+}
+
+
+function renderDraft() {
+
+    const drafter =
+        currentDraftPlayer();
+
+    const picks =
+        state.draft_picks ?? [];
+
+    const last =
+        picks[picks.length - 1]
+        ?? null;
+
+
+    return `
+        <div class="draft-layout">
+
+            <div
+                class="draft-hero"
+                style="
+                    --player:
+                    ${drafter ? playerColor(drafter.id) : "#7c8aa6"};
+                "
+            >
+
+                <div class="scene-kicker">
+                    Pick ${state.event.draft_pick_number}
+                </div>
+
+                <div class="on-clock">
+                    ${
+                        drafter
+                        ? escapeHtml(drafter.display_name)
+                        : "Waiting"
+                    }
+                </div>
+
+                <div class="scene-subtitle">
+                    is on the clock
+                </div>
+
+                ${
+                    last
+                    ? `
+                        <div class="last-pick">
+
+                            <div class="scene-kicker">
+                                Last Pick
+                            </div>
+
+                            <strong>
+                                ${escapeHtml(
+                                    playerName(last.player_id)
+                                )}
+                            </strong>
+
+                            <div style="margin-top:5px;">
+                                ${last.tier} •
+                                ${escapeHtml(last.unit_name)}
+                                •
+                                ${last.cost.toLocaleString()}
+                            </div>
+
+                        </div>
+                      `
+                    : ""
+                }
+
+            </div>
+
+
+            <div class="draft-rosters">
+
+                ${
+                    state.players
+                    .slice()
+                    .sort(
+                        (a,b) =>
+                            (a.draft_position ?? 99)
+                            -
+                            (b.draft_position ?? 99)
+                    )
+                    .map(
+                        player => {
+
+                            const owned =
+                                picks.filter(
+                                    pick =>
+                                        pick.player_id ===
+                                        player.id
+                                );
+
+
+                            return `
+                                <div
+                                    class="draft-player"
+                                    style="
+                                        --player:
+                                        ${playerColor(player.id)};
+                                    "
+                                >
+
+                                    <div class="draft-name">
+
+                                        <span>
+                                            #${player.draft_position ?? "—"}
+                                            ${escapeHtml(player.display_name)}
+                                        </span>
+
+                                        <span>
+                                            ${owned.length}/8
+                                        </span>
+
+                                    </div>
+
+                                    <div class="draft-tags">
+
+                                        ${
+                                            owned.map(
+                                                pick => `
+                                                    <span class="draft-tag">
+                                                        ${pick.tier}
+                                                        ${escapeHtml(pick.unit_name)}
+                                                    </span>
+                                                `
+                                            ).join("")
+                                        }
+
+                                    </div>
+
+                                </div>
+                            `;
+                        }
+                    ).join("")
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderStandingsPrep() {
+
+    const status =
+        state.event.status;
+
+    const copy = {
+        draft_complete:
+            [
+                "Draft Complete",
+                "The factions are locked."
+            ],
+
+        shop:
+            [
+                `Round ${state.event.current_round} Shop`,
+                "Players are trading War Chest for tools, skills, and advantages."
+            ],
+
+        army_build:
+            [
+                `Round ${state.event.current_round} Army Build`,
+                `${state.army_submission_players.length} of ${state.players.length} armies submitted.`
+            ],
+
+        regular_complete:
+            [
+                "Regular Season Complete",
+                "Final Skill Allocation is open before the Final War."
+            ]
+    }[status];
+
+
+    return `
+        <div class="scene-kicker">
+            Current Standings
+        </div>
+
+        <h1 class="scene-title">
+            ${copy?.[0] ?? "Standings"}
+        </h1>
+
+        <div class="scene-subtitle">
+            ${copy?.[1] ?? ""}
+        </div>
+
+        ${renderLeaderboard()}
+    `;
+}
+
+
+function renderStandings() {
+
+    return `
+        <div class="scene-kicker">
+            War Chest Rankings
+        </div>
+
+        <h1 class="scene-title">
+            Standings
+        </h1>
+
+        ${renderLeaderboard()}
+    `;
+}
+
+
+function renderLeaderboard() {
+
+    return `
+        <div class="leaderboard">
+
+            ${
+                standings()
+                .map(
+                    (player,index) => `
+                        <div
+                            class="leader-row"
+                            style="
+                                --player:
+                                ${playerColor(player.id)};
+                            "
+                        >
+
+                            <div class="leader-rank">
+                                #${index + 1}
+                            </div>
+
+                            <div class="leader-name">
+                                ${escapeHtml(player.display_name)}
+                            </div>
+
+                            <div class="leader-money">
+                                ${money(player.war_chest)}
+                            </div>
+
+                            <div class="leader-record">
+                                ${player.wins} win${player.wins === 1 ? "" : "s"}
+                            </div>
+
+                        </div>
+                    `
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderBettingOpen() {
+
+    const ready =
+        state.players.filter(
+            player =>
+                player.betting_ready_round ===
+                state.event.current_round
+        ).length;
+
+
+    return `
+        <div class="scene-kicker">
+            Round ${state.event.current_round}
+        </div>
+
+        <h1 class="scene-title">
+            Place Your Bets
+        </h1>
+
+        <div class="scene-subtitle">
+            ${ready} of ${state.players.length} gamblers are ready.
+            Wagers remain secret until the pools lock.
+        </div>
+
+        <div class="cast-grid">
+
+            ${
+                state.players.map(
+                    player => {
+
+                        const isReady =
+                            player.betting_ready_round ===
+                            state.event.current_round;
+
+
+                        return `
+                            <div
+                                class="
+                                    player-card
+                                    ${isReady ? "ready" : ""}
+                                "
+                                style="
+                                    --player:
+                                    ${playerColor(player.id)};
+                                "
+                            >
+
+                                <div class="rank">
+                                    ${isReady ? "BETTING COMPLETE" : "BETTING"}
+                                </div>
+
+                                <div class="name">
+                                    ${escapeHtml(player.display_name)}
+                                </div>
+
+                                <div class="money">
+                                    ${money(player.war_chest)}
+                                </div>
+
+                            </div>
+                        `;
+                    }
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderPools() {
+
+    const roundMatches =
+        state.matches.filter(
+            match =>
+                match.round_number ===
+                state.event.current_round
+        );
+
+
+    return `
+        <div class="scene-kicker">
+            Round ${state.event.current_round}
+        </div>
+
+        <h1 class="scene-title">
+            The Pools Are Locked
+        </h1>
+
+        <div class="scene-subtitle">
+            House-seeded pools are public. Armies reveal one fight at a time.
+        </div>
+
+        <div class="pool-grid">
+
+            ${
+                roundMatches.map(
+                    match => {
+
+                        const pool =
+                            state.betting_pools
+                            .find(
+                                row =>
+                                    row.match_id ===
+                                    match.id
+                            );
+
+
+                        const current =
+                            match.match_number ===
+                            state.event.current_match_number;
+
+
+                        return `
+                            <div
+                                class="
+                                    pool-card
+                                    ${current ? "current" : ""}
+                                "
+                                style="
+                                    --p1:
+                                    ${playerColor(match.player1_id)};
+                                    --p2:
+                                    ${playerColor(match.player2_id)};
+                                "
+                            >
+
+                                <div class="pool-title">
+                                    Fight ${match.match_number}
+                                    ${current ? " • UP NEXT" : ""}
+                                </div>
+
+                                <div class="pool-sides">
+
+                                    <div class="pool-side one">
+
+                                        <div class="pool-name">
+                                            ${escapeHtml(
+                                                playerName(
+                                                    match.player1_id
+                                                )
+                                            )}
+                                        </div>
+
+                                        <div class="pool-money">
+                                            ${money(pool?.player1_pool ?? 1000)}
+                                        </div>
+
+                                    </div>
+
+                                    <div class="pool-side two">
+
+                                        <div class="pool-name">
+                                            ${escapeHtml(
+                                                playerName(
+                                                    match.player2_id
+                                                )
+                                            )}
+                                        </div>
+
+                                        <div class="pool-money">
+                                            ${money(pool?.player2_pool ?? 1000)}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        `;
+                    }
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderArmyReveal(
+    match,
+    armies,
+    isFinalWar
+) {
+
+    if (!match) {
+
+        return `
+            <h1 class="scene-title">
+                Match Loading…
+            </h1>
+        `;
+    }
+
+
+    const a1 =
+        armies.find(
+            army =>
+                army.player_id ===
+                match.player1_id
+        );
+
+    const a2 =
+        armies.find(
+            army =>
+                army.player_id ===
+                match.player2_id
+        );
+
+
+    return `
+        <div class="scene-kicker">
+            ${
+                isFinalWar
+                ? `Final War • Stage ${match.stage_number}`
+                : `Round ${match.round_number} • Fight ${match.match_number}`
+            }
+        </div>
+
+        <div class="hero-split">
+
+            ${renderFighterArmy(
+                match.player1_id,
+                a1,
+                isFinalWar
+            )}
+
+            <div class="vs">
+                VS
+            </div>
+
+            ${renderFighterArmy(
+                match.player2_id,
+                a2,
+                isFinalWar
+            )}
+
+        </div>
+    `;
+}
+
+
+function renderFighterArmy(
+    playerId,
+    army,
+    isFinalWar
+) {
+
+    const zones = [
+        ["frontline","FRONTLINE"],
+        ["midrange","MID-RANGE"],
+        ["backline","BACKLINE"]
+    ];
+
+
+    return `
+        <article
+            class="fighter-panel"
+            style="
+                --player:
+                ${playerColor(playerId)};
+            "
+        >
+
+            <div class="fighter-name">
+                ${escapeHtml(playerName(playerId))}
+            </div>
+
+            <div class="fighter-money">
+                ${
+                    isFinalWar
+                    ? `Frozen budget ${money(army?.army_budget ?? 0)}`
+                    : `War Chest ${money(playerById(playerId)?.war_chest ?? 0)}`
+                }
+            </div>
+
+
+            <div class="army-zones">
+
+                ${
+                    zones.map(
+                        ([zone,label]) => {
+
+                            const lines =
+                                (army?.lines ?? [])
+                                .filter(
+                                    line =>
+                                        line.zone === zone
+                                );
+
+
+                            return `
+                                <div class="army-zone">
+
+                                    <h4>
+                                        ${label}
+                                    </h4>
+
+                                    ${
+                                        lines.length
+                                        ? lines.map(
+                                            line => `
+                                                <div class="army-unit">
+
+                                                    <span>
+                                                        ${escapeHtml(line.unit_name)}
+                                                    </span>
+
+                                                    <strong>
+                                                        ×${line.quantity}
+                                                    </strong>
+
+                                                </div>
+                                            `
+                                        ).join("")
+                                        : `
+                                            <div class="army-unit">
+                                                <span>—</span>
+                                            </div>
+                                          `
+                                    }
+
+                                </div>
+                            `;
+                        }
+                    ).join("")
+                }
+
+            </div>
+
+
+            <div class="army-total">
+                ${
+                    army
+                    ? `${Number(army.total_cost).toLocaleString()} points`
+                    : "Army loading…"
+                }
+
+                ${
+                    !isFinalWar
+                    && army?.reinforcements_used
+                    ? " • Reinforcements"
+                    : ""
+                }
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderFightResult() {
+
+    const match =
+        currentMatch();
+
+    const winner =
+        playerById(
+            match?.winner_player_id
+        );
+
+
+    return `
+        <div class="champion-scene">
+
+            <div
+                class="champion-card"
+                style="
+                    --player:
+                    ${playerColor(winner?.id)};
+                "
+            >
+
+                <div class="champ-label">
+                    Fight ${match?.match_number} Winner
+                </div>
+
+                <div class="champ-name">
+                    ${escapeHtml(winner?.display_name ?? "Winner")}
+                </div>
+
+                <div class="scene-subtitle">
+                    Waiting for the Host to settle wagers and award the battle purse.
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderFinalBracket() {
+
+    const seeds =
+        (state.final_war_entries ?? [])
+        .filter(entry => entry.qualified)
+        .sort(
+            (a,b) =>
+                a.seed - b.seed
+        );
+
+
+    const current =
+        currentFinalMatch();
+
+
+    return `
+        <div class="scene-kicker">
+            The Final War
+        </div>
+
+        <h1 class="scene-title">
+            Gauntlet
+        </h1>
+
+        <div class="scene-subtitle">
+            Frozen War Chest totals become Final War army budgets.
+        </div>
+
+
+        <div class="final-seeds">
+
+            ${
+                seeds.map(
+                    seed => `
+                        <div
+                            class="final-seed"
+                            style="
+                                --player:
+                                ${playerColor(seed.player_id)};
+                            "
+                        >
+
+                            <div class="seed-num">
+                                Seed #${seed.seed}
+                            </div>
+
+                            <div class="seed-name">
+                                ${escapeHtml(
+                                    playerName(
+                                        seed.player_id
+                                    )
+                                )}
+                            </div>
+
+                            <div class="seed-budget">
+                                ${money(seed.frozen_budget)}
+                            </div>
+
+                        </div>
+                    `
+                ).join("")
+            }
+
+        </div>
+
+
+        ${
+            current
+            ? `
+                <div
+                    class="pool-card current"
+                    style="
+                        margin-top:18px;
+                        --p1:${playerColor(current.player1_id)};
+                        --p2:${playerColor(current.player2_id)};
+                    "
+                >
+
+                    <div class="pool-title">
+                        Stage ${current.stage_number}
+                        •
+                        ${
+                            state.event.status === "final_war_ready"
+                            ? "ARMIES READY"
+                            : "BUILDING ARMIES"
+                        }
+                    </div>
+
+                    <div class="pool-sides">
+
+                        <div class="pool-side one">
+                            <div class="pool-name">
+                                ${escapeHtml(playerName(current.player1_id))}
+                            </div>
+                            <div class="pool-money">
+                                ${money(current.player1_budget)}
+                            </div>
+                        </div>
+
+                        <div class="pool-side two">
+                            <div class="pool-name">
+                                ${escapeHtml(playerName(current.player2_id))}
+                            </div>
+                            <div class="pool-money">
+                                ${money(current.player2_budget)}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+              `
+            : ""
+        }
+
+
+        <div class="bracket-history">
+
+            ${
+                (state.final_war_matches ?? [])
+                .filter(match => match.winner_player_id)
+                .map(
+                    match => `
+                        <div class="bracket-row">
+
+                            <span>
+                                Stage ${match.stage_number}
+                            </span>
+
+                            <span>
+                                ${escapeHtml(playerName(match.player1_id))}
+                                vs
+                                ${escapeHtml(playerName(match.player2_id))}
+                            </span>
+
+                            <span class="winner">
+                                ${escapeHtml(playerName(match.winner_player_id))}
+                                advances
+                            </span>
+
+                        </div>
+                    `
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderChampion() {
+
+    const championId =
+        state.event
+        .final_war_champion_id;
+
+
+    return `
+        <div class="champion-scene">
+
+            <div
+                class="champion-card"
+                style="
+                    --player:
+                    ${playerColor(championId)};
+                "
+            >
+
+                <div class="crown">
+                    👑
+                </div>
+
+                <div class="champ-label">
+                    TABS War Chest Betting Special Champion
+                </div>
+
+                <div class="champ-name">
+                    ${escapeHtml(playerName(championId))}
+                </div>
+
+                <div class="scene-subtitle">
+                    DreamHarrier • Benefiting Extra Life
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function maybeShowWinner() {
+
+    if (
+        state.event.status !== "fight"
+    ) {
+        return;
+    }
+
+
+    const match =
+        currentMatch();
+
+
+    if (!match?.winner_player_id) {
+        return;
+    }
+
+
+    const key =
+        `${match.id}:${match.winner_player_id}`;
+
+
+    if (key === lastWinnerKey) {
+        return;
+    }
+
+
+    lastWinnerKey = key;
+
+
+    const banner =
+        document.getElementById(
+            "winner-banner"
+        );
+
+
+    banner.innerHTML = `
+        <div
+            class="winner-banner-inner"
+            style="
+                --player:
+                ${playerColor(match.winner_player_id)};
+            "
+        >
+            <small>VICTORY</small>
+            <strong>
+                ${escapeHtml(
+                    playerName(
+                        match.winner_player_id
+                    )
+                )}
+            </strong>
+        </div>
+    `;
+
+
+    banner.classList.remove("hidden");
+
+
+    clearTimeout(
+        winnerTimer
+    );
+
+
+    winnerTimer =
+        setTimeout(
+            () =>
+                banner.classList.add("hidden"),
+            2600
+        );
+}
+
+
+function settlementResults(
+    settlement
+) {
+
+    const result =
+        new Map();
+
+
+    const add = (
+        playerId,
+        value,
+        label
+    ) => {
+
+        if (!playerId) {
+            return;
+        }
+
+
+        const current =
+            result.get(playerId)
+            ?? {
+                value: 0,
+                labels: []
+            };
+
+
+        current.value +=
+            Number(value ?? 0);
+
+
+        if (
+            label
+            &&
+            Number(value ?? 0) !== 0
+        ) {
+            current.labels.push(label);
+        }
+
+
+        result.set(
+            playerId,
+            current
+        );
+    };
+
+
+    // Winner's $500 battle purse.
+    add(
+        settlement.winner_player_id,
+        500,
+        "Battle purse"
+    );
+
+
+    for (
+        const bet of
+        settlement.standard_bets ?? []
+    ) {
+
+        add(
+            bet.player_id,
+            Number(bet.payout ?? 0)
+            -
+            Number(bet.amount ?? 0),
+            "Winner bet"
+        );
+    }
+
+
+    for (
+        const hedge of
+        settlement.hedges ?? []
+    ) {
+
+        add(
+            hedge.player_id,
+            Number(hedge.payout ?? 0)
+            -
+            Number(hedge.stake ?? 0),
+            "Hedge"
+        );
+    }
+
+
+    for (
+        const prop of
+        settlement.props ?? []
+    ) {
+
+        add(
+            prop.player_id,
+            Number(prop.payout ?? 0)
+            -
+            Number(prop.amount ?? 0),
+            "Prop"
+        );
+    }
+
+
+    for (
+        const parlay of
+        settlement.parlays ?? []
+    ) {
+
+        add(
+            parlay.player_id,
+            Number(parlay.payout ?? 0)
+            -
+            Number(parlay.starting_amount ?? 0),
+            parlay.leg_count === 3
+            ? "Moonshot"
+            : "Parlay"
+        );
+    }
+
+
+    return result;
+}
+
+
+function maybeShowPayout() {
+
+    const settlement =
+        state.latest_settlement;
+
+
+    if (!settlement?.match_id) {
+        return;
+    }
+
+
+    if (
+        settlement.match_id ===
+        lastSettlementId
+    ) {
+        return;
+    }
+
+
+    lastSettlementId =
+        settlement.match_id;
+
+
+    const overlay =
+        document.getElementById(
+            "payout-overlay"
+        );
+
+
+    const results =
+        settlementResults(
+            settlement
+        );
+
+
+    const rows =
+        standings()
+        .map(
+            player => {
+
+                const result =
+                    results.get(
+                        player.id
+                    )
+                    ?? {
+                        value: 0,
+                        labels: []
+                    };
+
+
+                const cssClass =
+                    result.value > 0
+                    ? "positive"
+                    : result.value < 0
+                    ? "negative"
+                    : "";
+
+
+                return `
+                    <div
+                        class="
+                            payout-player
+                            ${cssClass}
+                        "
+                        style="
+                            --player:
+                            ${playerColor(player.id)};
+                        "
+                    >
+
+                        <div class="p-name">
+                            ${escapeHtml(player.display_name)}
+                        </div>
+
+                        <div class="p-delta">
+                            ${signedMoney(result.value)}
+                        </div>
+
+                        <div class="p-total">
+                            War Chest:
+                            ${money(player.war_chest)}
+                        </div>
+
+                        ${
+                            result.labels.length
+                            ? `
+                                <div
+                                    style="
+                                        margin-top:5px;
+                                        color:var(--muted);
+                                        font-size:.7rem;
+                                    "
+                                >
+                                    ${escapeHtml(
+                                        result.labels.join(" • ")
+                                    )}
+                                </div>
+                              `
+                            : ""
+                        }
+
+                    </div>
+                `;
+            }
+        )
+        .join("");
+
+
+    overlay.innerHTML = `
+        <div class="payout-board">
+
+            <div class="payout-heading">
+
+                <h2>
+                    Settling Fight ${settlement.match_number}
+                </h2>
+
+                <p>
+                    Bet results, completed advanced wagers, and the $500 battle purse.
+                </p>
+
+            </div>
+
+            <div class="payout-grid">
+                ${rows}
+            </div>
+
+        </div>
+    `;
+
+
+    overlay.classList.add(
+        "active"
+    );
+
+
+    clearTimeout(
+        payoutTimer
+    );
+
+
+    payoutTimer =
+        setTimeout(
+            () => {
+
+                overlay.classList.remove(
+                    "active"
+                );
+
+            },
+            6200
+        );
+}
+
+
+async function initialize() {
+
+    const fromUrl =
+        roomFromUrl();
+
+
+    if (fromUrl) {
+
+        document
+            .getElementById(
+                "room-code"
+            )
+            .value =
+                fromUrl;
+
+
+        await connectBroadcast();
+
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "room-code"
+        )
+        .focus();
+}
+
+
+document
+    .getElementById(
+        "room-code"
+    )
+    .addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+                connectBroadcast();
+            }
+        }
+    );
+
+
+initialize();
+</script>
+
+</body>
+</html>
