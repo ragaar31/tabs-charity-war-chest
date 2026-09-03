@@ -694,25 +694,25 @@ input {
 }
 
 .market-board {
-    --market-tile: clamp(42px, 2.62vw, 51px);
+    --market-tile: clamp(48px, 3.05vw, 58px);
     min-height: 0;
     display: grid;
     align-content: start;
-    gap: 8px;
-    padding-top: 13px;
+    gap: 6px;
+    padding-top: 12px;
     overflow: hidden;
 }
 
 .market-band {
     --tier-color: #8b97ae;
-    --cols: 18;
+    --cols: 16;
     position: relative;
     width: max-content;
     max-width: 100%;
     min-height: 0;
-    padding: 8px;
+    padding: 7px;
     border: 3px solid var(--tier-color);
-    border-radius: 13px;
+    border-radius: 14px;
     background:
         linear-gradient(
             145deg,
@@ -729,12 +729,12 @@ input {
     top: -3px;
     right: 10px;
     transform: translateY(-50%);
-    min-width: 74px;
-    padding: 5px 13px;
+    min-width: 78px;
+    padding: 5px 14px;
     border-radius: 8px;
     background: var(--tier-color);
     color: #0d1119;
-    font-size: .72rem;
+    font-size: .74rem;
     line-height: 1;
     text-align: center;
     font-weight: 1000;
@@ -753,19 +753,19 @@ input {
             var(--market-tile)
         );
     grid-auto-rows: var(--market-tile);
-    gap: 5px;
+    gap: 4px;
 }
 
 .market-tile {
     min-width: 0;
     min-height: 0;
     aspect-ratio: 1 / 1;
-    padding: 5px 4px 4px;
-    border-radius: 7px;
+    padding: 6px 5px 5px;
+    border-radius: 8px;
     background:
         linear-gradient(
             145deg,
-            rgba(255,255,255,.085),
+            rgba(255,255,255,.09),
             rgba(255,255,255,.045)
         );
     border: 1px solid rgba(255,255,255,.085);
@@ -777,7 +777,7 @@ input {
 }
 
 .market-tile-name {
-    font-size: .50rem;
+    font-size: .53rem;
     line-height: 1.02;
     font-weight: 900;
     color: rgba(255,255,255,.97);
@@ -790,7 +790,7 @@ input {
 
 .market-tile-cost {
     align-self: flex-end;
-    font-size: .48rem;
+    font-size: .50rem;
     color: rgba(255,255,255,.7);
     font-weight: 850;
     font-variant-numeric: tabular-nums;
@@ -864,7 +864,7 @@ input {
         grid-template-columns: 1fr 1.35fr;
     }
     .market-board {
-        --market-tile: clamp(38px, 2.35vw, 46px);
+        --market-tile: clamp(43px, 2.7vw, 52px);
     }
     .draft-order-strip {
         grid-template-columns: repeat(4, minmax(0,1fr));
@@ -2477,7 +2477,7 @@ function renderDraft() {
                                                     1,
                                                     Math.min(
                                                         units.length,
-                                                        18
+                                                        16
                                                     )
                                                 )};
                                             "
