@@ -1479,6 +1479,123 @@ body.player-connected main > p:last-of-type {
     }
 }
 
+
+.skill-branch-selector {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding-bottom: 12px;
+}
+
+.skill-branch-selector button {
+    min-width: 0;
+    min-height: 62px;
+    padding: 9px 7px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.12;
+    background: rgba(255,255,255,.04);
+    border-color: rgba(255,255,255,.12);
+}
+
+.skill-branch-selector button.active {
+    background: rgba(var(--player-rgb), .16);
+    border-color: rgba(var(--player-rgb), .58);
+    outline: 1px solid rgba(var(--player-rgb), .35);
+}
+
+.skill-branch-selector button:nth-child(5) {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 680px) {
+    .skill-branch-selector {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
+    }
+
+    .skill-branch-selector button:nth-child(5) {
+        grid-column: auto;
+    }
+}
+
+
+.zone-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 12px;
+}
+
+.zone-field {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255,255,255,.065);
+}
+
+.zone-field:first-child {
+    border-top: 0;
+}
+
+.zone-field label {
+    margin: 0;
+    font-size: .76rem;
+    font-weight: bold;
+    opacity: .78;
+}
+
+.qty-stepper {
+    display: grid;
+    grid-template-columns:
+        minmax(42px, .8fr)
+        minmax(42px, .8fr)
+        minmax(54px, 1fr)
+        minmax(42px, .8fr)
+        minmax(42px, .8fr);
+    gap: 5px;
+    align-items: stretch;
+}
+
+.qty-stepper button {
+    min-height: 44px;
+    padding: 8px 4px;
+    font-size: .83rem;
+    line-height: 1;
+}
+
+.qty-stepper button:disabled {
+    opacity: .26;
+}
+
+.qty-display {
+    min-width: 0;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 6px 4px;
+    border-radius: 8px;
+    background: rgba(var(--player-rgb), .11);
+    border: 1px solid rgba(var(--player-rgb), .32);
+    color: white;
+    font-size: 1.08rem;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 390px) {
+    .zone-field {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .zone-field label {
+        text-align: center;
+    }
+}
+
 </style>
 </head>
 
@@ -4929,10 +5046,7 @@ function renderSkillTree() {
             <strong>${me.skill_points} SP</strong>
         </div>
 
-        <div
-            class="focus-task-nav"
-            style="padding-bottom:12px;"
-        >
+        <div class="skill-branch-selector">
             ${
                 Object.entries(skillBranchMeta)
                 .map(
@@ -5412,6 +5526,183 @@ function setArmyQty(
     saveArmyDraft();
     renderArmyBuilder();
     renderBetting();
+}
+
+
+function adjustArmyQty(
+    unitId,
+    zone,
+    delta
+) {
+
+    const unit =
+        units.find(
+            row => row.id === unitId
+        );
+
+
+    if (!unit) {
+        return;
+    }
+
+
+    const current =
+        getQty(
+            unitId,
+            zone
+        );
+
+
+    let change = delta;
+
+
+    if (delta > 0) {
+
+        const remaining =
+            Math.max(
+                0,
+                currentArmyBudget()
+                -
+                armyTotalCost()
+            );
+
+
+        const affordable =
+            Math.floor(
+                remaining
+                /
+                unit.cost
+            );
+
+
+        change =
+            Math.min(
+                delta,
+                affordable
+            );
+    }
+
+
+    setArmyQty(
+        unitId,
+        zone,
+        Math.max(
+            0,
+            current + change
+        )
+    );
+}
+
+
+function armyCanAdd(
+    unitId
+) {
+
+    const unit =
+        units.find(
+            row => row.id === unitId
+        );
+
+
+    if (!unit) {
+        return false;
+    }
+
+
+    return (
+        currentArmyBudget()
+        -
+        armyTotalCost()
+    ) >= unit.cost;
+}
+
+
+function renderArmyQtyStepper(
+    unit,
+    zone,
+    label
+) {
+
+    const quantity =
+        getQty(
+            unit.id,
+            zone
+        );
+
+
+    const canAdd =
+        armyCanAdd(
+            unit.id
+        );
+
+
+    return `
+        <div class="zone-field">
+
+            <label>
+                ${label}
+            </label>
+
+            <div class="qty-stepper">
+
+                <button
+                    type="button"
+                    class="secondary"
+                    ${quantity <= 0 ? "disabled" : ""}
+                    onclick="adjustArmyQty(
+                        '${unit.id}',
+                        '${zone}',
+                        -10
+                    )"
+                >
+                    −10
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary"
+                    ${quantity <= 0 ? "disabled" : ""}
+                    onclick="adjustArmyQty(
+                        '${unit.id}',
+                        '${zone}',
+                        -1
+                    )"
+                >
+                    −1
+                </button>
+
+                <div class="qty-display">
+                    ${quantity}
+                </div>
+
+                <button
+                    type="button"
+                    ${canAdd ? "" : "disabled"}
+                    onclick="adjustArmyQty(
+                        '${unit.id}',
+                        '${zone}',
+                        1
+                    )"
+                >
+                    +1
+                </button>
+
+                <button
+                    type="button"
+                    ${canAdd ? "" : "disabled"}
+                    onclick="adjustArmyQty(
+                        '${unit.id}',
+                        '${zone}',
+                        10
+                    )"
+                >
+                    +10
+                </button>
+
+            </div>
+
+        </div>
+    `;
 }
 
 
@@ -6094,94 +6385,23 @@ function renderArmyBuilder() {
 
                                 <div class="zone-grid">
 
-                                    <div class="zone-field">
+                                    ${renderArmyQtyStepper(
+                                        unit,
+                                        "frontline",
+                                        "Frontline"
+                                    )}
 
-                                        <label>
-                                            Frontline
-                                        </label>
+                                    ${renderArmyQtyStepper(
+                                        unit,
+                                        "midrange",
+                                        "Mid-range"
+                                    )}
 
-                                        <input
-                                            class="qty-input"
-                                            type="number"
-                                            inputmode="numeric"
-                                            min="0"
-                                            step="1"
-                                            value="${
-                                                getQty(
-                                                    unit.id,
-                                                    "frontline"
-                                                )
-                                            }"
-                                            oninput="
-                                                setArmyQty(
-                                                    '${unit.id}',
-                                                    'frontline',
-                                                    this.value
-                                                )
-                                            "
-                                        >
-
-                                    </div>
-
-
-                                    <div class="zone-field">
-
-                                        <label>
-                                            Mid-range
-                                        </label>
-
-                                        <input
-                                            class="qty-input"
-                                            type="number"
-                                            inputmode="numeric"
-                                            min="0"
-                                            step="1"
-                                            value="${
-                                                getQty(
-                                                    unit.id,
-                                                    "midrange"
-                                                )
-                                            }"
-                                            oninput="
-                                                setArmyQty(
-                                                    '${unit.id}',
-                                                    'midrange',
-                                                    this.value
-                                                )
-                                            "
-                                        >
-
-                                    </div>
-
-
-                                    <div class="zone-field">
-
-                                        <label>
-                                            Backline
-                                        </label>
-
-                                        <input
-                                            class="qty-input"
-                                            type="number"
-                                            inputmode="numeric"
-                                            min="0"
-                                            step="1"
-                                            value="${
-                                                getQty(
-                                                    unit.id,
-                                                    "backline"
-                                                )
-                                            }"
-                                            oninput="
-                                                setArmyQty(
-                                                    '${unit.id}',
-                                                    'backline',
-                                                    this.value
-                                                )
-                                            "
-                                        >
-
-                                    </div>
+                                    ${renderArmyQtyStepper(
+                                        unit,
+                                        "backline",
+                                        "Backline"
+                                    )}
 
                                 </div>
 
@@ -9526,6 +9746,195 @@ function setFinalWarQty(
 }
 
 
+function adjustFinalWarQty(
+    unitId,
+    zone,
+    delta
+) {
+
+    const unit =
+        units.find(
+            row => row.id === unitId
+        );
+
+
+    if (!unit) {
+        return;
+    }
+
+
+    const current =
+        finalWarQty(
+            unitId,
+            zone
+        );
+
+
+    let change = delta;
+
+
+    if (delta > 0) {
+
+        const budget =
+            myFinalWarEntry()
+            ?.frozen_budget
+            ?? 0;
+
+
+        const remaining =
+            Math.max(
+                0,
+                budget
+                -
+                finalWarTotal()
+            );
+
+
+        const affordable =
+            Math.floor(
+                remaining
+                /
+                unit.cost
+            );
+
+
+        change =
+            Math.min(
+                delta,
+                affordable
+            );
+    }
+
+
+    setFinalWarQty(
+        unitId,
+        zone,
+        Math.max(
+            0,
+            current + change
+        )
+    );
+}
+
+
+function finalWarCanAdd(
+    unitId
+) {
+
+    const unit =
+        units.find(
+            row => row.id === unitId
+        );
+
+
+    if (!unit) {
+        return false;
+    }
+
+
+    const budget =
+        myFinalWarEntry()
+        ?.frozen_budget
+        ?? 0;
+
+
+    return (
+        budget
+        -
+        finalWarTotal()
+    ) >= unit.cost;
+}
+
+
+function renderFinalWarQtyStepper(
+    unit,
+    zone,
+    label
+) {
+
+    const quantity =
+        finalWarQty(
+            unit.id,
+            zone
+        );
+
+
+    const canAdd =
+        finalWarCanAdd(
+            unit.id
+        );
+
+
+    return `
+        <div class="zone-field">
+
+            <label>
+                ${label}
+            </label>
+
+            <div class="qty-stepper">
+
+                <button
+                    type="button"
+                    class="secondary"
+                    ${quantity <= 0 ? "disabled" : ""}
+                    onclick="adjustFinalWarQty(
+                        '${unit.id}',
+                        '${zone}',
+                        -10
+                    )"
+                >
+                    −10
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary"
+                    ${quantity <= 0 ? "disabled" : ""}
+                    onclick="adjustFinalWarQty(
+                        '${unit.id}',
+                        '${zone}',
+                        -1
+                    )"
+                >
+                    −1
+                </button>
+
+                <div class="qty-display">
+                    ${quantity}
+                </div>
+
+                <button
+                    type="button"
+                    ${canAdd ? "" : "disabled"}
+                    onclick="adjustFinalWarQty(
+                        '${unit.id}',
+                        '${zone}',
+                        1
+                    )"
+                >
+                    +1
+                </button>
+
+                <button
+                    type="button"
+                    ${canAdd ? "" : "disabled"}
+                    onclick="adjustFinalWarQty(
+                        '${unit.id}',
+                        '${zone}',
+                        10
+                    )"
+                >
+                    +10
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
 function finalWarBuilderUnits() {
 
     const draftedIds =
@@ -9944,46 +10353,23 @@ function renderFinalWar() {
 
                             <div class="zone-grid">
 
-                                ${
-                                    [
-                                        ["frontline","Frontline"],
-                                        ["midrange","Mid-range"],
-                                        ["backline","Backline"]
-                                    ]
-                                    .map(
-                                        ([zoneCode,label]) => `
-                                            <div class="zone-field">
+                                ${renderFinalWarQtyStepper(
+                                    unit,
+                                    "frontline",
+                                    "Frontline"
+                                )}
 
-                                                <label>
-                                                    ${label}
-                                                </label>
+                                ${renderFinalWarQtyStepper(
+                                    unit,
+                                    "midrange",
+                                    "Mid-range"
+                                )}
 
-                                                <input
-                                                    class="qty-input"
-                                                    type="number"
-                                                    inputmode="numeric"
-                                                    min="0"
-                                                    step="1"
-                                                    value="${
-                                                        finalWarQty(
-                                                            unit.id,
-                                                            zoneCode
-                                                        )
-                                                    }"
-                                                    oninput="
-                                                        setFinalWarQty(
-                                                            '${unit.id}',
-                                                            '${zoneCode}',
-                                                            this.value
-                                                        )
-                                                    "
-                                                >
-
-                                            </div>
-                                        `
-                                    )
-                                    .join("")
-                                }
+                                ${renderFinalWarQtyStepper(
+                                    unit,
+                                    "backline",
+                                    "Backline"
+                                )}
 
                             </div>
 
