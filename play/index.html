@@ -1802,64 +1802,101 @@ async function loadState() {
     }
 
 
-    const finalEntryResult =
-        await db
-            .from("final_war_entries")
-            .select("*")
-            .eq("event_id", currentEventId)
-            .order("standing_rank");
-
-    if (finalEntryResult.error) {
-        console.error(finalEntryResult.error);
-        return;
-    }
-
-    finalWarEntries =
-        finalEntryResult.data ?? [];
+    finalWarEntries = [];
+    finalWarMatches = [];
+    finalWarSubmissions = [];
 
 
-    const finalMatchResult =
-        await db
-            .from("final_war_matches")
-            .select("*")
-            .eq("event_id", currentEventId)
-            .order("stage_number");
-
-    if (finalMatchResult.error) {
-        console.error(finalMatchResult.error);
-        return;
-    }
-
-    finalWarMatches =
-        finalMatchResult.data ?? [];
+    const finalWarActive =
+        [
+            "final_war_build",
+            "final_war_ready",
+            "final_war_fight",
+            "final_war_complete"
+        ].includes(
+            eventData.status
+        );
 
 
-    const finalSubmissionResult =
-        await db
-            .from("final_war_submissions")
-            .select(`
-                *,
-                final_war_lines (
-                    unit_id,
-                    zone,
-                    quantity,
-                    units (
-                        name,
-                        cost,
-                        faction,
-                        tier
+    if (finalWarActive) {
+
+        const finalEntryResult =
+            await db
+                .from("final_war_entries")
+                .select("*")
+                .eq("event_id", currentEventId)
+                .order("standing_rank");
+
+
+        if (finalEntryResult.error) {
+
+            console.error(
+                "Final War entries:",
+                finalEntryResult.error
+            );
+        }
+        else {
+
+            finalWarEntries =
+                finalEntryResult.data ?? [];
+        }
+
+
+        const finalMatchResult =
+            await db
+                .from("final_war_matches")
+                .select("*")
+                .eq("event_id", currentEventId)
+                .order("stage_number");
+
+
+        if (finalMatchResult.error) {
+
+            console.error(
+                "Final War matches:",
+                finalMatchResult.error
+            );
+        }
+        else {
+
+            finalWarMatches =
+                finalMatchResult.data ?? [];
+        }
+
+
+        const finalSubmissionResult =
+            await db
+                .from("final_war_submissions")
+                .select(`
+                    *,
+                    final_war_lines (
+                        unit_id,
+                        zone,
+                        quantity,
+                        units (
+                            name,
+                            cost,
+                            faction,
+                            tier
+                        )
                     )
-                )
-            `)
-            .eq("event_id", currentEventId);
+                `)
+                .eq("event_id", currentEventId);
 
-    if (finalSubmissionResult.error) {
-        console.error(finalSubmissionResult.error);
-        return;
+
+        if (finalSubmissionResult.error) {
+
+            console.error(
+                "Final War submissions:",
+                finalSubmissionResult.error
+            );
+        }
+        else {
+
+            finalWarSubmissions =
+                finalSubmissionResult.data ?? [];
+        }
     }
-
-    finalWarSubmissions =
-        finalSubmissionResult.data ?? [];
 
 
     render();
