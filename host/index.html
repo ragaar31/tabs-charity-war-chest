@@ -131,6 +131,29 @@ button:disabled {
     border-radius: 9px;
 }
 
+.player-name-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.bot-badge {
+    display: inline-block;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.18);
+    font-size: .65rem;
+    font-weight: bold;
+    letter-spacing: .07em;
+}
+
+.chaos-help {
+    margin-top: 10px;
+    max-width: 760px;
+}
+
 .order-number {
     width: 35px;
     height: 35px;
@@ -431,7 +454,7 @@ a { color: white; }
 
     <h3>
         Players
-        (<span id="player-count">0</span>)
+        (<span id="player-count">0</span> / 8)
     </h3>
 
     <div id="player-list"></div>
@@ -538,6 +561,10 @@ let armyChannel = null;
 let skillChannel = null;
 let recruitChannel = null;
 let advancedBetChannel = null;
+
+let chaosResolving = false;
+let chaosResolveTimer = null;
+let lastAutoChaosKey = null;
 
 
 function escapeHtml(value) {
@@ -1145,6 +1172,8 @@ function render() {
     renderRound();
     renderArmyHost();
     renderBettingHost();
+
+    scheduleChaosResolution();
 }
 
 
@@ -1171,10 +1200,32 @@ function renderActions() {
 
         actions.innerHTML = `
             <div class="actions">
+
+                <button
+                    class="secondary"
+                    ${players.length >= 8 ? "disabled" : ""}
+                    onclick="addChaosGambler()"
+                >
+                    🎲 Add Chaos Gambler
+                </button>
+
+                <button
+                    class="secondary"
+                    ${players.length >= 8 ? "disabled" : ""}
+                    onclick="fillChaosGamblers()"
+                >
+                    🎲 Fill to 8
+                </button>
+
                 <button onclick="lockLobby()">
                     Lock Lobby
                 </button>
+
             </div>
+
+            <p class="status chaos-help">
+                Chaos Gamblers are computer-controlled player seats. They draft, shop, spend Skill Points, build armies, and gamble automatically.
+            </p>
         `;
     }
 
@@ -1318,6 +1369,37 @@ function renderActions() {
         title.textContent =
             "Regular Season Complete";
     }
+
+
+    const chaosPhases = [
+        "draft",
+        "shop",
+        "army_build",
+        "betting_open",
+        "betting_locked",
+        "regular_complete"
+    ];
+
+    if (
+        players.some(player => player.is_bot)
+        &&
+        chaosPhases.includes(eventData.status)
+    ) {
+
+        actions.insertAdjacentHTML(
+            "beforeend",
+            `
+                <div class="actions">
+                    <button
+                        class="secondary"
+                        onclick="resolveChaosGamblers(false)"
+                    >
+                        🎲 Resolve Chaos Gamblers
+                    </button>
+                </div>
+            `
+        );
+    }
 }
 
 
@@ -1379,7 +1461,11 @@ function renderPlayers() {
                     ? `
                         <button
                             class="danger"
-                            onclick="removePlayer('${player.id}')"
+                            onclick="${
+                                player.is_bot
+                                ? `removeChaosGambler('${player.id}')`
+                                : `removePlayer('${player.id}')`
+                            }"
                         >
                             Remove
                         </button>
@@ -1394,9 +1480,21 @@ function renderPlayers() {
                 return `
                     <div class="player-row">
 
-                        <strong>
-                            ${escapeHtml(player.display_name)}
-                        </strong>
+                        <div class="player-name-wrap">
+                            <strong>
+                                ${escapeHtml(player.display_name)}
+                            </strong>
+
+                            ${
+                                player.is_bot
+                                ? `
+                                    <span class="bot-badge">
+                                        🎲 CHAOS
+                                    </span>
+                                  `
+                                : ""
+                            }
+                        </div>
 
                         ${position}
 
@@ -1869,6 +1967,372 @@ function renderRound() {
             }
         )
         .join("");
+}
+
+
+async function addChaosGambler() {
+
+    setMessage(
+        "Adding Chaos Gambler..."
+    );
+
+
+    const {
+        error
+    } = await db.rpc(
+        "add_chaos_gambler",
+        {
+            p_event_id:
+                currentEventId
+        }
+    );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Chaos Gambler added."
+    );
+
+    await loadState();
+}
+
+
+async function fillChaosGamblers() {
+
+    setMessage(
+        "Filling open seats with Chaos Gamblers..."
+    );
+
+
+    const {
+        data,
+        error
+    } = await db.rpc(
+        "fill_chaos_gamblers",
+        {
+            p_event_id:
+                currentEventId
+        }
+    );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        data > 0
+        ? `Added ${data} Chaos Gambler${data === 1 ? "" : "s"}.`
+        : "All 8 seats are already filled."
+    );
+
+    await loadState();
+}
+
+
+async function removeChaosGambler(
+    playerId
+) {
+
+    if (
+        eventData.status !==
+        "lobby"
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } = await db.rpc(
+        "remove_chaos_gambler",
+        {
+            p_event_id:
+                currentEventId,
+
+            p_player_id:
+                playerId
+        }
+    );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Chaos Gambler removed."
+    );
+
+    await loadState();
+}
+
+
+function chaosAutoKey() {
+
+    if (
+        !eventData
+        ||
+        !players.some(
+            player =>
+                player.is_bot
+        )
+    ) {
+        return null;
+    }
+
+
+    if (
+        eventData.status ===
+        "draft"
+    ) {
+
+        const state =
+            getCurrentDraftState();
+
+        if (!state?.player?.is_bot) {
+            return null;
+        }
+
+        return (
+            `draft:${eventData.draft_pick_number}`
+        );
+    }
+
+
+    if (
+        eventData.status ===
+        "shop"
+    ) {
+
+        return (
+            `shop:${eventData.current_round}`
+        );
+    }
+
+
+    if (
+        eventData.status ===
+        "army_build"
+    ) {
+
+        const missingBotArmy =
+            players.some(
+                player =>
+                    player.is_bot
+                    &&
+                    !armySubmissions.some(
+                        submission =>
+                            submission.round_number ===
+                            eventData.current_round
+                            &&
+                            submission.player_id ===
+                            player.id
+                    )
+            );
+
+        return missingBotArmy
+            ? `army:${eventData.current_round}`
+            : null;
+    }
+
+
+    if (
+        eventData.status ===
+        "betting_open"
+    ) {
+
+        const pendingBot =
+            players.some(
+                player =>
+                    player.is_bot
+                    &&
+                    player.betting_ready_round !==
+                    eventData.current_round
+            );
+
+        return pendingBot
+            ? `bet:${eventData.current_round}`
+            : null;
+    }
+
+
+    if (
+        eventData.status ===
+        "betting_locked"
+    ) {
+
+        return (
+            `closing:${eventData.current_round}`
+        );
+    }
+
+
+    if (
+        eventData.status ===
+        "regular_complete"
+    ) {
+
+        return "final-skill";
+    }
+
+
+    return null;
+}
+
+
+function scheduleChaosResolution() {
+
+    const key =
+        chaosAutoKey();
+
+
+    if (
+        !key
+        ||
+        key ===
+        lastAutoChaosKey
+    ) {
+        return;
+    }
+
+
+    lastAutoChaosKey =
+        key;
+
+
+    if (chaosResolveTimer) {
+
+        clearTimeout(
+            chaosResolveTimer
+        );
+    }
+
+
+    chaosResolveTimer =
+        setTimeout(
+            () => {
+                resolveChaosGamblers(
+                    true,
+                    key
+                );
+            },
+            450
+        );
+}
+
+
+async function resolveChaosGamblers(
+    silent = false,
+    autoKey = null
+) {
+
+    if (
+        chaosResolving
+        ||
+        !currentEventId
+    ) {
+        return;
+    }
+
+
+    chaosResolving =
+        true;
+
+
+    if (!silent) {
+
+        setMessage(
+            "Chaos Gamblers are making random decisions..."
+        );
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await db.rpc(
+            "resolve_chaos_gamblers",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!silent) {
+
+            const actionCount =
+                Number(
+                    data?.actions ?? 0
+                );
+
+            setMessage(
+                actionCount > 0
+                ? `Chaos Gamblers resolved ${actionCount} action${actionCount === 1 ? "" : "s"}.`
+                : "No Chaos Gambler actions were pending."
+            );
+        }
+
+
+        if (
+            Number(
+                data?.actions ?? 0
+            ) > 0
+        ) {
+
+            await loadState();
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        if (autoKey) {
+            lastAutoChaosKey = null;
+        }
+
+        setMessage(
+            "Chaos Gambler error: "
+            + error.message
+        );
+    }
+
+    finally {
+
+        chaosResolving =
+            false;
+    }
 }
 
 
@@ -2956,6 +3420,10 @@ function renderBettingHost() {
 
 async function beginBetting() {
 
+    await resolveChaosGamblers(
+        true
+    );
+
     setMessage("Opening betting...");
 
     const { error } =
@@ -2983,6 +3451,10 @@ async function beginBetting() {
 
 
 async function lockBetting() {
+
+    await resolveChaosGamblers(
+        true
+    );
 
     const readyCount =
         players.filter(
@@ -3030,6 +3502,10 @@ async function lockBetting() {
 
 
 async function revealCurrentArmies() {
+
+    await resolveChaosGamblers(
+        true
+    );
 
     setMessage("Revealing current armies...");
 
@@ -3147,6 +3623,10 @@ async function settleFight() {
 
 
 async function closeShopAndLockBudgets() {
+
+    await resolveChaosGamblers(
+        true
+    );
 
     setMessage(
         "Closing Shop and locking army tiers..."
