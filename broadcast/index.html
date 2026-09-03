@@ -694,65 +694,25 @@ input {
 }
 
 .market-board {
-    --market-tile: clamp(47px, 3vw, 56px);
+    --market-tile: clamp(44px, 2.72vw, 53px);
     min-height: 0;
     display: grid;
     align-content: start;
-    gap: 4px;
-    padding-top: 12px;
+    gap: 8px;
+    padding-top: 13px;
     overflow: hidden;
 }
 
 .market-band {
     --tier-color: #8b97ae;
+    --cols: 18;
     position: relative;
     width: max-content;
     max-width: 100%;
     min-height: 0;
-    padding: 0;
-    background: none;
-    border: 0;
-    box-shadow: none;
-}
-
-.market-band-tab {
-    position: absolute;
-    z-index: 3;
-    top: 0;
-    right: 10px;
-    transform: translateY(-45%);
-    min-width: 78px;
-    padding: 5px 14px;
-    border-radius: 8px;
-    background: var(--tier-color);
-    color: #0d1119;
-    font-size: .74rem;
-    line-height: 1;
-    text-align: center;
-    font-weight: 1000;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    box-shadow: 0 7px 16px rgba(0,0,0,.24);
-}
-
-.market-band-rows {
-    display: grid;
-    align-content: start;
-    gap: 0;
-    width: max-content;
-    max-width: 100%;
-}
-
-.market-step-row {
-    --row-cols: 1;
-    position: relative;
-    width: max-content;
-    max-width: 100%;
-    min-height: 0;
-    padding: 7px;
+    padding: 8px;
     border: 3px solid var(--tier-color);
-    border-radius: 14px;
+    border-radius: 13px;
     background:
         linear-gradient(
             145deg,
@@ -763,33 +723,50 @@ input {
         inset 0 0 0 1px rgba(255,255,255,.035);
 }
 
-.market-step-row + .market-step-row {
-    margin-top: -3px;
+.market-band-tab {
+    position: absolute;
+    z-index: 2;
+    top: -3px;
+    right: 10px;
+    transform: translateY(-50%);
+    min-width: 74px;
+    padding: 5px 13px;
+    border-radius: 8px;
+    background: var(--tier-color);
+    color: #0d1119;
+    font-size: .72rem;
+    line-height: 1;
+    text-align: center;
+    font-weight: 1000;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 7px 16px rgba(0,0,0,.24);
 }
 
-.market-step-grid {
+.market-band-grid {
     min-height: 0;
     display: grid;
     grid-template-columns:
         repeat(
-            var(--row-cols),
+            var(--cols),
             var(--market-tile)
         );
     grid-auto-rows: var(--market-tile);
-    gap: 4px;
+    gap: 5px;
 }
 
 .market-tile {
     min-width: 0;
     min-height: 0;
     aspect-ratio: 1 / 1;
-    padding: 6px 5px 5px;
-    border-radius: 8px;
+    padding: 5px 4px 4px;
+    border-radius: 7px;
     background:
         linear-gradient(
             145deg,
-            rgba(255,255,255,.09),
-            rgba(255,255,255,.045)
+            rgba(255,255,255,.105),
+            rgba(255,255,255,.050)
         );
     border: 1px solid rgba(255,255,255,.085);
     display: flex;
@@ -887,7 +864,7 @@ input {
         grid-template-columns: 1fr 1.35fr;
     }
     .market-board {
-        --market-tile: clamp(42px, 2.6vw, 50px);
+        --market-tile: clamp(40px, 2.45vw, 48px);
     }
     .draft-order-strip {
         grid-template-columns: repeat(4, minmax(0,1fr));
@@ -2175,43 +2152,6 @@ function draftUnitsRemaining() {
 }
 
 
-function marketTierRows(
-    units,
-    maxCols = 14
-) {
-
-    if (!units.length) {
-        return [[]];
-    }
-
-    const rows = [];
-    let index = 0;
-
-    while (index < units.length) {
-
-        const remaining =
-            units.length - index;
-
-        const take =
-            Math.min(
-                maxCols,
-                remaining
-            );
-
-        rows.push(
-            units.slice(
-                index,
-                index + take
-            )
-        );
-
-        index += take;
-    }
-
-    return rows;
-}
-
-
 function nextDraftPlayers(
     count = 2
 ) {
@@ -2528,63 +2468,48 @@ function renderDraft() {
                                                 unit.tier === tier
                                         );
 
-                                    const rows =
-                                        marketTierRows(
-                                            units,
-                                            14
-                                        );
-
                                     return `
-                                        <div class="market-band market-band-${tier}">
+                                        <div
+                                            class="market-band market-band-${tier}"
+                                            style="
+                                                --cols:
+                                                ${Math.max(
+                                                    1,
+                                                    Math.min(
+                                                        units.length,
+                                                        18
+                                                    )
+                                                )};
+                                            "
+                                        >
 
                                             <div class="market-band-tab">
                                                 Tier ${tier}
                                             </div>
 
-                                            <div class="market-band-rows">
+                                            <div class="market-band-grid">
 
                                                 ${
-                                                    rows.map(
-                                                        row => `
-                                                            <div class="market-step-row">
-                                                                <div
-                                                                    class="market-step-grid"
-                                                                    style="
-                                                                        --row-cols:
-                                                                        ${Math.max(
-                                                                            1,
-                                                                            row.length
-                                                                        )};
-                                                                    "
-                                                                >
-
-                                                                    ${
-                                                                        row.length
-                                                                        ? row.map(
-                                                                            unit => `
-                                                                                <div class="market-tile">
-                                                                                    <div class="market-tile-name">
-                                                                                        ${escapeHtml(unit.name)}
-                                                                                    </div>
-                                                                                    <div class="market-tile-cost">
-                                                                                        ${Number(unit.cost).toLocaleString()}
-                                                                                    </div>
-                                                                                </div>
-                                                                            `
-                                                                        ).join("")
-                                                                        : `
-                                                                            <div class="market-tile">
-                                                                                <div class="market-tile-name">
-                                                                                    Drafted
-                                                                                </div>
-                                                                            </div>
-                                                                          `
-                                                                    }
-
+                                                    units.length
+                                                    ? units.map(
+                                                        unit => `
+                                                            <div class="market-tile">
+                                                                <div class="market-tile-name">
+                                                                    ${escapeHtml(unit.name)}
+                                                                </div>
+                                                                <div class="market-tile-cost">
+                                                                    ${Number(unit.cost).toLocaleString()}
                                                                 </div>
                                                             </div>
                                                         `
                                                     ).join("")
+                                                    : `
+                                                        <div class="market-tile">
+                                                            <div class="market-tile-name">
+                                                                Drafted
+                                                            </div>
+                                                        </div>
+                                                      `
                                                 }
 
                                             </div>
