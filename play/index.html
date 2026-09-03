@@ -10,12 +10,200 @@
 <style>
 * { box-sizing: border-box; }
 
+
+:root {
+    --player-color: #8FA1B8;
+    --player-rgb: 143,161,184;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--player-color);
+    pointer-events: none;
+}
+
+.color-picker {
+    margin-top: 18px;
+}
+
+.color-picker-label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.color-picker-help {
+    margin-bottom: 10px;
+    font-size: .82rem;
+    opacity: .68;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 7px;
+}
+
+.color-choice {
+    min-height: 54px;
+    padding: 8px 5px;
+    display: grid;
+    place-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.12);
+    color: white;
+}
+
+.color-choice:hover:not(:disabled) {
+    border-color: var(--swatch-color);
+    background: rgba(255,255,255,.09);
+}
+
+.color-choice.selected {
+    border-color: var(--swatch-color);
+    outline: 2px solid var(--swatch-color);
+    background: rgba(255,255,255,.12);
+}
+
+.color-choice.taken {
+    opacity: .27;
+}
+
+.color-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--swatch-color);
+    box-shadow:
+        0 0 0 2px rgba(255,255,255,.18),
+        0 0 12px var(--swatch-color);
+}
+
+.color-name {
+    font-size: .66rem;
+    line-height: 1;
+}
+
+#color-status {
+    margin-top: 8px;
+}
+
+.player-identity {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.player-identity-dot {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--player-color);
+    box-shadow: 0 0 12px rgba(var(--player-rgb), .65);
+}
+
+/* Player theme */
+body {
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(var(--player-rgb), .24),
+            #171b26 45%,
+            #090b10 100%
+        );
+}
+
+.panel {
+    border-color:
+        rgba(var(--player-rgb), .24);
+}
+
+button {
+    background:
+        rgba(var(--player-rgb), .20);
+    color: white;
+    border:
+        1px solid
+        rgba(var(--player-rgb), .46);
+}
+
+button:hover:not(:disabled) {
+    background:
+        rgba(var(--player-rgb), .29);
+}
+
+input:focus,
+select:focus {
+    outline:
+        2px solid
+        rgba(var(--player-rgb), .8);
+}
+
+#display-name,
+.stat strong {
+    color: var(--player-color);
+}
+
+.current {
+    border-color:
+        rgba(var(--player-rgb), .62);
+}
+
+.your-turn {
+    background:
+        rgba(var(--player-rgb), .20);
+}
+
+.tier-tab.active {
+    outline-color:
+        var(--player-color);
+}
+
+.bet-choice.selected,
+.special-choice-toggle button.selected {
+    background:
+        rgba(var(--player-rgb), .34);
+    outline:
+        2px solid
+        var(--player-color);
+}
+
+.skill-ready,
+.final-war-badge {
+    border-color:
+        rgba(var(--player-rgb), .42);
+}
+
+@media (max-width: 430px) {
+    .color-grid {
+        grid-template-columns:
+            repeat(4, minmax(0,1fr));
+    }
+
+    .color-name {
+        font-size: .6rem;
+    }
+}
+
+
 body {
     margin: 0;
     min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
     background:
-        radial-gradient(circle at top, #343c50, #171b26 45%, #090b10 100%);
+        radial-gradient(
+            circle at top,
+            rgba(var(--player-rgb), .24),
+            #171b26 45%,
+            #090b10 100%
+        );
     color: white;
 }
 
@@ -61,10 +249,15 @@ input {
 
 button {
     padding: 12px 16px;
-    border: 0;
+    border:
+        1px solid
+        rgba(var(--player-rgb), .46);
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+    background:
+        rgba(var(--player-rgb), .20);
+    color: white;
 }
 
 button:disabled {
@@ -502,9 +695,11 @@ select {
 }
 
 .bet-choice.selected {
-    background: #2f855a;
+    background:
+        rgba(var(--player-rgb), .34);
     color: white;
-    outline: 2px solid #9ae6b4;
+    outline:
+        2px solid var(--player-color);
 }
 
 .bet-choice.selection-disabled {
@@ -817,9 +1012,11 @@ select {
 }
 
 .special-choice-toggle button.selected {
-    background: #2f855a;
+    background:
+        rgba(var(--player-rgb), .34);
     color: white;
-    outline: 2px solid #9ae6b4;
+    outline:
+        2px solid var(--player-color);
 }
 
 .bet-total-preview {
@@ -908,6 +1105,7 @@ a { color: white; }
         maxlength="6"
         autocomplete="off"
         placeholder="ABC123"
+        oninput="handleRoomCodeInput()"
     >
 
     <label for="player-name">Player Name</label>
@@ -917,9 +1115,35 @@ a { color: white; }
         maxlength="24"
         autocomplete="off"
         placeholder="Your name"
+        oninput="updateJoinButton()"
     >
 
-    <button id="join-event">
+    <div class="color-picker">
+
+        <div class="color-picker-label">
+            Player Color
+        </div>
+
+        <div class="color-picker-help">
+            Enter the room code to see which colors are still available.
+        </div>
+
+        <div
+            id="color-grid"
+            class="color-grid"
+        ></div>
+
+        <div
+            id="color-status"
+            class="status"
+        ></div>
+
+    </div>
+
+    <button
+        id="join-event"
+        disabled
+    >
         Join Event
     </button>
 
@@ -932,7 +1156,10 @@ a { color: white; }
 
     <div class="status">Connected Player</div>
 
-    <h2 id="display-name">Player</h2>
+    <div class="player-identity">
+        <span class="player-identity-dot"></span>
+        <h2 id="display-name">Player</h2>
+    </div>
 
     <div class="stats">
 
@@ -1097,6 +1324,12 @@ let myParlays = [];
 let pendingParlaySides = {};
 let pendingParlayLegCount = 2;
 let pendingHedgeMatchId = null;
+const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A", "rgb": "255,77,90"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D", "rgb": "255,138,61"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C", "rgb": "242,201,76"}, {"code": "lime", "label": "Lime", "hex": "#A3E635", "rgb": "163,230,53"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583", "rgb": "50,213,131"}, {"code": "teal", "label": "Teal", "hex": "#14B8A6", "rgb": "20,184,166"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE", "rgb": "34,211,238"}, {"code": "sky", "label": "Sky", "hex": "#38BDF8", "rgb": "56,189,248"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6", "rgb": "59,130,246"}, {"code": "indigo", "label": "Indigo", "hex": "#6366F1", "rgb": "99,102,241"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6", "rgb": "139,92,246"}, {"code": "purple", "label": "Purple", "hex": "#C05CFF", "rgb": "192,92,255"}, {"code": "magenta", "label": "Magenta", "hex": "#EC4899", "rgb": "236,72,153"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8", "rgb": "255,122,184"}, {"code": "copper", "label": "Copper", "hex": "#C98245", "rgb": "201,130,69"}, {"code": "silver", "label": "Silver", "hex": "#B8C4D6", "rgb": "184,196,214"}];
+
+let selectedJoinColor = null;
+let colorAvailability = new Map();
+let colorLookupTimer = null;
+
 let pendingHedgeAmounts = {};
 
 let finalWarEntries = [];
@@ -1186,6 +1419,343 @@ const itemNames = {
     "rainy-day":
         "Rainy Day Fund"
 };
+
+
+
+function playerColorMeta(
+    colorCode
+) {
+
+    return (
+        PLAYER_COLORS.find(
+            color =>
+                color.code === colorCode
+        )
+        ?? PLAYER_COLORS.find(
+            color =>
+                color.code === "silver"
+        )
+    );
+}
+
+
+function applyPlayerTheme(
+    colorCode
+) {
+
+    const color =
+        playerColorMeta(
+            colorCode
+        );
+
+
+    document
+        .documentElement
+        .style
+        .setProperty(
+            "--player-color",
+            color.hex
+        );
+
+
+    document
+        .documentElement
+        .style
+        .setProperty(
+            "--player-rgb",
+            color.rgb
+        );
+}
+
+
+function renderJoinColors() {
+
+    const grid =
+        document.getElementById(
+            "color-grid"
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    grid.innerHTML =
+        PLAYER_COLORS
+        .map(
+            color => {
+
+                const taken =
+                    colorAvailability.get(
+                        color.code
+                    ) === true;
+
+
+                const selected =
+                    selectedJoinColor ===
+                    color.code;
+
+
+                return `
+                    <button
+                        type="button"
+                        class="
+                            color-choice
+                            ${selected ? "selected" : ""}
+                            ${taken ? "taken" : ""}
+                        "
+                        style="
+                            --swatch-color:
+                            ${color.hex};
+                        "
+                        ${taken ? "disabled" : ""}
+                        onclick="selectJoinColor('${color.code}')"
+                    >
+                        <span class="color-swatch"></span>
+
+                        <span class="color-name">
+                            ${color.label}
+                        </span>
+                    </button>
+                `;
+            }
+        )
+        .join("");
+
+
+    updateJoinButton();
+}
+
+
+function selectJoinColor(
+    colorCode
+) {
+
+    if (
+        colorAvailability.get(
+            colorCode
+        ) === true
+    ) {
+        return;
+    }
+
+
+    selectedJoinColor =
+        colorCode;
+
+
+    applyPlayerTheme(
+        colorCode
+    );
+
+
+    renderJoinColors();
+
+
+    document
+        .getElementById(
+            "color-status"
+        )
+        .textContent =
+            `${playerColorMeta(colorCode).label} selected.`;
+}
+
+
+function updateJoinButton() {
+
+    const button =
+        document.getElementById(
+            "join-event"
+        );
+
+
+    if (!button) {
+        return;
+    }
+
+
+    const code =
+        document
+            .getElementById("room")
+            .value
+            .trim();
+
+
+    const name =
+        document
+            .getElementById(
+                "player-name"
+            )
+            .value
+            .trim();
+
+
+    button.disabled =
+        code.length !== 6
+        ||
+        !name
+        ||
+        !selectedJoinColor
+        ||
+        colorAvailability.get(
+            selectedJoinColor
+        ) === true;
+}
+
+
+function handleRoomCodeInput() {
+
+    const code =
+        document
+            .getElementById("room")
+            .value
+            .trim()
+            .toUpperCase();
+
+
+    clearTimeout(
+        colorLookupTimer
+    );
+
+
+    selectedJoinColor = null;
+    colorAvailability =
+        new Map();
+
+
+    renderJoinColors();
+
+
+    const status =
+        document.getElementById(
+            "color-status"
+        );
+
+
+    if (code.length !== 6) {
+
+        status.textContent =
+            "Enter the full 6-character room code.";
+
+        updateJoinButton();
+        return;
+    }
+
+
+    status.textContent =
+        "Checking available colors...";
+
+
+    colorLookupTimer =
+        setTimeout(
+            loadColorAvailability,
+            250
+        );
+}
+
+
+async function loadColorAvailability() {
+
+    const code =
+        document
+            .getElementById("room")
+            .value
+            .trim()
+            .toUpperCase();
+
+
+    if (code.length !== 6) {
+        return;
+    }
+
+
+    const status =
+        document.getElementById(
+            "color-status"
+        );
+
+
+    try {
+
+        await ensureAnonymousSession();
+
+
+        const { data, error } =
+            await db.rpc(
+                "get_event_color_status",
+                {
+                    p_code: code
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        colorAvailability =
+            new Map(
+                (data ?? []).map(
+                    row => [
+                        row.color_code,
+                        row.taken
+                    ]
+                )
+            );
+
+
+        if (
+            selectedJoinColor
+            &&
+            colorAvailability.get(
+                selectedJoinColor
+            ) === true
+        ) {
+            selectedJoinColor = null;
+        }
+
+
+        renderJoinColors();
+
+
+        const availableCount =
+            PLAYER_COLORS.filter(
+                color =>
+                    colorAvailability.get(
+                        color.code
+                    ) !== true
+            ).length;
+
+
+        status.textContent =
+            `${availableCount} colors available. Choose your player color.`;
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        colorAvailability =
+            new Map(
+                PLAYER_COLORS.map(
+                    color => [
+                        color.code,
+                        true
+                    ]
+                )
+            );
+
+
+        selectedJoinColor = null;
+        renderJoinColors();
+
+
+        status.textContent =
+            error.message;
+    }
+}
 
 
 function escapeHtml(value) {
@@ -1284,10 +1854,16 @@ async function joinEvent() {
         );
 
 
-    if (!code || !name) {
+    if (
+        !code
+        ||
+        !name
+        ||
+        !selectedJoinColor
+    ) {
 
         status.textContent =
-            "Enter a room code and name.";
+            "Enter a room code, name, and player color.";
 
         return;
     }
@@ -1307,7 +1883,9 @@ async function joinEvent() {
                 "join_event",
                 {
                     p_code: code,
-                    p_display_name: name
+                    p_display_name: name,
+                    p_color_code:
+                        selectedJoinColor
                 }
             );
 
@@ -1347,8 +1925,21 @@ async function joinEvent() {
     catch (error) {
 
         console.error(error);
+
         status.textContent =
             error.message;
+
+
+        if (
+            error.message
+            ?.toLowerCase()
+            .includes("color")
+        ) {
+
+            selectedJoinColor = null;
+
+            await loadColorAvailability();
+        }
     }
 }
 
@@ -1904,6 +2495,11 @@ async function loadState() {
 
 
 function render() {
+
+    applyPlayerTheme(
+        me.color_code
+    );
+
 
     document
         .getElementById("join-panel")
@@ -8576,6 +9172,9 @@ document
 
 
 async function initialize() {
+
+    renderJoinColors();
+
 
     try {
 
