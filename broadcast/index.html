@@ -1229,6 +1229,207 @@ input {
         grid-template-columns: repeat(2, minmax(0,1fr));
     }
 }
+
+/* =========================================================
+   DRAFT MICRO-ANIMATIONS
+   ========================================================= */
+
+.draft-hero.draft-switch-out {
+    animation:
+        draftSpotOut 180ms
+        cubic-bezier(.4,0,1,1)
+        both;
+}
+
+.draft-hero.draft-switch-in {
+    animation:
+        draftSpotIn 340ms
+        cubic-bezier(.16,.84,.28,1)
+        both;
+}
+
+@keyframes draftSpotOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-16px) scale(.985);
+    }
+}
+
+@keyframes draftSpotIn {
+    from {
+        opacity: 0;
+        transform: translateX(18px) scale(.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.draft-roster-card.draft-slot-land {
+    animation:
+        draftSlotLand 300ms
+        cubic-bezier(.18,.88,.3,1)
+        both;
+}
+
+@keyframes draftSlotLand {
+    0% {
+        transform: scale(.88);
+        opacity: .55;
+    }
+
+    55% {
+        transform: scale(1.055);
+        opacity: 1;
+        box-shadow:
+            0 0 24px
+            color-mix(
+                in srgb,
+                var(--draft-land-color, white) 38%,
+                transparent
+            );
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: none;
+    }
+}
+
+.draft-flight-card {
+    position: fixed !important;
+    z-index: 5000 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    transform-origin: center center;
+    overflow: hidden;
+    box-shadow:
+        0 16px 40px rgba(0,0,0,.42),
+        0 0 24px
+        color-mix(
+            in srgb,
+            var(--flight-player, white) 24%,
+            transparent
+        );
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--flight-player, white) 42%,
+            rgba(255,255,255,.12)
+        ) !important;
+}
+
+.market-tile.draft-source-lifting {
+    opacity: .22;
+    transform: scale(.92);
+    transition:
+        opacity 140ms ease,
+        transform 140ms ease;
+}
+
+.draft-order-strip {
+    position: relative;
+}
+
+.draft-order-glider {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    border-radius: 14px;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            155deg,
+            color-mix(
+                in srgb,
+                var(--glider-color, white) 22%,
+                transparent
+            ),
+            rgba(255,255,255,.035)
+        );
+    border:
+        2px solid
+        color-mix(
+            in srgb,
+            var(--glider-color, white) 64%,
+            white 4%
+        );
+    box-shadow:
+        0 0 30px
+        color-mix(
+            in srgb,
+            var(--glider-color, white) 30%,
+            transparent
+        );
+    transition:
+        left 480ms cubic-bezier(.2,.82,.2,1),
+        top 480ms cubic-bezier(.2,.82,.2,1),
+        width 480ms cubic-bezier(.2,.82,.2,1),
+        height 480ms cubic-bezier(.2,.82,.2,1),
+        opacity 160ms ease;
+}
+
+.draft-order-card {
+    position: relative;
+    z-index: 1;
+}
+
+.draft-order-card.current {
+    transition:
+        background 280ms ease,
+        border-color 280ms ease,
+        box-shadow 280ms ease,
+        transform 280ms ease;
+}
+
+.draft-order-card.current.just-activated {
+    animation:
+        draftCurrentGlow 760ms
+        cubic-bezier(.18,.85,.25,1)
+        both;
+}
+
+@keyframes draftCurrentGlow {
+    0% {
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    42% {
+        transform: translateY(-6px);
+        box-shadow:
+            0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--player) 70%,
+                transparent
+            ),
+            0 0 34px
+            color-mix(
+                in srgb,
+                var(--player) 42%,
+                transparent
+            );
+    }
+
+    100% {
+        transform: translateY(-4px);
+    }
+}
+
 </style>
 </head>
 
@@ -1365,6 +1566,9 @@ let payoutTimer = null;
 
 let lastWinnerKey = null;
 let winnerTimer = null;
+
+let draftPlayerJustChanged = false;
+let pendingDraftGliderStart = null;
 
 
 function escapeHtml(value) {
@@ -1708,8 +1912,61 @@ async function refreshState(
         }
 
 
-        previousState =
+        const oldState =
             state;
+
+
+        const draftPick =
+            !initial
+            &&
+            oldState?.event?.status === "draft"
+            &&
+            data?.event?.status === "draft"
+            ? newestDraftPickBetween(
+                oldState,
+                data
+              )
+            : null;
+
+
+        if (draftPick) {
+
+            const oldDrafter =
+                draftPlayerForSnapshot(
+                    oldState
+                );
+
+            const newDrafter =
+                draftPlayerForSnapshot(
+                    data
+                );
+
+
+            pendingDraftGliderStart =
+                captureDraftGliderStart();
+
+
+            await animateDraftPickFlight(
+                draftPick,
+                oldState
+            );
+
+
+            draftPlayerJustChanged =
+                oldDrafter?.id
+                !==
+                newDrafter?.id;
+
+
+            if (draftPlayerJustChanged) {
+
+                await fadeOutCurrentDrafter();
+            }
+        }
+
+
+        previousState =
+            oldState;
 
         state =
             data;
@@ -1727,6 +1984,8 @@ async function refreshState(
 
 
         renderBroadcast();
+
+        runDraftPostRenderAnimations();
 
 
         maybeShowWinner();
@@ -2125,6 +2384,520 @@ function renderCastGrid(
 
 
 
+
+function draftPlayerForSnapshot(
+    snapshot
+) {
+
+    const event =
+        snapshot?.event;
+
+    const players =
+        snapshot?.players ?? [];
+
+
+    if (
+        !event
+        ||
+        !players.length
+        ||
+        !event.draft_pick_number
+    ) {
+        return null;
+    }
+
+
+    const count =
+        players.length;
+
+    const pick =
+        event.draft_pick_number;
+
+    const round =
+        Math.floor(
+            (pick - 1) / count
+        ) + 1;
+
+    const index =
+        (pick - 1) % count;
+
+    const position =
+        round % 2 === 1
+        ? index + 1
+        : count - index;
+
+
+    return (
+        players.find(
+            player =>
+                player.draft_position ===
+                position
+        )
+        ?? null
+    );
+}
+
+
+function newestDraftPickBetween(
+    oldSnapshot,
+    newSnapshot
+) {
+
+    const oldPicks =
+        oldSnapshot?.draft_picks
+        ?? [];
+
+    const newPicks =
+        newSnapshot?.draft_picks
+        ?? [];
+
+
+    if (
+        newPicks.length <=
+        oldPicks.length
+    ) {
+        return null;
+    }
+
+
+    const oldMax =
+        oldPicks.reduce(
+            (max,pick) =>
+                Math.max(
+                    max,
+                    Number(
+                        pick.pick_number
+                        ?? 0
+                    )
+                ),
+            0
+        );
+
+
+    return (
+        newPicks.find(
+            pick =>
+                Number(
+                    pick.pick_number
+                ) > oldMax
+        )
+        ?? null
+    );
+}
+
+
+function captureDraftGliderStart() {
+
+    const strip =
+        document.querySelector(
+            ".draft-order-strip"
+        );
+
+    const card =
+        document.querySelector(
+            ".draft-order-card.current"
+        );
+
+
+    if (!strip || !card) {
+        return null;
+    }
+
+
+    return {
+        left:
+            card.offsetLeft,
+
+        top:
+            card.offsetTop,
+
+        width:
+            card.offsetWidth,
+
+        height:
+            card.offsetHeight
+    };
+}
+
+
+function draftFlightTargetSlot(
+    pickedPlayerId,
+    oldSnapshot
+) {
+
+    const alreadyOwned =
+        (oldSnapshot?.draft_picks ?? [])
+        .filter(
+            pick =>
+                pick.player_id ===
+                pickedPlayerId
+        )
+        .length;
+
+
+    return document.querySelector(
+        `[data-draft-slot="${alreadyOwned}"]`
+    );
+}
+
+
+async function animateDraftPickFlight(
+    pick,
+    oldSnapshot
+) {
+
+    if (!pick) {
+        return;
+    }
+
+
+    const source =
+        document.querySelector(
+            `[data-market-unit-id="${pick.unit_id}"]`
+        );
+
+
+    const target =
+        draftFlightTargetSlot(
+            pick.player_id,
+            oldSnapshot
+        );
+
+
+    if (!source || !target) {
+        return;
+    }
+
+
+    const sourceRect =
+        source.getBoundingClientRect();
+
+    const targetRect =
+        target.getBoundingClientRect();
+
+
+    source.classList.add(
+        "draft-source-lifting"
+    );
+
+
+    const clone =
+        source.cloneNode(true);
+
+
+    clone.classList.add(
+        "draft-flight-card"
+    );
+
+
+    clone.style.setProperty(
+        "--flight-player",
+        playerColor(
+            pick.player_id
+        )
+    );
+
+
+    Object.assign(
+        clone.style,
+        {
+            left:
+                `${sourceRect.left}px`,
+
+            top:
+                `${sourceRect.top}px`,
+
+            width:
+                `${sourceRect.width}px`,
+
+            height:
+                `${sourceRect.height}px`
+        }
+    );
+
+
+    document.body.appendChild(
+        clone
+    );
+
+
+    const flight =
+        clone.animate(
+            [
+                {
+                    left:
+                        `${sourceRect.left}px`,
+
+                    top:
+                        `${sourceRect.top}px`,
+
+                    width:
+                        `${sourceRect.width}px`,
+
+                    height:
+                        `${sourceRect.height}px`,
+
+                    borderRadius:
+                        "8px",
+
+                    transform:
+                        "translateY(0) scale(1)"
+                },
+
+                {
+                    offset: .52,
+
+                    transform:
+                        "translateY(-24px) scale(1.08)"
+                },
+
+                {
+                    left:
+                        `${targetRect.left}px`,
+
+                    top:
+                        `${targetRect.top}px`,
+
+                    width:
+                        `${targetRect.width}px`,
+
+                    height:
+                        `${targetRect.height}px`,
+
+                    borderRadius:
+                        "11px",
+
+                    transform:
+                        "translateY(0) scale(1)"
+                }
+            ],
+            {
+                duration: 620,
+                easing:
+                    "cubic-bezier(.18,.78,.22,1)",
+                fill: "forwards"
+            }
+        );
+
+
+    try {
+        await flight.finished;
+    }
+    catch {
+        // Animation cancellation is harmless.
+    }
+
+
+    clone.remove();
+
+
+    source.classList.remove(
+        "draft-source-lifting"
+    );
+
+
+    target.classList.remove(
+        "empty"
+    );
+
+
+    target.style.setProperty(
+        "--draft-land-color",
+        playerColor(
+            pick.player_id
+        )
+    );
+
+
+    target.innerHTML = `
+        <div class="draft-roster-tier">
+            ${escapeHtml(pick.tier)}
+        </div>
+
+        <div class="draft-roster-name">
+            ${escapeHtml(pick.unit_name)}
+        </div>
+
+        <div class="draft-roster-meta">
+            ${escapeHtml(pick.faction)}
+            •
+            ${Number(pick.cost).toLocaleString()}
+        </div>
+    `;
+
+
+    target.classList.add(
+        "draft-slot-land"
+    );
+
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                170
+            )
+    );
+}
+
+
+async function fadeOutCurrentDrafter() {
+
+    const hero =
+        document.querySelector(
+            ".draft-hero"
+        );
+
+
+    if (!hero) {
+        return;
+    }
+
+
+    hero.classList.add(
+        "draft-switch-out"
+    );
+
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                175
+            )
+    );
+}
+
+
+function animateDraftGlider() {
+
+    const from =
+        pendingDraftGliderStart;
+
+
+    pendingDraftGliderStart =
+        null;
+
+
+    if (!from) {
+        return;
+    }
+
+
+    const strip =
+        document.querySelector(
+            ".draft-order-strip"
+        );
+
+    const current =
+        document.querySelector(
+            ".draft-order-card.current"
+        );
+
+    const glider =
+        document.querySelector(
+            ".draft-order-glider"
+        );
+
+
+    if (
+        !strip
+        ||
+        !current
+        ||
+        !glider
+    ) {
+        return;
+    }
+
+
+    glider.style.setProperty(
+        "--glider-color",
+        getComputedStyle(
+            current
+        ).getPropertyValue(
+            "--player"
+        )
+        || "#ffffff"
+    );
+
+
+    Object.assign(
+        glider.style,
+        {
+            left:
+                `${from.left}px`,
+
+            top:
+                `${from.top}px`,
+
+            width:
+                `${from.width}px`,
+
+            height:
+                `${from.height}px`,
+
+            opacity: "1"
+        }
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            requestAnimationFrame(
+                () => {
+
+                    glider.style.left =
+                        `${current.offsetLeft}px`;
+
+                    glider.style.top =
+                        `${current.offsetTop}px`;
+
+                    glider.style.width =
+                        `${current.offsetWidth}px`;
+
+                    glider.style.height =
+                        `${current.offsetHeight}px`;
+
+                }
+            );
+
+        }
+    );
+
+
+    setTimeout(
+        () => {
+            glider.style.opacity = "0";
+        },
+        560
+    );
+}
+
+
+function runDraftPostRenderAnimations() {
+
+    if (
+        state?.event?.status !==
+        "draft"
+    ) {
+        draftPlayerJustChanged = false;
+        pendingDraftGliderStart = null;
+        return;
+    }
+
+
+    if (draftPlayerJustChanged) {
+
+        animateDraftGlider();
+    }
+
+
+    draftPlayerJustChanged = false;
+}
+
+
 function draftOrderPlayers() {
 
     return state.players
@@ -2315,7 +3088,10 @@ function renderDraft() {
                 <div class="draft-left">
 
                     <div
-                        class="draft-hero"
+                        class="
+                            draft-hero
+                            ${draftPlayerJustChanged ? "draft-switch-in" : ""}
+                        "
                         style="
                             --player:
                             ${drafter ? playerColor(drafter.id) : "#7c8aa6"};
@@ -2354,7 +3130,10 @@ function renderDraft() {
                                     (pick,index) =>
                                         pick
                                         ? `
-                                            <div class="draft-roster-card">
+                                            <div
+                                                class="draft-roster-card"
+                                                data-draft-slot="${index}"
+                                            >
 
                                                 <div class="draft-roster-tier">
                                                     ${pick.tier}
@@ -2371,7 +3150,10 @@ function renderDraft() {
                                             </div>
                                           `
                                         : `
-                                            <div class="draft-roster-card empty">
+                                            <div
+                                                class="draft-roster-card empty"
+                                                data-draft-slot="${index}"
+                                            >
                                                 ${index + 1}
                                             </div>
                                           `
@@ -2493,7 +3275,10 @@ function renderDraft() {
                                                     units.length
                                                     ? units.map(
                                                         unit => `
-                                                            <div class="market-tile">
+                                                            <div
+                                                                class="market-tile"
+                                                                data-market-unit-id="${unit.id}"
+                                                            >
                                                                 <div class="market-tile-name">
                                                                     ${escapeHtml(unit.name)}
                                                                 </div>
@@ -2528,12 +3313,24 @@ function renderDraft() {
 
             <div class="draft-order-strip">
 
+                <div class="draft-order-glider"></div>
+
                 ${
                     draftOrderPlayers()
                     .map(
                         player => `
                             <div
-                                class="draft-order-card ${drafter?.id === player.id ? "current" : ""}"
+                                class="
+                                    draft-order-card
+                                    ${drafter?.id === player.id ? "current" : ""}
+                                    ${
+                                        drafter?.id === player.id
+                                        &&
+                                        draftPlayerJustChanged
+                                        ? "just-activated"
+                                        : ""
+                                    }
+                                "
                                 style="
                                     --player:
                                     ${playerColor(player.id)};
