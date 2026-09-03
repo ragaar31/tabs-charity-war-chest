@@ -120,6 +120,29 @@ button:disabled {
     }
 }
 
+
+.player-row {
+    --row-color: rgba(255,255,255,.2);
+    border-left:
+        4px solid
+        var(--row-color);
+}
+
+.player-color-dot {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--row-color);
+    box-shadow:
+        0 0 9px var(--row-color);
+}
+
+.player-color-label {
+    font-size: .68rem;
+    opacity: .6;
+}
+
 .player-row {
     padding: 13px;
     margin-top: 8px;
@@ -732,7 +755,28 @@ let finalWarChannel = null;
 
 let chaosResolving = false;
 let chaosResolveTimer = null;
+const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C"}, {"code": "lime", "label": "Lime", "hex": "#A3E635"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583"}, {"code": "teal", "label": "Teal", "hex": "#14B8A6"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE"}, {"code": "sky", "label": "Sky", "hex": "#38BDF8"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6"}, {"code": "indigo", "label": "Indigo", "hex": "#6366F1"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6"}, {"code": "purple", "label": "Purple", "hex": "#C05CFF"}, {"code": "magenta", "label": "Magenta", "hex": "#EC4899"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8"}, {"code": "copper", "label": "Copper", "hex": "#C98245"}, {"code": "silver", "label": "Silver", "hex": "#B8C4D6"}];
+
 let lastAutoChaosKey = null;
+
+
+
+function playerColorMeta(
+    colorCode
+) {
+
+    return (
+        PLAYER_COLORS.find(
+            color =>
+                color.code === colorCode
+        )
+        ?? {
+            code: "silver",
+            label: "Silver",
+            hex: "#B8C4D6"
+        }
+    );
+}
 
 
 function escapeHtml(value) {
@@ -1818,13 +1862,32 @@ function renderPlayers() {
                     `;
 
 
+                const color =
+                    playerColorMeta(
+                        player.color_code
+                    );
+
+
                 return `
-                    <div class="player-row">
+                    <div
+                        class="player-row"
+                        style="
+                            --row-color:
+                            ${color.hex};
+                        "
+                    >
 
                         <div class="player-name-wrap">
+
+                            <span class="player-color-dot"></span>
+
                             <strong>
                                 ${escapeHtml(player.display_name)}
                             </strong>
+
+                            <span class="player-color-label">
+                                ${color.label}
+                            </span>
 
                             ${
                                 player.is_bot
@@ -1995,8 +2058,21 @@ function renderRosters() {
                     `;
 
 
+                const color =
+                    playerColorMeta(
+                        player.color_code
+                    );
+
+
                 return `
-                    <div class="roster">
+                    <div
+                        class="roster"
+                        style="
+                            border-left:
+                                4px solid
+                                ${color.hex};
+                        "
+                    >
 
                         <h3>
                             ${escapeHtml(player.display_name)}
