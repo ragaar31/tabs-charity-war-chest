@@ -383,6 +383,41 @@ button:disabled {
     font-weight: bold;
 }
 
+.economy-detail-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(215px,1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.economy-detail-card {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.economy-detail-card strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 1.25rem;
+}
+
+.economy-mini {
+    margin-top: 5px;
+    font-size: .82rem;
+    opacity: .72;
+}
+
+.economy-player-detail {
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255,255,255,.09);
+    font-size: .78rem;
+    opacity: .78;
+}
+
 .pool-card.current-fight {
     border: 2px solid rgba(255,255,255,.45);
 }
@@ -3032,41 +3067,179 @@ function renderEconomyReport() {
     }
 
 
-    const playerCards =
-        (economyReport.players ?? [])
+    const propNames = {
+        cheaper_army_wins:
+            "Cheaper Army Wins",
+
+        winner_used_reinforcements:
+            "Winner Used Reinforcements",
+
+        winner_used_mercenary:
+            "Winner Used a Mercenary",
+
+        winner_used_all_zones:
+            "Winner Used All Three Zones"
+    };
+
+
+    const propCards =
+        (economyReport.prop_breakdown ?? [])
         .map(
-            player => `
-                <div class="economy-player-card">
+            prop => `
+                <div class="economy-detail-card">
+
+                    ${escapeHtml(
+                        propNames[prop.prop_code]
+                        ?? prop.prop_code
+                    )}
 
                     <strong>
-                        ${escapeHtml(player.display_name)}
+                        ${signedMoney(prop.net)}
                     </strong>
 
-                    <div class="economy-player-line">
-                        Ending:
-                        $${Number(player.ending_war_chest ?? 0).toLocaleString()}
-                    </div>
-
-                    <div class="economy-player-line">
-                        SP bought:
-                        ${player.purchased_sp}
-                        (-$${Number(player.skill_point_spend ?? 0).toLocaleString()})
-                    </div>
-
-                    <div class="economy-player-line">
-                        Consumables:
-                        -$${Number(player.consumable_spend ?? 0).toLocaleString()}
-                    </div>
-
-                    <div class="economy-player-line">
-                        Betting / House net:
-                        <span class="${Number(player.betting_house_net ?? 0) >= 0 ? "economy-positive" : "economy-negative"}">
-                            ${signedMoney(player.betting_house_net)}
-                        </span>
+                    <div class="economy-mini">
+                        ${prop.bets} bets
+                        •
+                        ${prop.wins} wins
+                        ${
+                            Number(prop.pushes ?? 0) > 0
+                            ? `• ${prop.pushes} pushes`
+                            : ""
+                        }
+                        •
+                        $${Number(prop.stake ?? 0).toLocaleString()}
+                        staked
                     </div>
 
                 </div>
             `
+        )
+        .join("");
+
+
+    const parlayCards =
+        (economyReport.parlay_breakdown ?? [])
+        .map(
+            parlay => `
+                <div class="economy-detail-card">
+
+                    ${
+                        Number(parlay.leg_count) === 3
+                        ? "3-Leg Moonshots"
+                        : "2-Leg Parlays"
+                    }
+
+                    <strong>
+                        ${signedMoney(parlay.net)}
+                    </strong>
+
+                    <div class="economy-mini">
+                        ${parlay.parlays} attempts
+                        •
+                        ${parlay.wins} wins
+                        •
+                        ${parlay.losses} losses
+                        •
+                        $${Number(parlay.stake ?? 0).toLocaleString()}
+                        opening stake
+                    </div>
+
+                </div>
+            `
+        )
+        .join("");
+
+
+    const playerCards =
+        (economyReport.players ?? [])
+        .map(
+            player => {
+
+                const protection =
+                    Number(player.insurance_refunds ?? 0)
+                    +
+                    Number(player.no_sweat_refunds ?? 0);
+
+
+                return `
+                    <div class="economy-player-card">
+
+                        <strong>
+                            ${escapeHtml(player.display_name)}
+                        </strong>
+
+                        <div class="economy-player-line">
+                            Ending:
+                            $${Number(player.ending_war_chest ?? 0).toLocaleString()}
+                        </div>
+
+                        <div class="economy-player-line">
+                            SP bought:
+                            ${player.purchased_sp}
+                            (-$${Number(player.skill_point_spend ?? 0).toLocaleString()})
+                        </div>
+
+                        <div class="economy-player-line">
+                            Consumables:
+                            -$${Number(player.consumable_spend ?? 0).toLocaleString()}
+                        </div>
+
+                        <div class="economy-player-line">
+                            Gambling net:
+                            <span class="${Number(player.tracked_gambling_net ?? 0) >= 0 ? "economy-positive" : "economy-negative"}">
+                                ${signedMoney(player.tracked_gambling_net)}
+                            </span>
+                        </div>
+
+                        <div class="economy-player-detail">
+                            Winner:
+                            ${signedMoney(player.standard_winner_net)}
+                            • Protect:
+                            ${signedMoney(protection)}
+                            • Hedge:
+                            ${signedMoney(player.hedge_net)}
+                            • Props:
+                            ${signedMoney(player.prop_net)}
+                            • Parlay:
+                            ${signedMoney(player.parlay_net)}
+                        </div>
+
+                        ${
+                            Number(player.reinforcements_used ?? 0) > 0
+                            ||
+                            Number(player.mercenaries_used ?? 0) > 0
+                            ? `
+                                <div class="economy-player-detail">
+                                    Reinforcements:
+                                    ${player.reinforcements_used ?? 0}
+                                    used /
+                                    ${player.reinforcements_wins ?? 0}
+                                    wins
+                                    •
+                                    Mercenaries:
+                                    ${player.mercenaries_used ?? 0}
+                                    used /
+                                    ${player.mercenary_wins ?? 0}
+                                    wins
+                                </div>
+                              `
+                            : ""
+                        }
+
+                        ${
+                            Number(player.unclassified_net ?? 0) !== 0
+                            ? `
+                                <div class="economy-player-detail">
+                                    Unclassified:
+                                    ${signedMoney(player.unclassified_net)}
+                                </div>
+                              `
+                            : ""
+                        }
+
+                    </div>
+                `;
+            }
         )
         .join("");
 
@@ -3077,7 +3250,7 @@ function renderEconomyReport() {
             <h3>Economy Report</h3>
 
             <p class="status">
-                The Betting / House figure is the residual after known Shop spending, battle purses, and mastery cashouts. It includes winner betting, House subsidies, props, protection refunds, Hedge Fund, and Parlay/Moonshot results.
+                Gambling is now tracked directly by category. Residual Net is calculated independently from ending War Chests, so Unclassified acts as a sanity check for money movement we have not categorized yet.
             </p>
 
             <div class="economy-summary-grid">
@@ -3133,9 +3306,23 @@ function renderEconomyReport() {
                 </div>
 
                 <div class="economy-stat">
-                    Betting / House Net
+                    Tracked Gambling Net
+                    <strong>
+                        ${signedMoney(economyReport.tracked_gambling_net)}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Residual Net
                     <strong>
                         ${signedMoney(economyReport.betting_house_net)}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Unclassified
+                    <strong>
+                        ${signedMoney(economyReport.unclassified_net)}
                     </strong>
                 </div>
 
@@ -3148,6 +3335,145 @@ function renderEconomyReport() {
 
             </div>
 
+
+            <h4>Gambling Breakdown</h4>
+
+            <div class="economy-detail-grid">
+
+                <div class="economy-detail-card">
+                    Standard Winner Bets
+                    <strong>
+                        ${signedMoney(economyReport.standard_winner_net)}
+                    </strong>
+                    <div class="economy-mini">
+                        ${economyReport.standard_bet_count ?? 0}
+                        settled bets. Protection refunds are separate.
+                    </div>
+                </div>
+
+                <div class="economy-detail-card">
+                    Insurance Refunds
+                    <strong>
+                        +$${Number(economyReport.insurance_refunds ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-detail-card">
+                    No-Sweat Refunds
+                    <strong>
+                        +$${Number(economyReport.no_sweat_refunds ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-detail-card">
+                    Hedge Fund
+                    <strong>
+                        ${signedMoney(economyReport.hedge_net)}
+                    </strong>
+                    <div class="economy-mini">
+                        ${economyReport.hedge_count ?? 0}
+                        hedges
+                    </div>
+                </div>
+
+                <div class="economy-detail-card">
+                    Props
+                    <strong>
+                        ${signedMoney(economyReport.prop_net)}
+                    </strong>
+                    <div class="economy-mini">
+                        ${economyReport.prop_count ?? 0}
+                        props
+                    </div>
+                </div>
+
+                <div class="economy-detail-card">
+                    Parlays / Moonshots
+                    <strong>
+                        ${signedMoney(economyReport.parlay_net)}
+                    </strong>
+                    <div class="economy-mini">
+                        ${economyReport.parlay_wins ?? 0}
+                        wins /
+                        ${economyReport.parlay_count ?? 0}
+                        attempts
+                    </div>
+                </div>
+
+            </div>
+
+
+            ${
+                propCards
+                ? `
+                    <h4>Prop Performance</h4>
+                    <div class="economy-detail-grid">
+                        ${propCards}
+                    </div>
+                  `
+                : ""
+            }
+
+
+            ${
+                parlayCards
+                ? `
+                    <h4>Parlay Performance</h4>
+                    <div class="economy-detail-grid">
+                        ${parlayCards}
+                    </div>
+                  `
+                : ""
+            }
+
+
+            <h4>Consumable Performance</h4>
+
+            <div class="economy-detail-grid">
+
+                <div class="economy-detail-card">
+
+                    Reinforcements
+
+                    <strong>
+                        ${economyReport.reinforcements_wins ?? 0}
+                        /
+                        ${economyReport.reinforcements_used ?? 0}
+                        fights won
+                    </strong>
+
+                    <div class="economy-mini">
+                        ${economyReport.reinforcements_bought ?? 0}
+                        bought
+                        •
+                        -$${Number(economyReport.reinforcements_spend ?? 0).toLocaleString()}
+                    </div>
+
+                </div>
+
+                <div class="economy-detail-card">
+
+                    Mercenary Contracts
+
+                    <strong>
+                        ${economyReport.mercenary_wins ?? 0}
+                        /
+                        ${economyReport.mercenaries_used ?? 0}
+                        fights won
+                    </strong>
+
+                    <div class="economy-mini">
+                        ${economyReport.mercenaries_bought ?? 0}
+                        bought
+                        •
+                        -$${Number(economyReport.mercenary_spend ?? 0).toLocaleString()}
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <h4>By Player</h4>
 
             <div class="economy-player-grid">
@@ -3157,7 +3483,6 @@ function renderEconomyReport() {
         </div>
     `;
 }
-
 
 function renderBettingHost() {
 
