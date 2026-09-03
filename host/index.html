@@ -3250,7 +3250,7 @@ function renderEconomyReport() {
             <h3>Economy Report</h3>
 
             <p class="status">
-                Gambling is now tracked directly by category. Residual Net is calculated independently from ending War Chests, so Unclassified acts as a sanity check for money movement we have not categorized yet.
+                Gambling is tracked directly by category. Residual Net is calculated independently from ending War Chests, so Unclassified acts as a sanity check. Pari-Mutuel House Net is the actual aggregate player gain/loss from winner bets, Hedge Fund, and Parlays after player-to-player transfers cancel out.
             </p>
 
             <div class="economy-summary-grid">
@@ -3327,9 +3327,9 @@ function renderEconomyReport() {
                 </div>
 
                 <div class="economy-stat">
-                    House Subsidies Triggered
+                    Pari-Mutuel House Net
                     <strong>
-                        +$${Number(economyReport.house_subsidies_triggered ?? 0).toLocaleString()}
+                        ${signedMoney(economyReport.pari_mutuel_house_net)}
                     </strong>
                 </div>
 
