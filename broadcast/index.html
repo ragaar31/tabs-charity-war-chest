@@ -653,6 +653,7 @@ input {
     border-radius: 20px;
     background: rgba(255,255,255,.035);
     border: 1px solid rgba(255,255,255,.09);
+    overflow: hidden;
 }
 
 .draft-market-head {
@@ -672,65 +673,97 @@ input {
     font-size: .85rem;
 }
 
-.draft-market-grid {
-    min-height: 0;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0,1fr));
-    gap: 12px;
-}
-
-.market-tier {
-    min-height: 0;
-    display: grid;
-    grid-template-rows: auto minmax(0,1fr);
-    gap: 10px;
-}
-
-.market-tier-head {
-    padding: 10px 12px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.055);
-    border: 1px solid rgba(255,255,255,.08);
-    font-size: .84rem;
-    font-weight: 900;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-.market-tier-list {
+.market-board {
     min-height: 0;
     display: grid;
     align-content: start;
-    gap: 8px;
+    gap: 10px;
+    overflow: hidden;
 }
 
-.market-unit {
-    padding: 11px 12px;
-    border-radius: 12px;
+.market-band {
+    --tier-color: #8b97ae;
+    position: relative;
+    min-height: 0;
+    padding: 12px 10px 10px;
+    border: 3px solid var(--tier-color);
+    border-radius: 14px;
     background:
         linear-gradient(
             145deg,
-            rgba(255,255,255,.065),
-            rgba(255,255,255,.03)
+            rgba(255,255,255,.035),
+            rgba(255,255,255,.015)
+        );
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.market-band-tab {
+    position: absolute;
+    top: -16px;
+    right: 12px;
+    padding: 6px 14px;
+    border-radius: 10px 10px 6px 6px;
+    background: var(--tier-color);
+    color: #101521;
+    font-size: .78rem;
+    font-weight: 1000;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    box-shadow:
+        0 10px 20px rgba(0,0,0,.22);
+}
+
+.market-band-grid {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0,1fr));
+    gap: 6px;
+}
+
+.market-tile {
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    padding: 6px 5px 5px;
+    border-radius: 8px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.045)
         );
     border: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    overflow: hidden;
 }
 
-.market-unit-name {
-    font-weight: 850;
-    line-height: 1.1;
+.market-tile-name {
+    font-size: .55rem;
+    line-height: 1.02;
+    font-weight: 900;
+    color: rgba(255,255,255,.96);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-wrap: balance;
 }
 
-.market-unit-meta {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: .74rem;
+.market-tile-cost {
+    align-self: flex-end;
+    font-size: .52rem;
+    color: rgba(255,255,255,.7);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
 }
 
-.market-tier-A .market-tier-head { border-left: 4px solid #f2c94c; }
-.market-tier-B .market-tier-head { border-left: 4px solid #ff8a3d; }
-.market-tier-C .market-tier-head { border-left: 4px solid #3b82f6; }
-.market-tier-D .market-tier-head { border-left: 4px solid #8b5cf6; }
+.market-band-A { --tier-color: #F2C94C; }
+.market-band-B { --tier-color: #FF8A3D; }
+.market-band-C { --tier-color: #3B82F6; }
+.market-band-D { --tier-color: #8B5CF6; }
 
 .draft-order-strip {
     display: grid;
@@ -793,8 +826,8 @@ input {
     .draft-layout {
         grid-template-columns: 1fr 1.35fr;
     }
-    .draft-market-grid {
-        grid-template-columns: repeat(2, minmax(0,1fr));
+    .market-band-grid {
+        grid-template-columns: repeat(12, minmax(0,1fr));
     }
     .draft-order-strip {
         grid-template-columns: repeat(4, minmax(0,1fr));
@@ -2383,7 +2416,7 @@ function renderDraft() {
                         </div>
                     </div>
 
-                    <div class="draft-market-grid">
+                    <div class="market-board">
 
                         ${
                             tiers.map(
@@ -2396,32 +2429,32 @@ function renderDraft() {
                                         );
 
                                     return `
-                                        <div class="market-tier market-tier-${tier}">
+                                        <div class="market-band market-band-${tier}">
 
-                                            <div class="market-tier-head">
+                                            <div class="market-band-tab">
                                                 Tier ${tier}
                                             </div>
 
-                                            <div class="market-tier-list">
+                                            <div class="market-band-grid">
 
                                                 ${
                                                     units.length
                                                     ? units.map(
                                                         unit => `
-                                                            <div class="market-unit">
-                                                                <div class="market-unit-name">
+                                                            <div class="market-tile">
+                                                                <div class="market-tile-name">
                                                                     ${escapeHtml(unit.name)}
                                                                 </div>
-                                                                <div class="market-unit-meta">
-                                                                    ${escapeHtml(unit.faction)} • ${Number(unit.cost).toLocaleString()}
+                                                                <div class="market-tile-cost">
+                                                                    ${Number(unit.cost).toLocaleString()}
                                                                 </div>
                                                             </div>
                                                         `
                                                     ).join("")
                                                     : `
-                                                        <div class="market-unit">
-                                                            <div class="market-unit-name">
-                                                                All drafted
+                                                        <div class="market-tile">
+                                                            <div class="market-tile-name">
+                                                                Drafted
                                                             </div>
                                                         </div>
                                                       `
