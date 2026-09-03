@@ -418,6 +418,72 @@ button:disabled {
     opacity: .78;
 }
 
+.final-war-seeds,
+.final-war-match-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px,1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.final-war-seed,
+.final-war-fighter,
+.final-war-history-card {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.065);
+    border: 1px solid rgba(255,255,255,.11);
+}
+
+.final-war-seed.qualified {
+    border-color: rgba(255,255,255,.32);
+}
+
+.final-war-budget {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.final-war-versus {
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+    opacity: .55;
+    padding: 8px;
+}
+
+.final-war-army-sheet {
+    margin-top: 12px;
+    padding: 13px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.16);
+}
+
+.final-war-zone {
+    margin-top: 9px;
+}
+
+.final-war-zone strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.final-war-champion {
+    padding: 24px;
+    text-align: center;
+    border-radius: 14px;
+    background: rgba(255,255,255,.14);
+    border: 2px solid rgba(255,255,255,.32);
+}
+
+.final-war-champion strong {
+    display: block;
+    margin-top: 7px;
+    font-size: 2.4rem;
+}
+
 .pool-card.current-fight {
     border: 2px solid rgba(255,255,255,.45);
 }
@@ -613,6 +679,15 @@ a { color: white; }
 </section>
 
 
+<section id="final-war-host-panel" class="panel hidden">
+
+    <h2>Final War</h2>
+
+    <div id="final-war-host-content"></div>
+
+</section>
+
+
 <p style="margin-top:30px;">
     <a href="../">← Return Home</a>
 </p>
@@ -642,6 +717,9 @@ let parlays = [];
 let playerSkills = [];
 let playerRecruits = [];
 let economyReport = null;
+let finalWarEntries = [];
+let finalWarMatches = [];
+let finalWarSubmissions = [];
 
 let eventChannel = null;
 let playerChannel = null;
@@ -650,6 +728,7 @@ let armyChannel = null;
 let skillChannel = null;
 let recruitChannel = null;
 let advancedBetChannel = null;
+let finalWarChannel = null;
 
 let chaosResolving = false;
 let chaosResolveTimer = null;
@@ -1216,6 +1295,66 @@ async function loadState() {
         recruitResult.data ?? [];
 
 
+    const finalEntryResult =
+        await db
+            .from("final_war_entries")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("standing_rank");
+
+    if (finalEntryResult.error) {
+        console.error(finalEntryResult.error);
+        return;
+    }
+
+    finalWarEntries =
+        finalEntryResult.data ?? [];
+
+
+    const finalMatchResult =
+        await db
+            .from("final_war_matches")
+            .select("*")
+            .eq("event_id", currentEventId)
+            .order("stage_number");
+
+    if (finalMatchResult.error) {
+        console.error(finalMatchResult.error);
+        return;
+    }
+
+    finalWarMatches =
+        finalMatchResult.data ?? [];
+
+
+    const finalSubmissionResult =
+        await db
+            .from("final_war_submissions")
+            .select(`
+                *,
+                final_war_lines (
+                    unit_id,
+                    zone,
+                    quantity,
+                    units (
+                        name,
+                        cost,
+                        faction,
+                        tier
+                    )
+                )
+            `)
+            .eq("event_id", currentEventId);
+
+    if (finalSubmissionResult.error) {
+        console.error(finalSubmissionResult.error);
+        return;
+    }
+
+    finalWarSubmissions =
+        finalSubmissionResult.data ?? [];
+
+
     economyReport = null;
 
     if (eventData.status === "regular_complete") {
@@ -1286,6 +1425,7 @@ function render() {
     renderRound();
     renderArmyHost();
     renderBettingHost();
+    renderFinalWarHost();
 
     scheduleChaosResolution();
 }
@@ -1482,6 +1622,37 @@ function renderActions() {
 
         title.textContent =
             "Regular Season Complete";
+
+        actions.innerHTML = `
+            <div class="actions">
+                <button onclick="seedFinalWar()">
+                    Lock Final Skills & Seed Final War
+                </button>
+            </div>
+        `;
+    }
+
+
+    else if (
+        [
+            "final_war_build",
+            "final_war_ready",
+            "final_war_fight"
+        ].includes(eventData.status)
+    ) {
+
+        title.textContent =
+            `Final War — Stage ${eventData.final_war_current_stage}`;
+    }
+
+
+    else if (
+        eventData.status ===
+        "final_war_complete"
+    ) {
+
+        title.textContent =
+            "Final War Complete";
     }
 
 
@@ -4250,6 +4421,728 @@ function startNewEvent() {
 }
 
 
+
+function finalWarPlayerName(playerId) {
+    return (
+        players.find(
+            player =>
+                player.id === playerId
+        )?.display_name
+        ?? "Player"
+    );
+}
+
+
+function finalWarCurrentMatch() {
+
+    return (
+        finalWarMatches.find(
+            match =>
+                match.stage_number ===
+                eventData.final_war_current_stage
+        )
+        ?? null
+    );
+}
+
+
+function finalWarSubmissionFor(
+    matchId,
+    playerId
+) {
+
+    return (
+        finalWarSubmissions.find(
+            submission =>
+                submission.match_id === matchId
+                &&
+                submission.player_id === playerId
+        )
+        ?? null
+    );
+}
+
+
+function renderFinalWarArmySheet(
+    submission
+) {
+
+    if (!submission) {
+        return `
+            <p class="status">
+                Army not submitted yet.
+            </p>
+        `;
+    }
+
+
+    const zones = [
+        ["frontline", "FRONTLINE"],
+        ["midrange", "MID-RANGE"],
+        ["backline", "BACKLINE"]
+    ];
+
+
+    return `
+        <div class="final-war-army-sheet">
+
+            ${
+                zones.map(
+                    ([zoneCode, label]) => {
+
+                        const lines =
+                            (submission.final_war_lines ?? [])
+                            .filter(
+                                line =>
+                                    line.zone === zoneCode
+                            );
+
+
+                        if (!lines.length) {
+                            return "";
+                        }
+
+
+                        return `
+                            <div class="final-war-zone">
+
+                                <strong>
+                                    ${label}
+                                </strong>
+
+                                ${
+                                    lines.map(
+                                        line => `
+                                            <div>
+                                                ${line.quantity}×
+                                                ${escapeHtml(
+                                                    line.units?.name
+                                                    ?? line.unit_id
+                                                )}
+                                            </div>
+                                        `
+                                    ).join("")
+                                }
+
+                            </div>
+                        `;
+                    }
+                ).join("")
+            }
+
+            <div
+                class="status"
+                style="margin-top:10px;"
+            >
+                ${submission.total_cost.toLocaleString()}
+                /
+                ${submission.army_budget.toLocaleString()}
+                points
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderFinalWarHost() {
+
+    const panel =
+        document.getElementById(
+            "final-war-host-panel"
+        );
+
+    const content =
+        document.getElementById(
+            "final-war-host-content"
+        );
+
+
+    const phases = [
+        "final_war_build",
+        "final_war_ready",
+        "final_war_fight",
+        "final_war_complete"
+    ];
+
+
+    if (!phases.includes(eventData.status)) {
+
+        panel.classList.add("hidden");
+        return;
+    }
+
+
+    panel.classList.remove("hidden");
+
+
+    const seeds =
+        [...finalWarEntries]
+        .filter(entry => entry.qualified)
+        .sort(
+            (a,b) =>
+                a.seed - b.seed
+        );
+
+
+    const seedHtml = `
+        <h3>Frozen Seeds</h3>
+
+        <p class="status">
+            Final War budgets are frozen. No betting or normal consumables are used here. Permanent Quartermaster recruits remain legal.
+        </p>
+
+        <div class="final-war-seeds">
+
+            ${
+                seeds.map(
+                    entry => `
+                        <div
+                            class="
+                                final-war-seed
+                                qualified
+                            "
+                        >
+
+                            <strong>
+                                #${entry.seed}
+                                ${escapeHtml(
+                                    finalWarPlayerName(
+                                        entry.player_id
+                                    )
+                                )}
+                            </strong>
+
+                            <div class="final-war-budget">
+                                $${entry.frozen_budget.toLocaleString()}
+                            </div>
+
+                        </div>
+                    `
+                ).join("")
+            }
+
+        </div>
+    `;
+
+
+    if (
+        eventData.status ===
+        "final_war_complete"
+    ) {
+
+        const champion =
+            finalWarPlayerName(
+                eventData.final_war_champion_id
+            );
+
+
+        content.innerHTML = `
+            ${seedHtml}
+
+            <div
+                class="final-war-champion"
+                style="margin-top:20px;"
+            >
+                FINAL WAR CHAMPION
+                <strong>
+                    ${escapeHtml(champion)}
+                </strong>
+            </div>
+
+            <h3 style="margin-top:22px;">
+                Gauntlet Results
+            </h3>
+
+            ${
+                finalWarMatches.map(
+                    match => `
+                        <div class="final-war-history-card">
+                            Stage ${match.stage_number}:
+                            ${escapeHtml(
+                                finalWarPlayerName(
+                                    match.player1_id
+                                )
+                            )}
+                            vs
+                            ${escapeHtml(
+                                finalWarPlayerName(
+                                    match.player2_id
+                                )
+                            )}
+                            —
+                            <strong>
+                                ${escapeHtml(
+                                    finalWarPlayerName(
+                                        match.winner_player_id
+                                    )
+                                )}
+                                wins
+                            </strong>
+                        </div>
+                    `
+                ).join("")
+            }
+        `;
+
+        return;
+    }
+
+
+    const match =
+        finalWarCurrentMatch();
+
+
+    if (!match) {
+
+        content.innerHTML = `
+            ${seedHtml}
+
+            <p class="status">
+                Current Final War match is loading...
+            </p>
+        `;
+
+        return;
+    }
+
+
+    const p1Submission =
+        finalWarSubmissionFor(
+            match.id,
+            match.player1_id
+        );
+
+    const p2Submission =
+        finalWarSubmissionFor(
+            match.id,
+            match.player2_id
+        );
+
+
+    const p1 =
+        finalWarPlayerName(
+            match.player1_id
+        );
+
+    const p2 =
+        finalWarPlayerName(
+            match.player2_id
+        );
+
+
+    const matchHeader = `
+        ${seedHtml}
+
+        <h3 style="margin-top:22px;">
+            Stage ${match.stage_number}
+        </h3>
+
+        <div class="final-war-match-grid">
+
+            <div class="final-war-fighter">
+
+                <strong>
+                    ${escapeHtml(p1)}
+                </strong>
+
+                <div class="final-war-budget">
+                    $${match.player1_budget.toLocaleString()}
+                </div>
+
+                <div class="status">
+                    ${
+                        p1Submission
+                        ? "✅ Army submitted"
+                        : "⏳ Building army"
+                    }
+                </div>
+
+                ${renderFinalWarArmySheet(p1Submission)}
+
+                ${
+                    p1Submission
+                    &&
+                    [
+                        "final_war_build",
+                        "final_war_ready"
+                    ].includes(eventData.status)
+                    ? `
+                        <button
+                            class="secondary"
+                            style="margin-top:10px;"
+                            onclick="reopenFinalWarArmy('${match.player1_id}')"
+                        >
+                            Reopen Army
+                        </button>
+                      `
+                    : ""
+                }
+
+            </div>
+
+
+            <div class="final-war-fighter">
+
+                <strong>
+                    ${escapeHtml(p2)}
+                </strong>
+
+                <div class="final-war-budget">
+                    $${match.player2_budget.toLocaleString()}
+                </div>
+
+                <div class="status">
+                    ${
+                        p2Submission
+                        ? "✅ Army submitted"
+                        : "⏳ Building army"
+                    }
+                </div>
+
+                ${renderFinalWarArmySheet(p2Submission)}
+
+                ${
+                    p2Submission
+                    &&
+                    [
+                        "final_war_build",
+                        "final_war_ready"
+                    ].includes(eventData.status)
+                    ? `
+                        <button
+                            class="secondary"
+                            style="margin-top:10px;"
+                            onclick="reopenFinalWarArmy('${match.player2_id}')"
+                        >
+                            Reopen Army
+                        </button>
+                      `
+                    : ""
+                }
+
+            </div>
+
+        </div>
+    `;
+
+
+    if (
+        eventData.status ===
+        "final_war_build"
+    ) {
+
+        content.innerHTML = `
+            ${matchHeader}
+
+            <div class="actions">
+
+                ${
+                    players.some(
+                        player =>
+                            player.is_bot
+                            &&
+                            [
+                                match.player1_id,
+                                match.player2_id
+                            ].includes(player.id)
+                    )
+                    ? `
+                        <button
+                            class="secondary"
+                            onclick="resolveFinalWarBots(false)"
+                        >
+                            🎲 Resolve Chaos Finalists
+                        </button>
+                      `
+                    : ""
+                }
+
+            </div>
+
+            <p class="status">
+                Both finalists may completely rebuild for this stage.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    if (
+        eventData.status ===
+        "final_war_ready"
+    ) {
+
+        content.innerHTML = `
+            ${matchHeader}
+
+            <div class="actions">
+                <button onclick="revealFinalWarArmies()">
+                    Reveal Armies & Begin Fight
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    content.innerHTML = `
+        ${matchHeader}
+
+        <div class="actions">
+
+            <button
+                onclick="recordFinalWarWinner('${match.player1_id}')"
+            >
+                ${escapeHtml(p1)} Wins
+            </button>
+
+            <button
+                onclick="recordFinalWarWinner('${match.player2_id}')"
+            >
+                ${escapeHtml(p2)} Wins
+            </button>
+
+        </div>
+
+        <p class="status">
+            Run the battle in TABS using the exact revealed armies. If the game bugs or draws, rerun the same armies and leave this screen unchanged.
+        </p>
+    `;
+}
+
+
+async function seedFinalWar() {
+
+    setMessage(
+        "Locking Final Skill Allocation and seeding Final War..."
+    );
+
+
+    await resolveChaosGamblers(
+        true
+    );
+
+
+    const { error } =
+        await db.rpc(
+            "start_final_war",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            "Error: " + error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
+
+    await resolveFinalWarBots(
+        true
+    );
+
+
+    setMessage(
+        "Final War seeded."
+    );
+}
+
+
+async function resolveFinalWarBots(
+    silent = false
+) {
+
+    if (
+        !currentEventId
+        ||
+        eventData.status !==
+        "final_war_build"
+    ) {
+        return;
+    }
+
+
+    const { data, error } =
+        await db.rpc(
+            "resolve_final_war_bots",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        if (!silent) {
+            setMessage(
+                "Error: " + error.message
+            );
+        }
+
+        return;
+    }
+
+
+    await loadState();
+
+
+    if (!silent) {
+
+        setMessage(
+            `${Number(data ?? 0)} Chaos Final War army`
+            +
+            `${Number(data ?? 0) === 1 ? "" : "ies"} resolved.`
+        );
+    }
+}
+
+
+async function reopenFinalWarArmy(
+    playerId
+) {
+
+    const { error } =
+        await db.rpc(
+            "reopen_final_war_army",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_player_id:
+                    playerId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            "Error: " + error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
+}
+
+
+async function revealFinalWarArmies() {
+
+    await resolveFinalWarBots(
+        true
+    );
+
+
+    const { error } =
+        await db.rpc(
+            "reveal_final_war_armies",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            "Error: " + error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
+
+    setMessage(
+        "Final War armies revealed."
+    );
+}
+
+
+async function recordFinalWarWinner(
+    playerId
+) {
+
+    const winner =
+        finalWarPlayerName(
+            playerId
+        );
+
+
+    const confirmed =
+        window.confirm(
+            `${winner} won this Final War battle?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const { data, error } =
+        await db.rpc(
+            "record_final_war_winner",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_winner_player_id:
+                    playerId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            "Error: " + error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
+
+
+    if (data?.complete) {
+
+        setMessage(
+            `${winner} is the Final War Champion!`
+        );
+
+        return;
+    }
+
+
+    await resolveFinalWarBots(
+        true
+    );
+
+
+    setMessage(
+        `${winner} advances. The next Final War armies are being built.`
+    );
+}
+
+
 function setMessage(message) {
 
     document
@@ -4294,6 +5187,10 @@ function startRealtime() {
 
     if (advancedBetChannel) {
         db.removeChannel(advancedBetChannel);
+    }
+
+    if (finalWarChannel) {
+        db.removeChannel(finalWarChannel);
     }
 
 
@@ -4463,6 +5360,40 @@ function startRealtime() {
             loadState
         )
         .subscribe();
+
+
+
+    finalWarChannel =
+        db
+        .channel(
+            "host-final-war-" +
+            currentEventId
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "final_war_matches",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "final_war_submissions",
+                filter:
+                    `event_id=eq.${currentEventId}`
+            },
+            loadState
+        )
+        .subscribe();
+
+
 
 }
 
