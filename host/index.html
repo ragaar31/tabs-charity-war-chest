@@ -330,6 +330,59 @@ button:disabled {
     border: 1px solid rgba(255,255,255,.32);
 }
 
+
+.economy-report {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.14);
+}
+
+.economy-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.economy-stat {
+    padding: 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+}
+
+.economy-stat strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 1.35rem;
+}
+
+.economy-player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.economy-player-card {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,.055);
+}
+
+.economy-player-line {
+    margin-top: 5px;
+    font-size: .84rem;
+    opacity: .78;
+}
+
+.economy-positive {
+    font-weight: bold;
+}
+
+.economy-negative {
+    font-weight: bold;
+}
+
 .pool-card.current-fight {
     border: 2px solid rgba(255,255,255,.45);
 }
@@ -553,6 +606,7 @@ let propBets = [];
 let parlays = [];
 let playerSkills = [];
 let playerRecruits = [];
+let economyReport = null;
 
 let eventChannel = null;
 let playerChannel = null;
@@ -1125,6 +1179,31 @@ async function loadState() {
 
     playerRecruits =
         recruitResult.data ?? [];
+
+
+    economyReport = null;
+
+    if (eventData.status === "regular_complete") {
+
+        const reportResult =
+            await db.rpc(
+                "get_economy_report",
+                {
+                    p_event_id:
+                        currentEventId
+                }
+            );
+
+        if (reportResult.error) {
+            console.error(
+                reportResult.error
+            );
+        }
+        else {
+            economyReport =
+                reportResult.data;
+        }
+    }
 
 
     render();
@@ -2924,6 +3003,162 @@ function renderHostArmySheet(submission) {
 }
 
 
+function signedMoney(value) {
+    const amount = Number(value ?? 0);
+
+    if (amount > 0) {
+        return `+$${amount.toLocaleString()}`;
+    }
+
+    if (amount < 0) {
+        return `-$${Math.abs(amount).toLocaleString()}`;
+    }
+
+    return "$0";
+}
+
+
+function renderEconomyReport() {
+
+    if (!economyReport) {
+        return `
+            <div class="economy-report">
+                <h3>Economy Report</h3>
+                <p class="status">
+                    Economy data is loading...
+                </p>
+            </div>
+        `;
+    }
+
+
+    const playerCards =
+        (economyReport.players ?? [])
+        .map(
+            player => `
+                <div class="economy-player-card">
+
+                    <strong>
+                        ${escapeHtml(player.display_name)}
+                    </strong>
+
+                    <div class="economy-player-line">
+                        Ending:
+                        $${Number(player.ending_war_chest ?? 0).toLocaleString()}
+                    </div>
+
+                    <div class="economy-player-line">
+                        SP bought:
+                        ${player.purchased_sp}
+                        (-$${Number(player.skill_point_spend ?? 0).toLocaleString()})
+                    </div>
+
+                    <div class="economy-player-line">
+                        Consumables:
+                        -$${Number(player.consumable_spend ?? 0).toLocaleString()}
+                    </div>
+
+                    <div class="economy-player-line">
+                        Betting / House net:
+                        <span class="${Number(player.betting_house_net ?? 0) >= 0 ? "economy-positive" : "economy-negative"}">
+                            ${signedMoney(player.betting_house_net)}
+                        </span>
+                    </div>
+
+                </div>
+            `
+        )
+        .join("");
+
+
+    return `
+        <div class="economy-report">
+
+            <h3>Economy Report</h3>
+
+            <p class="status">
+                The Betting / House figure is the residual after known Shop spending, battle purses, and mastery cashouts. It includes winner betting, House subsidies, props, protection refunds, Hedge Fund, and Parlay/Moonshot results.
+            </p>
+
+            <div class="economy-summary-grid">
+
+                <div class="economy-stat">
+                    Starting Economy
+                    <strong>
+                        $${Number(economyReport.starting_total ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Ending Economy
+                    <strong>
+                        $${Number(economyReport.ending_total ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Net Change
+                    <strong>
+                        ${signedMoney(economyReport.net_change)}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Battle Purses
+                    <strong>
+                        +$${Number(economyReport.battle_purses ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Mastery Cashouts
+                    <strong>
+                        +$${Number(economyReport.mastery_cashouts ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Skill Points Bought
+                    <strong>
+                        ${economyReport.skill_points_purchased ?? 0}
+                        / -$${Number(economyReport.skill_point_spend ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Consumables Bought
+                    <strong>
+                        -$${Number(economyReport.consumable_spend ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    Betting / House Net
+                    <strong>
+                        ${signedMoney(economyReport.betting_house_net)}
+                    </strong>
+                </div>
+
+                <div class="economy-stat">
+                    House Subsidies Triggered
+                    <strong>
+                        +$${Number(economyReport.house_subsidies_triggered ?? 0).toLocaleString()}
+                    </strong>
+                </div>
+
+            </div>
+
+            <h4>By Player</h4>
+
+            <div class="economy-player-grid">
+                ${playerCards}
+            </div>
+
+        </div>
+    `;
+}
+
+
 function renderBettingHost() {
 
     const panel =
@@ -3004,6 +3239,8 @@ function renderBettingHost() {
                     ).join("")
                 }
             </div>
+
+            ${renderEconomyReport()}
         `;
 
         return;
