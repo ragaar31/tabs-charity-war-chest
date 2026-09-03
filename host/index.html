@@ -755,7 +755,7 @@ let finalWarChannel = null;
 
 let chaosResolving = false;
 let chaosResolveTimer = null;
-const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C"}, {"code": "lime", "label": "Lime", "hex": "#A3E635"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583"}, {"code": "teal", "label": "Teal", "hex": "#14B8A6"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE"}, {"code": "sky", "label": "Sky", "hex": "#38BDF8"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6"}, {"code": "indigo", "label": "Indigo", "hex": "#6366F1"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6"}, {"code": "purple", "label": "Purple", "hex": "#C05CFF"}, {"code": "magenta", "label": "Magenta", "hex": "#EC4899"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8"}, {"code": "copper", "label": "Copper", "hex": "#C98245"}, {"code": "silver", "label": "Silver", "hex": "#B8C4D6"}];
+const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8"}];
 
 let lastAutoChaosKey = null;
 
@@ -771,9 +771,9 @@ function playerColorMeta(
                 color.code === colorCode
         )
         ?? {
-            code: "silver",
-            label: "Silver",
-            hex: "#B8C4D6"
+            code: "blue",
+            label: "Blue",
+            hex: "#3B82F6"
         }
     );
 }
