@@ -2903,6 +2903,14 @@ function animateDraftGlider() {
     );
 
 
+    // The glider is a newly-rendered element, so its CSS default
+    // position is 0,0. Place it on the PREVIOUS player's card
+    // instantly before enabling movement transitions. Otherwise
+    // the browser visibly animates from the strip's top-left corner.
+    glider.style.transition =
+        "none";
+
+
     Object.assign(
         glider.style,
         {
@@ -2923,6 +2931,20 @@ function animateDraftGlider() {
     );
 
 
+    // Force the browser to commit the starting geometry while
+    // transitions are disabled.
+    void glider.offsetWidth;
+
+
+    glider.style.transition = `
+        left 480ms cubic-bezier(.2,.82,.2,1),
+        top 480ms cubic-bezier(.2,.82,.2,1),
+        width 480ms cubic-bezier(.2,.82,.2,1),
+        height 480ms cubic-bezier(.2,.82,.2,1),
+        opacity 160ms ease
+    `;
+
+
     const targetLeft =
         current.offsetLeft;
 
@@ -2938,23 +2960,17 @@ function animateDraftGlider() {
     requestAnimationFrame(
         () => {
 
-            requestAnimationFrame(
-                () => {
+            glider.style.left =
+                `${targetLeft}px`;
 
-                    glider.style.left =
-                        `${targetLeft}px`;
+            glider.style.top =
+                `${current.offsetTop}px`;
 
-                    glider.style.top =
-                        `${current.offsetTop}px`;
+            glider.style.width =
+                `${current.offsetWidth}px`;
 
-                    glider.style.width =
-                        `${current.offsetWidth}px`;
-
-                    glider.style.height =
-                        `${current.offsetHeight}px`;
-
-                }
-            );
+            glider.style.height =
+                `${current.offsetHeight}px`;
 
         }
     );
