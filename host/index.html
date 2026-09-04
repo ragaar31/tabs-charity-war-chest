@@ -1571,8 +1571,8 @@ function renderActions() {
                     🎲 Fill to 8
                 </button>
 
-                <button onclick="lockLobby()">
-                    Lock Lobby
+                <button onclick="lockLobbyAndDetermineOrder()">
+                    Lock Lobby &amp; Determine Draft Order
                 </button>
 
             </div>
@@ -2780,6 +2780,61 @@ async function removePlayer(playerId) {
     if (error) {
         setMessage(error.message);
     }
+}
+
+
+async function lockLobbyAndDetermineOrder() {
+
+    setMessage(
+        "Locking lobby and determining draft order..."
+    );
+
+
+    const lockResult =
+        await db.rpc(
+            "lock_lobby",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (lockResult.error) {
+
+        setMessage(
+            lockResult.error.message
+        );
+
+        return;
+    }
+
+
+    const orderResult =
+        await db.rpc(
+            "randomize_draft_order",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (orderResult.error) {
+
+        setMessage(
+            "Lobby locked, but draft order failed: "
+            +
+            orderResult.error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Lobby locked and draft order determined."
+    );
 }
 
 
