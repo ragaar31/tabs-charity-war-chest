@@ -1920,6 +1920,9 @@ let armyDraft = {
     quantities: {}
 };
 
+let armyProgressSyncTimer = null;
+let lastArmyProgressSignature = null;
+
 let selectedTier = "S";
 
 let eventChannel = null;
@@ -3675,6 +3678,7 @@ async function loadState() {
         !armySubmission
     ) {
         loadArmyDraft();
+        scheduleArmyBuildProgressSync();
     }
 
 
@@ -5372,6 +5376,9 @@ function saveArmyDraft() {
             error
         );
     }
+
+
+    scheduleArmyBuildProgressSync();
 }
 
 
@@ -5396,6 +5403,9 @@ function clearArmyDraft() {
         mercenary_unit_id: null,
         quantities: {}
     };
+
+    lastArmyProgressSignature =
+        null;
 }
 
 
@@ -6079,6 +6089,166 @@ function armyTotalCost() {
 
 
     return total;
+}
+
+
+function armyTotalUnits() {
+
+    let total = 0;
+
+
+    for (
+        const zones
+        of Object.values(
+            armyDraft.quantities
+            ?? {}
+        )
+    ) {
+
+        total +=
+            Number(
+                zones.frontline
+                ?? 0
+            )
+            +
+            Number(
+                zones.midrange
+                ?? 0
+            )
+            +
+            Number(
+                zones.backline
+                ?? 0
+            );
+    }
+
+
+    return total;
+}
+
+
+function armyProgressSignature() {
+
+    return [
+        eventData?.current_round
+        ?? 0,
+
+        armyTotalUnits(),
+
+        armyTotalCost(),
+
+        currentArmyBudget(),
+
+        armyDraft.use_reinforcements
+        ? 1
+        : 0
+    ].join(":");
+}
+
+
+function scheduleArmyBuildProgressSync() {
+
+    if (
+        eventData?.status !==
+        "army_build"
+        ||
+        !currentEventId
+        ||
+        !currentPlayerId
+        ||
+        armySubmission
+    ) {
+        return;
+    }
+
+
+    if (armyProgressSyncTimer) {
+
+        window.clearTimeout(
+            armyProgressSyncTimer
+        );
+    }
+
+
+    armyProgressSyncTimer =
+        window.setTimeout(
+            syncArmyBuildProgress,
+            90
+        );
+}
+
+
+async function syncArmyBuildProgress() {
+
+    armyProgressSyncTimer = null;
+
+
+    if (
+        eventData?.status !==
+        "army_build"
+        ||
+        !currentEventId
+        ||
+        !currentPlayerId
+        ||
+        armySubmission
+    ) {
+        return;
+    }
+
+
+    const signature =
+        armyProgressSignature();
+
+
+    if (
+        signature ===
+        lastArmyProgressSignature
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await db.rpc(
+            "upsert_my_army_build_progress",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_round_number:
+                    eventData.current_round,
+
+                p_total_units:
+                    armyTotalUnits(),
+
+                p_total_cost:
+                    armyTotalCost(),
+
+                p_use_reinforcements:
+                    Boolean(
+                        armyDraft
+                        .use_reinforcements
+                    )
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Could not sync hidden Army Build progress.",
+            error
+        );
+
+        return;
+    }
+
+
+    lastArmyProgressSignature =
+        signature;
 }
 
 
