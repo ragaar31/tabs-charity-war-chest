@@ -4293,6 +4293,21 @@ input {
     }
 }
 
+
+/* =========================================================
+   FINAL DRAFT PICK HOLD
+   ========================================================= */
+
+.draft-final-lock-message {
+    color: #f7f8fb;
+    font-weight: 850;
+}
+
+.draft-final-lock-message strong {
+    color: #32d583;
+    font-size: 1.05rem;
+}
+
 </style>
 </head>
 
@@ -5687,12 +5702,24 @@ async function refreshState(
         }
 
 
+        const finalDraftTransition =
+            !initial
+            &&
+            oldState?.event?.status === "draft"
+            &&
+            data?.event?.status === "draft_complete";
+
+
         const draftPick =
             !initial
             &&
             oldState?.event?.status === "draft"
             &&
-            data?.event?.status === "draft"
+            (
+                data?.event?.status === "draft"
+                ||
+                data?.event?.status === "draft_complete"
+            )
             ? newestDraftPickBetween(
                 oldState,
                 data
@@ -5734,6 +5761,153 @@ async function refreshState(
                         900
                     )
             );
+
+
+            /*
+               The final Draft pick used to jump immediately into
+               Draft Complete because the event status changes on the
+               same poll that contains the last pick.
+
+               For the final pick, render a completed Draft snapshot
+               for a few seconds before transitioning.
+            */
+            if (
+                finalDraftTransition
+            ) {
+
+                previousState =
+                    oldState;
+
+
+                state = {
+                    ...data,
+
+                    event: {
+                        ...data.event,
+
+                        status:
+                            "draft",
+
+                        draft_pick_number:
+                            oldState.event
+                            ?.draft_pick_number,
+
+                        broadcast_final_draft_hold:
+                            true
+                    },
+
+                    draft_units:
+                        oldState.draft_units
+                        ??
+                        data.draft_units
+                        ??
+                        []
+                };
+
+
+                draftPlayerJustChanged =
+                    false;
+
+
+                renderBroadcast();
+                runDraftPostRenderAnimations();
+
+
+                // Hold the fully completed Draft board on screen.
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            2800
+                        )
+                );
+
+
+                const scene =
+                    document.getElementById(
+                        "scene"
+                    );
+
+
+                if (scene) {
+
+                    const fadeOut =
+                        scene.animate(
+                            [
+                                {
+                                    opacity: 1,
+                                    transform:
+                                        "translateY(0) scale(1)"
+                                },
+                                {
+                                    opacity: 0,
+                                    transform:
+                                        "translateY(-8px) scale(.995)"
+                                }
+                            ],
+                            {
+                                duration: 260,
+                                easing: "ease",
+                                fill: "forwards"
+                            }
+                        );
+
+
+                    try {
+                        await fadeOut.finished;
+                    }
+                    catch {
+                        // Harmless if interrupted.
+                    }
+                }
+
+
+                previousState =
+                    oldState;
+
+                state =
+                    data;
+
+
+                renderBroadcast();
+
+
+                if (scene) {
+
+                    scene.getAnimations()
+                        .forEach(
+                            animation =>
+                                animation.cancel()
+                        );
+
+
+                    scene.animate(
+                        [
+                            {
+                                opacity: 0,
+                                transform:
+                                    "translateY(10px) scale(.995)"
+                            },
+                            {
+                                opacity: 1,
+                                transform:
+                                    "translateY(0) scale(1)"
+                            }
+                        ],
+                        {
+                            duration: 340,
+                            easing:
+                                "cubic-bezier(.16,.82,.24,1)"
+                        }
+                    );
+                }
+
+
+                maybeShowWinner();
+                maybeShowPayout();
+
+                return;
+            }
 
 
             draftPlayerJustChanged =
@@ -7901,6 +8075,13 @@ function currentDraftPlayer() {
 
 function renderDraft() {
 
+    const finalDraftHold =
+        Boolean(
+            state.event
+            ?.broadcast_final_draft_hold
+        );
+
+
     const drafter =
         currentDraftPlayer();
 
@@ -7955,7 +8136,11 @@ function renderDraft() {
                     >
 
                         <div class="pick-num">
-                            Pick ${state.event.draft_pick_number}
+                            ${
+                                finalDraftHold
+                                ? "Final Pick Locked"
+                                : `Pick ${state.event.draft_pick_number}`
+                            }
                         </div>
 
                         <div class="on-clock">
@@ -7967,7 +8152,11 @@ function renderDraft() {
                         </div>
 
                         <div class="clock-sub">
-                            is on the clock
+                            ${
+                                finalDraftHold
+                                ? "the draft is complete"
+                                : "is on the clock"
+                            }
                         </div>
 
                     </div>
@@ -8050,30 +8239,45 @@ function renderDraft() {
                         <div class="next-up">
 
                             <div class="draft-panel-label">
-                                Up Next
+                                ${
+                                    finalDraftHold
+                                    ? "Draft Status"
+                                    : "Up Next"
+                                }
                             </div>
 
                             <div class="next-up-list">
 
                                 ${
-                                    upNext.length
-                                    ? upNext.map(
-                                        (player,index) => `
-                                            <div class="next-up-item">
-                                                <strong style="color:${playerColor(player.id)};">
-                                                    ${index + 1}.
-                                                </strong>
-                                                <span style="flex:1;">
-                                                    ${escapeHtml(player.display_name)}
-                                                </span>
-                                            </div>
-                                        `
-                                    ).join("")
-                                    : `
-                                        <div class="next-up-item">
-                                            <span>Waiting…</span>
+                                    finalDraftHold
+                                    ? `
+                                        <div class="next-up-item draft-final-lock-message">
+                                            <strong>✓</strong>
+                                            <span>
+                                                All factions locked
+                                            </span>
                                         </div>
                                       `
+                                    : (
+                                        upNext.length
+                                        ? upNext.map(
+                                            (player,index) => `
+                                                <div class="next-up-item">
+                                                    <strong style="color:${playerColor(player.id)};">
+                                                        ${index + 1}.
+                                                    </strong>
+                                                    <span style="flex:1;">
+                                                        ${escapeHtml(player.display_name)}
+                                                    </span>
+                                                </div>
+                                            `
+                                        ).join("")
+                                        : `
+                                            <div class="next-up-item">
+                                                <span>Waiting…</span>
+                                            </div>
+                                          `
+                                    )
                                 }
 
                             </div>
@@ -8195,7 +8399,13 @@ function renderDraft() {
 
                                 <div class="order-label">
                                     #${player.draft_position ?? "—"}
-                                    ${drafter?.id === player.id ? " • on the clock" : ""}
+                                    ${
+                                        !finalDraftHold
+                                        &&
+                                        drafter?.id === player.id
+                                        ? " • on the clock"
+                                        : ""
+                                    }
                                 </div>
 
                                 <div class="order-name">
