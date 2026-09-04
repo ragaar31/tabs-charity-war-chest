@@ -4489,6 +4489,352 @@ input {
     font-size: 1.05rem;
 }
 
+
+
+/* =========================================================
+   ARMY BUILD — FULL-WIDTH STANDINGS + HIDDEN BUILD PROGRESS
+   ========================================================= */
+
+.army-build-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 14px;
+}
+
+.army-build-board {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-content: start;
+}
+
+.army-build-row {
+    position: relative;
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(420px, 1.1fr)
+        minmax(360px, .82fr);
+    gap: 12px;
+    align-items: stretch;
+}
+
+.army-build-player-card,
+.army-build-tier-card {
+    position: relative;
+    min-width: 0;
+    min-height: 74px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(20,25,36,.92);
+    box-shadow: 0 12px 30px rgba(0,0,0,.22);
+}
+
+.army-build-player-card {
+    display: grid;
+    grid-template-columns: 66px minmax(0,1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px 0 0;
+}
+
+.army-build-player-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    border-radius: 18px 0 0 18px;
+    background: var(--player, #8aa0ff);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--player, #8aa0ff) 82%, transparent);
+}
+
+.army-build-player-card.is-sending {
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--player, #8aa0ff) 58%, transparent),
+        0 0 24px color-mix(in srgb, var(--player, #8aa0ff) 28%, transparent),
+        0 12px 30px rgba(0,0,0,.24);
+}
+
+.army-build-rank {
+    padding-left: 16px;
+    font-size: 1.08rem;
+    font-weight: 1000;
+    letter-spacing: -.02em;
+}
+
+.army-build-player-main {
+    min-width: 0;
+}
+
+.army-build-name {
+    font-size: 1.04rem;
+    font-weight: 930;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-player-meta {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+    text-transform: uppercase;
+}
+
+.army-build-money {
+    font-size: 1.22rem;
+    font-weight: 960;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-wins {
+    min-width: 68px;
+    padding-left: 10px;
+    color: #bfd0f6;
+    font-size: .86rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-tier-card {
+    isolation: isolate;
+    padding: 13px 16px;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    row-gap: 10px;
+}
+
+.army-build-tier-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--player, #8aa0ff) 28%, transparent),
+            color-mix(in srgb, var(--player, #8aa0ff) 16%, transparent) 62%,
+            transparent 100%
+        );
+    opacity: .14;
+    transition:
+        width 720ms cubic-bezier(.18,.82,.22,1),
+        opacity 360ms ease;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.army-build-tier-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.03);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.army-build-tier-card.is-pulsing {
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--player, #8aa0ff) 48%, transparent),
+        0 0 28px color-mix(in srgb, var(--player, #8aa0ff) 22%, transparent),
+        0 12px 30px rgba(0,0,0,.22);
+}
+
+.army-build-tier-head,
+.army-build-tier-foot,
+.army-build-tier-status {
+    position: relative;
+    z-index: 2;
+}
+
+.army-build-tier-head {
+    min-width: 0;
+}
+
+.army-build-tier-topline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.army-build-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 62px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tier-color, #8aa0ff) 18%, rgba(255,255,255,.05));
+    border: 1px solid color-mix(in srgb, var(--tier-color, #8aa0ff) 46%, rgba(255,255,255,.08));
+    color: #fff;
+    font-size: .80rem;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.army-build-tier-title {
+    min-width: 0;
+    font-size: .95rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-tier-subcopy {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: .76rem;
+    font-weight: 700;
+}
+
+.army-build-tier-status {
+    display: grid;
+    align-items: start;
+    justify-items: end;
+    gap: 9px;
+}
+
+.army-build-tier-target-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.25);
+    background: rgba(255,255,255,.05);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.24);
+}
+
+.army-build-tier-target-dot.is-lit {
+    border-color: color-mix(in srgb, var(--player, #8aa0ff) 75%, white 25%);
+    background: color-mix(in srgb, var(--player, #8aa0ff) 82%, white 18%);
+    box-shadow:
+        0 0 18px color-mix(in srgb, var(--player, #8aa0ff) 62%, transparent),
+        0 0 0 4px color-mix(in srgb, var(--player, #8aa0ff) 18%, transparent);
+}
+
+.army-build-tier-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    color: #e5edff;
+    font-size: .73rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.army-build-tier-pill.submitted {
+    background: color-mix(in srgb, var(--player, #8aa0ff) 18%, rgba(255,255,255,.04));
+    border-color: color-mix(in srgb, var(--player, #8aa0ff) 44%, rgba(255,255,255,.10));
+}
+
+.army-build-tier-pill.pending {
+    color: #c8d4ee;
+}
+
+.army-build-tier-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 0;
+    grid-column: 1 / 3;
+}
+
+.army-build-tier-progress-copy {
+    min-width: 0;
+    color: #ffffff;
+    font-size: .84rem;
+    font-weight: 820;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-tier-cap-copy {
+    color: var(--muted);
+    font-size: .75rem;
+    font-weight: 760;
+    white-space: nowrap;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-bottom-band {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        300px;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.army-build-bottom-band .lobby-qr-panel {
+    width: 300px;
+    max-width: 300px;
+    justify-self: end;
+    align-self: stretch;
+}
+
+.army-build-flight-orb {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background:
+        radial-gradient(circle at 35% 35%, white 0%, color-mix(in srgb, var(--orb-color, #8aa0ff) 86%, white 14%) 42%, var(--orb-color, #8aa0ff) 72%, transparent 100%);
+    box-shadow:
+        0 0 16px color-mix(in srgb, var(--orb-color, #8aa0ff) 72%, transparent),
+        0 0 28px color-mix(in srgb, var(--orb-color, #8aa0ff) 26%, transparent);
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@media (max-width: 1500px) {
+    .army-build-row {
+        grid-template-columns:
+            minmax(380px,1.08fr)
+            minmax(320px,.86fr);
+    }
+
+    .army-build-player-card {
+        grid-template-columns: 58px minmax(0,1fr) auto auto;
+    }
+
+    .army-build-bottom-band {
+        grid-template-columns:
+            minmax(0,1fr)
+            280px;
+    }
+
+    .army-build-bottom-band .lobby-qr-panel {
+        width: 280px;
+        max-width: 280px;
+    }
+}
+
 </style>
 </head>
 
@@ -4642,6 +4988,9 @@ let draftOrderRevealRunning = false;
    before the current unlock animation has finished.
 */
 let shopUnlockAnimationUntil = 0;
+
+let armyBuildPendingAnimations = [];
+let armyBuildAnimationUntil = 0;
 
 
 function escapeHtml(value) {
@@ -5712,6 +6061,41 @@ async function refreshState(
         }
 
 
+        if (
+            data?.event?.status === "army_build"
+        ) {
+
+            const {
+                data:
+                    armyBuildState,
+                error:
+                    armyBuildError
+            } =
+                await db.rpc(
+                    "get_broadcast_army_build_state",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (armyBuildError) {
+
+                console.error(
+                    armyBuildError
+                );
+
+            }
+
+            else if (armyBuildState) {
+
+                data.army_build =
+                    armyBuildState;
+            }
+        }
+
+
         /*
            The Audience-enhanced get_broadcast_state() replacement
            does not include draft_units. During Draft, load the legal
@@ -5846,6 +6230,18 @@ async function refreshState(
             state =
                 data;
 
+            return;
+        }
+
+
+        if (
+            oldState?.event?.status === "army_build"
+            &&
+            data?.event?.status === "army_build"
+            &&
+            performance.now() <
+                armyBuildAnimationUntil
+        ) {
             return;
         }
 
@@ -6182,6 +6578,17 @@ async function refreshState(
         }
 
 
+        armyBuildPendingAnimations =
+            !initial
+            && data?.event?.status ===
+                "army_build"
+            ? collectArmyBuildAnimations(
+                oldState,
+                data
+              )
+            : [];
+
+
         previousState =
             oldState;
 
@@ -6204,6 +6611,7 @@ async function refreshState(
 
         runDraftPostRenderAnimations();
         runShopPostRenderAnimations();
+        runArmyBuildPostRenderAnimations();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -7247,10 +7655,13 @@ function renderScene() {
     }
 
 
+    if (status === "army_build") {
+        return renderArmyBuildScene();
+    }
+
+
     if (
         status === "draft_complete"
-        ||
-        status === "army_build"
         ||
         status === "regular_complete"
     ) {
@@ -10477,6 +10888,646 @@ function renderStandingsPrep() {
     `;
 }
 
+
+
+function tierMetaForBudget(
+    budget
+) {
+
+    const value =
+        Number(budget ?? 0);
+
+
+    if (value >= 12000) {
+        return {
+            label: "S",
+            title: "Tier S Army",
+            color: "#FF4D5A"
+        };
+    }
+
+
+    if (value >= 11000) {
+        return {
+            label: "A",
+            title: "Tier A Army",
+            color: "#F2C94C"
+        };
+    }
+
+
+    if (value >= 10000) {
+        return {
+            label: "B",
+            title: "Tier B Army",
+            color: "#FF8A3D"
+        };
+    }
+
+
+    if (value >= 9000) {
+        return {
+            label: "C",
+            title: "Tier C Army",
+            color: "#3B82F6"
+        };
+    }
+
+
+    return {
+        label: "D",
+        title: "Tier D Army",
+        color: "#8B5CF6"
+    };
+}
+
+
+function armyBuildEntriesForSnapshot(
+    snapshot
+) {
+
+    return (
+        snapshot?.army_build?.entries
+        ?? []
+    );
+}
+
+
+function displayedArmyBudget(
+    entry
+) {
+
+    return Number(
+        entry?.submitted
+        ? (
+            entry.final_army_budget
+            ?? entry.army_budget
+            ?? entry.base_army_budget
+            ?? 0
+        )
+        : (
+            entry.army_budget
+            ?? entry.base_army_budget
+            ?? 0
+        )
+    );
+}
+
+
+function armyBuildProgress(
+    entry
+) {
+
+    const budget =
+        displayedArmyBudget(
+            entry
+        );
+
+
+    if (!budget) {
+        return 0;
+    }
+
+
+    return Math.max(
+        0,
+        Math.min(
+            1,
+            Number(
+                entry?.total_cost ?? 0
+            )
+            / budget
+        )
+    );
+}
+
+
+function collectArmyBuildAnimations(
+    oldSnapshot,
+    newSnapshot
+) {
+
+    const nextEntries =
+        armyBuildEntriesForSnapshot(
+            newSnapshot
+        );
+
+
+    const priorMap =
+        new Map(
+            armyBuildEntriesForSnapshot(
+                oldSnapshot
+            )
+            .map(
+                entry => [
+                    entry.player_id,
+                    entry
+                ]
+            )
+        );
+
+
+    return nextEntries
+        .filter(
+            entry => Boolean(
+                entry?.submitted
+            )
+        )
+        .map(
+            entry => {
+
+                const previous =
+                    priorMap.get(
+                        entry.player_id
+                    );
+
+                const changed =
+                    !previous
+                    || !previous.submitted
+                    || Number(
+                        previous.total_cost
+                        ?? 0
+                    )
+                    !==
+                    Number(
+                        entry.total_cost
+                        ?? 0
+                    )
+                    || Number(
+                        displayedArmyBudget(
+                            previous
+                        )
+                    )
+                    !==
+                    Number(
+                        displayedArmyBudget(
+                            entry
+                        )
+                    );
+
+
+                if (!changed) {
+                    return null;
+                }
+
+
+                return {
+                    playerId:
+                        entry.player_id,
+
+                    fromProgress:
+                        previous?.submitted
+                        ? armyBuildProgress(
+                            previous
+                          )
+                        : 0,
+
+                    toProgress:
+                        armyBuildProgress(
+                            entry
+                        )
+                };
+            }
+        )
+        .filter(Boolean);
+}
+
+
+function renderArmyBuildRow(
+    entry,
+    rank
+) {
+
+    const player =
+        playerById(
+            entry.player_id
+        );
+
+    const color =
+        playerColor(
+            entry.player_id
+        );
+
+    const tier =
+        tierMetaForBudget(
+            entry.base_army_budget
+            ?? entry.army_budget
+        );
+
+    const budget =
+        displayedArmyBudget(
+            entry
+        );
+
+    const progress =
+        armyBuildProgress(
+            entry
+        );
+
+    const percent =
+        Math.round(
+            progress * 100
+        );
+
+    const submitted =
+        Boolean(
+            entry.submitted
+        );
+
+    const progressCopy =
+        submitted
+        ? `${Number(entry.total_cost ?? 0).toLocaleString()} / ${Number(budget).toLocaleString()} pts • ${percent}% full`
+        : "Hidden build in progress • fill reveals on submission";
+
+    const capCopy =
+        submitted && entry.reinforcements_used
+        ? `Reinforced cap ${Number(budget).toLocaleString()} • +750`
+        : `${Number(budget).toLocaleString()} max army`;
+
+    const fillOpacity =
+        (0.14 + progress * 0.26)
+        .toFixed(3);
+
+
+    return `
+        <article
+            class="army-build-row"
+            data-army-player-id="${entry.player_id}"
+            style="
+                --player: ${color};
+                --tier-color: ${tier.color};
+            "
+        >
+
+            <div class="army-build-player-card">
+
+                <div class="army-build-rank">
+                    #${rank}
+                </div>
+
+                <div class="army-build-player-main">
+                    <div class="army-build-name">
+                        ${escapeHtml(player?.display_name ?? "Player")}
+                    </div>
+
+                    <div class="army-build-player-meta">
+                        ${submitted ? "Army submitted" : "Army in progress"}
+                    </div>
+                </div>
+
+                <div class="army-build-money">
+                    ${money(player?.war_chest ?? 0)}
+                </div>
+
+                <div class="army-build-wins">
+                    ${player?.wins ?? 0} wins
+                </div>
+
+            </div>
+
+            <div class="army-build-tier-card">
+
+                <div class="army-build-tier-fill" style="width:${percent}%; opacity:${fillOpacity};"></div>
+
+                <div class="army-build-tier-head">
+
+                    <div class="army-build-tier-topline">
+                        <div class="army-build-tier-badge">
+                            Tier ${tier.label}
+                        </div>
+
+                        <div class="army-build-tier-title">
+                            ${tier.title}
+                        </div>
+                    </div>
+
+                    <div class="army-build-tier-subcopy">
+                        Broadcast hides the exact composition, but this lane shows army capacity and commitment.
+                    </div>
+
+                </div>
+
+                <div class="army-build-tier-status">
+                    <div class="army-build-tier-target-dot"></div>
+                    <div class="army-build-tier-pill ${submitted ? "submitted" : "pending"}">
+                        ${submitted ? "Submitted" : "Building"}
+                    </div>
+                </div>
+
+                <div class="army-build-tier-foot">
+                    <div class="army-build-tier-progress-copy">
+                        ${progressCopy}
+                    </div>
+
+                    <div class="army-build-tier-cap-copy">
+                        ${capCopy}
+                    </div>
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderArmyBuildScene() {
+
+    const entries =
+        armyBuildEntriesForSnapshot(
+            state
+        );
+
+
+    return `
+        <div class="army-build-scene">
+
+            <div class="army-build-heading">
+
+                <div class="scene-kicker">
+                    Current Standings
+                </div>
+
+                <h1 class="scene-title">
+                    Round ${state.event.current_round} Army Build
+                </h1>
+
+                <div class="scene-subtitle">
+                    ${state.army_submission_players.length} of ${state.players.length} armies submitted.
+                </div>
+
+            </div>
+
+            <div class="army-build-board">
+                ${entries.map(
+                    (entry, index) =>
+                        renderArmyBuildRow(
+                            entry,
+                            index + 1
+                        )
+                ).join("")}
+            </div>
+
+            <div class="army-build-bottom-band">
+                ${renderDraftCompleteAudienceRow(8)}
+                ${renderLobbyGambleQrPanel()}
+            </div>
+
+        </div>
+    `;
+}
+
+
+function launchArmyBuildOrb(
+    color,
+    startX,
+    startY,
+    endX,
+    endY,
+    delay = 0
+) {
+
+    window.setTimeout(
+        () => {
+
+            const orb =
+                document.createElement(
+                    "div"
+                );
+
+            orb.className =
+                "army-build-flight-orb";
+
+            orb.style.setProperty(
+                "--orb-color",
+                color
+            );
+
+            orb.style.left =
+                `${startX}px`;
+
+            orb.style.top =
+                `${startY}px`;
+
+            document.body.appendChild(
+                orb
+            );
+
+            const dx =
+                endX - startX;
+
+            const dy =
+                endY - startY;
+
+            const drift =
+                -12 + (
+                    delay * 0.02
+                );
+
+            const animation =
+                orb.animate(
+                    [
+                        {
+                            transform:
+                                "translate(0px,0px) scale(.45)",
+                            opacity: 0
+                        },
+                        {
+                            transform:
+                                `translate(${dx * .42}px, ${dy * .26 + drift}px) scale(.96)`,
+                            opacity: .95,
+                            offset: .54
+                        },
+                        {
+                            transform:
+                                `translate(${dx}px, ${dy}px) scale(.72)`,
+                            opacity: 0
+                        }
+                    ],
+                    {
+                        duration: 580,
+                        easing:
+                            "cubic-bezier(.18,.82,.24,1)",
+                        fill: "forwards"
+                    }
+                );
+
+            animation.finished
+                .catch(
+                    () => null
+                )
+                .then(
+                    () => orb.remove()
+                );
+        },
+        delay
+    );
+}
+
+
+function playArmyBuildRowAnimation(
+    entry
+) {
+
+    const row =
+        document.querySelector(
+            `[data-army-player-id="${entry.playerId}"]`
+        );
+
+    if (!row) {
+        return;
+    }
+
+    const playerCard =
+        row.querySelector(
+            ".army-build-player-card"
+        );
+
+    const tierCard =
+        row.querySelector(
+            ".army-build-tier-card"
+        );
+
+    const fill =
+        row.querySelector(
+            ".army-build-tier-fill"
+        );
+
+    const dot =
+        row.querySelector(
+            ".army-build-tier-target-dot"
+        );
+
+    const startRect =
+        playerCard?.getBoundingClientRect();
+
+    const endRect =
+        dot?.getBoundingClientRect();
+
+    const color =
+        playerColor(
+            entry.playerId
+        );
+
+    if (fill) {
+        fill.style.width =
+            `${Math.max(0, entry.fromProgress * 100)}%`;
+        fill.style.opacity =
+            `${0.14 + Math.max(0, entry.fromProgress) * 0.26}`;
+    }
+
+    if (playerCard) {
+        playerCard.classList.add(
+            "is-sending"
+        );
+        window.setTimeout(
+            () =>
+                playerCard.classList.remove(
+                    "is-sending"
+                ),
+            560
+        );
+    }
+
+    if (startRect && endRect) {
+
+        const startX =
+            startRect.right - 34;
+        const startY =
+            startRect.top + startRect.height / 2;
+        const endX =
+            endRect.left + endRect.width / 2;
+        const endY =
+            endRect.top + endRect.height / 2;
+
+        [0, 90, 180].forEach(
+            delay =>
+                launchArmyBuildOrb(
+                    color,
+                    startX,
+                    startY,
+                    endX,
+                    endY,
+                    delay
+                )
+        );
+    }
+
+    window.setTimeout(
+        () => {
+
+            if (dot) {
+                dot.classList.add(
+                    "is-lit"
+                );
+                window.setTimeout(
+                    () =>
+                        dot.classList.remove(
+                            "is-lit"
+                        ),
+                    640
+                );
+            }
+
+            if (fill) {
+                fill.style.width =
+                    `${Math.max(0, entry.toProgress * 100)}%`;
+                fill.style.opacity =
+                    `${0.14 + Math.max(0, entry.toProgress) * 0.26}`;
+            }
+
+            if (tierCard) {
+                tierCard.classList.add(
+                    "is-pulsing"
+                );
+                window.setTimeout(
+                    () =>
+                        tierCard.classList.remove(
+                            "is-pulsing"
+                        ),
+                    780
+                );
+            }
+        },
+        230
+    );
+}
+
+
+function runArmyBuildPostRenderAnimations() {
+
+    if (
+        state?.event?.status !==
+            "army_build"
+        || !armyBuildPendingAnimations.length
+    ) {
+        return;
+    }
+
+    const queue =
+        armyBuildPendingAnimations.slice();
+
+    armyBuildPendingAnimations = [];
+    armyBuildAnimationUntil =
+        performance.now()
+        + 1100
+        + queue.length * 110;
+
+    queue.forEach(
+        (
+            entry,
+            index
+        ) => {
+            window.setTimeout(
+                () =>
+                    playArmyBuildRowAnimation(
+                        entry
+                    ),
+                index * 110
+            );
+        }
+    );
+}
 
 function renderStandings() {
 
