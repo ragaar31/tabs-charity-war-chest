@@ -4161,26 +4161,34 @@ input {
 
 .shop-owner-dot.shop-owner-new {
     animation:
-        shopOwnerPop
-        820ms
-        cubic-bezier(.12,.86,.22,1)
+        shopOwnerFadeIn
+        520ms
+        cubic-bezier(.18,.78,.24,1)
         both;
 }
 
-@keyframes shopOwnerPop {
+@keyframes shopOwnerFadeIn {
     0% {
         opacity: 0;
-        transform: scale(.25);
+        transform: scale(.78);
+        box-shadow: none;
     }
 
     55% {
-        opacity: 1;
-        transform: scale(1.55);
+        opacity: .72;
+        transform: scale(.94);
     }
 
     100% {
         opacity: 1;
         transform: scale(1);
+        box-shadow:
+            0 0 7px
+            color-mix(
+                in srgb,
+                var(--owner) 55%,
+                transparent
+            );
     }
 }
 
@@ -9418,8 +9426,8 @@ function animateShopSkillUnlock(
             );
 
 
-            // Stage 3: after the anchor has had time to pulse,
-            // reveal the permanent ownership marker.
+            // Stage 3: wait until the anchor pulse has fully
+            // faded, then gently fade in the permanent owner marker.
             window.setTimeout(
                 () => {
 
@@ -9440,11 +9448,12 @@ function animateShopSkillUnlock(
                         );
                     }
                 },
-                1320
+                1430
             );
 
 
-            // Stage 4: finish with a clear node-wide pulse.
+            // Stage 4: after the ownership marker has become readable,
+            // finish with the larger node-wide color pulse.
             window.setTimeout(
                 () => {
 
@@ -9458,7 +9467,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                1450
+                1900
             );
 
 
@@ -9474,7 +9483,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                2700
+                3200
             );
 
         },
