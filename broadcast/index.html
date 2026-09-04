@@ -3534,6 +3534,19 @@ async function refreshState(
             );
 
 
+            // Give viewers a beat to read the completed pick
+            // before advancing the Broadcast to the next drafter.
+            // This also applies at snake-draft endpoints where the
+            // same player immediately receives another pick.
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        900
+                    )
+            );
+
+
             draftPlayerJustChanged =
                 oldDrafter?.id
                 !==
