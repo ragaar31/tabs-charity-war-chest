@@ -14,6 +14,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-client.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 
 <style>
 * {
@@ -2274,6 +2275,377 @@ input {
     }
 }
 
+
+
+/* ===== Audience Broadcast V1 ===== */
+.scene-main-aside {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, .9fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.scene-lower-two {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(290px, .95fr);
+    gap: 16px;
+    margin-top: 18px;
+    align-items: start;
+}
+
+.audience-stack {
+    display: grid;
+    gap: 14px;
+}
+
+.audience-panel,
+.qr-panel,
+.audience-strip-panel {
+    position: relative;
+    overflow: hidden;
+    padding: 16px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: rgba(20,25,36,.90);
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+}
+
+.audience-panel::before,
+.qr-panel::before,
+.audience-strip-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, #f2c94c, #ff8a3d);
+    opacity: .9;
+}
+
+.audience-panel-head {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.audience-panel-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: .02em;
+}
+
+.audience-panel-copy {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.35;
+}
+
+.audience-count-pill {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(242,201,76,.26);
+    background: rgba(242,201,76,.12);
+    color: #fff0c2;
+    text-align: center;
+    font-weight: 900;
+    min-width: 72px;
+}
+
+.audience-count-pill span {
+    display: block;
+    color: var(--muted);
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.audience-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.audience-mini-card {
+    padding: 10px 10px 9px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.048);
+    border: 1px solid rgba(255,255,255,.08);
+    min-width: 0;
+}
+
+.audience-mini-name {
+    font-weight: 800;
+    font-size: .82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audience-mini-meta {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: .67rem;
+}
+
+.audience-empty {
+    margin-top: 14px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.04);
+    color: var(--muted);
+    text-align: center;
+}
+
+.audience-more {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: .74rem;
+    text-align: right;
+}
+
+.audience-mini-leaders {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.audience-leader-row {
+    display: grid;
+    grid-template-columns: 48px minmax(0,1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.audience-leader-row .rank {
+    color: #f2c94c;
+    font-weight: 900;
+    font-size: .84rem;
+}
+
+.audience-leader-row .name {
+    min-width: 0;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audience-leader-row .money {
+    font-size: .95rem;
+    font-weight: 900;
+}
+
+.audience-leader-foot {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: .72rem;
+    text-align: right;
+}
+
+.qr-panel {
+    display: grid;
+    gap: 12px;
+}
+
+.qr-wrap {
+    display: grid;
+    grid-template-columns: 164px minmax(0,1fr);
+    gap: 14px;
+    align-items: center;
+}
+
+.qr-canvas-wrap {
+    display: grid;
+    place-items: center;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.96);
+    min-height: 184px;
+}
+
+.qr-canvas-wrap canvas {
+    width: 164px;
+    height: 164px;
+}
+
+.qr-room-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: .08em;
+    font-size: .72rem;
+    text-transform: uppercase;
+}
+
+.qr-room-pill strong {
+    color: #f2c94c;
+}
+
+.qr-url {
+    margin-top: 10px;
+    color: #dfe6f3;
+    font-size: .76rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.qr-caption {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: .7rem;
+    line-height: 1.35;
+}
+
+.audience-pool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.audience-side-card {
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.audience-side-card.one {
+    border-top: 4px solid var(--p1);
+}
+
+.audience-side-card.two {
+    border-top: 4px solid var(--p2);
+}
+
+.audience-side-name {
+    font-weight: 900;
+    font-size: .88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audience-side-money {
+    margin-top: 6px;
+    font-size: 1.3rem;
+    font-weight: 900;
+}
+
+.audience-side-share {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: .72rem;
+}
+
+.audience-bar {
+    position: relative;
+    height: 16px;
+    margin-top: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+}
+
+.audience-bar-one,
+.audience-bar-two {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.audience-bar-one {
+    left: 0;
+    background: var(--p1);
+    opacity: .9;
+}
+
+.audience-bar-two {
+    right: 0;
+    background: var(--p2);
+    opacity: .9;
+}
+
+.audience-strip-panel {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.audience-strip-panel .audience-panel-title {
+    font-size: .96rem;
+}
+
+.audience-strip-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: #fff;
+    font-weight: 700;
+}
+
+.audience-strip-stats span {
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.lobby-with-audience {
+    display: grid;
+    gap: 18px;
+}
+
+.champion-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, .9fr);
+    gap: 18px;
+    align-items: start;
+}
+
+.audience-champion-card {
+    padding: 22px;
+    border-radius: 24px;
+    background: rgba(20,25,36,.92);
+    border: 1px solid var(--line);
+}
+
+.audience-champion-card .trophy {
+    font-size: 2.4rem;
+}
+
+.audience-champion-card .winner-name {
+    margin-top: 8px;
+    font-size: 1.55rem;
+    font-weight: 900;
+}
+
+.audience-champion-card .winner-money {
+    margin-top: 6px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #f2c94c;
+}
+
+.audience-champion-card .audience-panel-copy {
+    margin-top: 10px;
+}
+
 </style>
 </head>
 
@@ -3676,6 +4048,532 @@ function phaseLabel() {
 }
 
 
+
+
+function audienceCount() {
+
+    return Number(
+        state?.audience?.count
+        ?? 0
+    );
+}
+
+
+function audiencePreview(
+    limit = 12
+) {
+
+    return (
+        state?.audience?.preview
+        ?? []
+    ).slice(0, limit);
+}
+
+
+function audienceLeaders(
+    limit = 8
+) {
+
+    return (
+        state?.audience?.leaderboard
+        ?? []
+    ).slice(0, limit);
+}
+
+
+function audienceRegularPoolForMatch(
+    matchId
+) {
+
+    return (
+        state?.audience?.regular_pools
+        ?? []
+    ).find(
+        pool =>
+            pool.match_id ===
+            matchId
+    ) ?? null;
+}
+
+
+function audienceFinalPool() {
+
+    return (
+        state?.audience?.final_pool
+        ?? null
+    );
+}
+
+
+function gambleJoinUrl() {
+
+    try {
+
+        const url =
+            new URL(
+                "../gamble/",
+                window.location.href
+            );
+
+        if (roomCode) {
+            url.searchParams.set(
+                "room",
+                roomCode
+            );
+        }
+
+        return url.toString();
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        return roomCode
+            ? `../gamble/?room=${roomCode}`
+            : "../gamble/";
+    }
+}
+
+
+function renderAudiencePreviewPanel(
+    title = "Audience Lobby",
+    subtitle = "Viewers can join as pure gamblers and chase their own leaderboard.",
+    limit = 18
+) {
+
+    const audience =
+        audiencePreview(limit);
+
+    const count =
+        audienceCount();
+
+    const hidden =
+        Math.max(
+            0,
+            count - audience.length
+        );
+
+
+    return `
+        <section class="audience-panel">
+
+            <div class="audience-panel-head">
+
+                <div>
+                    <div class="audience-panel-title">
+                        ${title}
+                    </div>
+
+                    <div class="audience-panel-copy">
+                        ${subtitle}
+                    </div>
+                </div>
+
+                <div class="audience-count-pill">
+                    ${count}
+                    <span>Audience</span>
+                </div>
+
+            </div>
+
+            ${
+                audience.length
+                ? `
+                    <div class="audience-preview-grid">
+                        ${
+                            audience.map(
+                                viewer => `
+                                    <div class="audience-mini-card">
+                                        <div class="audience-mini-name">
+                                            ${escapeHtml(viewer.display_name)}
+                                        </div>
+
+                                        <div class="audience-mini-meta">
+                                            ${
+                                                viewer.rank
+                                                ? `#${viewer.rank} • `
+                                                : ""
+                                            }
+                                            ${money(viewer.bankroll ?? 10000)}
+                                        </div>
+                                    </div>
+                                `
+                            ).join("")
+                        }
+                    </div>
+
+                    ${
+                        hidden > 0
+                        ? `
+                            <div class="audience-more">
+                                +${hidden} more viewers in the audience pool
+                            </div>
+                          `
+                        : ""
+                    }
+                  `
+                : `
+                    <div class="audience-empty">
+                        No Audience Gamblers yet. Scan in and become the first.
+                    </div>
+                  `
+            }
+
+        </section>
+    `;
+}
+
+
+function renderAudienceLeaderboardMini(
+    title = "Audience Leaders",
+    subtitle = "Separate from the competitor standings.",
+    limit = 8
+) {
+
+    const leaders =
+        audienceLeaders(limit);
+
+    const count =
+        audienceCount();
+
+
+    return `
+        <section class="audience-panel">
+
+            <div class="audience-panel-head">
+
+                <div>
+                    <div class="audience-panel-title">
+                        ${title}
+                    </div>
+
+                    <div class="audience-panel-copy">
+                        ${subtitle}
+                    </div>
+                </div>
+
+                <div class="audience-count-pill">
+                    ${count}
+                    <span>Total</span>
+                </div>
+
+            </div>
+
+            ${
+                leaders.length
+                ? `
+                    <div class="audience-mini-leaders">
+                        ${
+                            leaders.map(
+                                row => `
+                                    <div class="audience-leader-row">
+                                        <div class="rank">
+                                            #${row.rank}
+                                        </div>
+
+                                        <div class="name">
+                                            ${escapeHtml(row.display_name)}
+                                        </div>
+
+                                        <div class="money">
+                                            ${money(row.bankroll)}
+                                        </div>
+                                    </div>
+                                `
+                            ).join("")
+                        }
+                    </div>
+                  `
+                : `
+                    <div class="audience-empty">
+                        Leaderboard will appear once viewers join.
+                    </div>
+                  `
+            }
+
+            ${
+                count > leaders.length
+                ? `
+                    <div class="audience-leader-foot">
+                        Top ${leaders.length} shown • ${count} total viewers
+                    </div>
+                  `
+                : ""
+            }
+
+        </section>
+    `;
+}
+
+
+function renderGambleQrPanel(
+    title = "Join the Audience Pool",
+    subtitle = "Scan to open the live gambling portal on your phone."
+) {
+
+    return `
+        <section class="qr-panel">
+
+            <div>
+                <div class="audience-panel-title">
+                    ${title}
+                </div>
+
+                <div class="audience-panel-copy">
+                    ${subtitle}
+                </div>
+            </div>
+
+            <div class="qr-wrap">
+
+                <div class="qr-canvas-wrap">
+                    <canvas data-gamble-qr="true"></canvas>
+                </div>
+
+                <div>
+                    <div class="qr-room-pill">
+                        Room <strong>${escapeHtml(roomCode || "------")}</strong>
+                    </div>
+
+                    <div class="qr-url" data-gamble-url-label>
+                        ${escapeHtml(gambleJoinUrl())}
+                    </div>
+
+                    <div class="qr-caption">
+                        Fictional betting currency only. Audience Gamblers never affect the eight competitors’ pools.
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderAudiencePoolPanel(
+    match,
+    isFinalWar = false
+) {
+
+    if (!match) {
+
+        return renderAudienceLeaderboardMini(
+            "Audience Status",
+            "Waiting for the next fight to load.",
+            6
+        );
+    }
+
+
+    const pool =
+        isFinalWar
+        ? audienceFinalPool()
+        : audienceRegularPoolForMatch(
+            match.id
+        );
+
+
+    const p1Name =
+        playerName(match.player1_id);
+
+    const p2Name =
+        playerName(match.player2_id);
+
+
+    const p1Pool =
+        Number(
+            pool?.player1_pool
+            ?? 1000
+        );
+
+    const p2Pool =
+        Number(
+            pool?.player2_pool
+            ?? 1000
+        );
+
+
+    const total =
+        Math.max(
+            1,
+            p1Pool + p2Pool
+        );
+
+    const p1Share =
+        Math.round(
+            (p1Pool / total) * 100
+        );
+
+    const p2Share =
+        100 - p1Share;
+
+
+    return `
+        <section
+            class="audience-panel"
+            style="
+                --p1:${playerColor(match.player1_id)};
+                --p2:${playerColor(match.player2_id)};
+            "
+        >
+
+            <div class="audience-panel-head">
+
+                <div>
+                    <div class="audience-panel-title">
+                        Audience Pool
+                    </div>
+
+                    <div class="audience-panel-copy">
+                        ${
+                            isFinalWar
+                            ? `Final War Stage ${match.stage_number}`
+                            : `Round ${match.round_number} • Fight ${match.match_number}`
+                        }
+                        • House seeded on both sides.
+                    </div>
+                </div>
+
+                <div class="audience-count-pill">
+                    ${audienceCount()}
+                    <span>Active</span>
+                </div>
+
+            </div>
+
+            <div class="audience-pool-grid">
+
+                <div class="audience-side-card one">
+                    <div class="audience-side-name">
+                        ${escapeHtml(p1Name)}
+                    </div>
+                    <div class="audience-side-money">
+                        ${money(p1Pool)}
+                    </div>
+                    <div class="audience-side-share">
+                        ${p1Share}% of visible Audience pool
+                    </div>
+                </div>
+
+                <div class="audience-side-card two">
+                    <div class="audience-side-name">
+                        ${escapeHtml(p2Name)}
+                    </div>
+                    <div class="audience-side-money">
+                        ${money(p2Pool)}
+                    </div>
+                    <div class="audience-side-share">
+                        ${p2Share}% of visible Audience pool
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="audience-bar">
+                <div class="audience-bar-one" style="width:${p1Share}%;"></div>
+                <div class="audience-bar-two" style="width:${p2Share}%;"></div>
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderAudienceStrip(
+    title = "Audience Ready"
+) {
+
+    const count =
+        audienceCount();
+
+    const top =
+        audienceLeaders(1)[0];
+
+
+    return `
+        <section class="audience-strip-panel">
+
+            <div>
+                <div class="audience-panel-title">
+                    ${title}
+                </div>
+                <div class="audience-panel-copy">
+                    Viewers can join at any time and bet separately from the competitors.
+                </div>
+            </div>
+
+            <div class="audience-strip-stats">
+                <div>
+                    ${count} <span>joined</span>
+                </div>
+                <div>
+                    ${
+                        top
+                        ? `${escapeHtml(top.display_name)} ${money(top.bankroll)}`
+                        : "No leader yet"
+                    }
+                    <span>top audience bankroll</span>
+                </div>
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderBroadcastDecorations() {
+
+    if (!window.QRCode) {
+        return;
+    }
+
+
+    const url =
+        gambleJoinUrl();
+
+
+    document
+        .querySelectorAll(
+            "[data-gamble-url-label]"
+        )
+        .forEach(
+            node => {
+                node.textContent = url;
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "canvas[data-gamble-qr]"
+        )
+        .forEach(
+            canvas => {
+
+                QRCode.toCanvas(
+                    canvas,
+                    url,
+                    {
+                        width: 164,
+                        margin: 1,
+                        color: {
+                            dark: "#0f1726",
+                            light: "#ffffff"
+                        }
+                    },
+                    error => {
+                        if (error) {
+                            console.error(error);
+                        }
+                    }
+                );
+            }
+        );
+}
+
+
 function renderBroadcast() {
 
     if (!state?.event) {
@@ -3715,6 +4613,12 @@ function renderBroadcast() {
 
     scene.innerHTML =
         renderScene();
+
+
+    requestAnimationFrame(
+        () =>
+            renderBroadcastDecorations()
+    );
 }
 
 
@@ -3727,10 +4631,10 @@ function footerStatus() {
     switch (event.status) {
 
         case "lobby":
-            return `${state.players.length} / 8 players connected`;
+            return `${state.players.length} / 8 players connected • ${audienceCount()} audience joined`;
 
         case "locked":
-            return "Lobby locked • preparing draft order";
+            return `Lobby locked • ${audienceCount()} audience joined`; 
 
         case "draft_order":
             return (
@@ -3743,7 +4647,7 @@ function footerStatus() {
             return `Pick ${event.draft_pick_number}`;
 
         case "shop":
-            return "Players are shopping and allocating skills";
+            return `Players are shopping • ${audienceCount()} audience on deck`; 
 
         case "army_build":
             return `${state.army_submission_players.length} / ${state.players.length} armies submitted`;
@@ -3772,7 +4676,7 @@ function footerStatus() {
         }
 
         case "regular_complete":
-            return "Final Skill Allocation";
+            return `Final Skill Allocation • ${audienceCount()} audience gamblers`; 
 
         case "final_war_build":
             return `${state.final_submission_players.length} / 2 Final War armies submitted`;
@@ -3784,7 +4688,7 @@ function footerStatus() {
             return "Final War battle live";
 
         case "final_war_complete":
-            return "Champion crowned";
+            return `Champion crowned • Audience leaderboard final`; 
 
         default:
             return "TABS War Chest Betting Special";
@@ -3889,23 +4793,43 @@ function renderScene() {
 function renderLobby() {
 
     return `
-        <div class="scene-kicker">
-            DreamHarrier presents
+        <div class="lobby-with-audience">
+
+            <div class="scene-kicker">
+                DreamHarrier presents
+            </div>
+
+            <h1 class="scene-title">
+                TABS War Chest
+            </h1>
+
+            <div class="scene-subtitle">
+                Players are joining the betting special.
+                Audience Gamblers can join right now and compete on their own leaderboard.
+            </div>
+
+            ${renderCastGrid(
+                state.players,
+                false,
+                true
+            )}
+
+            <div class="scene-lower-two">
+
+                ${renderAudiencePreviewPanel(
+                    "Audience Lobby",
+                    "Smaller viewer cards appear here as spectators scan in for the gambling role.",
+                    18
+                )}
+
+                ${renderGambleQrPanel(
+                    "Scan to Join",
+                    "Open the Audience portal, enter the room code, and start building a separate spectator bankroll."
+                )}
+
+            </div>
+
         </div>
-
-        <h1 class="scene-title">
-            TABS War Chest
-        </h1>
-
-        <div class="scene-subtitle">
-            Players are joining the betting special.
-        </div>
-
-        ${renderCastGrid(
-            state.players,
-            false,
-            true
-        )}
     `;
 }
 
@@ -4041,6 +4965,19 @@ function renderCastIntro() {
             state.players,
             false
         )}
+
+        <div class="scene-lower-two">
+            ${renderAudiencePreviewPanel(
+                "Audience Check-In",
+                "The crowd is gathering before the action starts.",
+                12
+            )}
+
+            ${renderGambleQrPanel(
+                "Late Join Welcome",
+                "Viewers can still join before the betting begins."
+            )}
+        </div>
     `;
 }
 
@@ -5238,7 +6175,23 @@ function renderStandingsPrep() {
             ${copy?.[1] ?? ""}
         </div>
 
-        ${renderLeaderboard()}
+        <div class="scene-main-aside">
+            <div>
+                ${renderLeaderboard()}
+            </div>
+
+            <div class="audience-stack">
+                ${renderAudienceLeaderboardMini(
+                    "Audience Leaders",
+                    "A completely separate race for the spectators.",
+                    8
+                )}
+                ${renderGambleQrPanel(
+                    "Join Mid-Show",
+                    "Late viewers can still jump in and start gambling."
+                )}
+            </div>
+        </div>
     `;
 }
 
@@ -5254,7 +6207,23 @@ function renderStandings() {
             Standings
         </h1>
 
-        ${renderLeaderboard()}
+        <div class="scene-main-aside">
+            <div>
+                ${renderLeaderboard()}
+            </div>
+
+            <div class="audience-stack">
+                ${renderAudienceLeaderboardMini(
+                    "Audience Leaders",
+                    "How the crowd is doing on the side board.",
+                    8
+                )}
+                ${renderGambleQrPanel(
+                    "Join the Crowd",
+                    "Scan in to become an Audience Gambler."
+                )}
+            </div>
+        </div>
     `;
 }
 
@@ -5368,6 +6337,19 @@ function renderBettingOpen() {
             }
 
         </div>
+
+        <div class="scene-lower-two">
+            ${renderAudiencePreviewPanel(
+                "Audience Betting Is Live",
+                "Spectators are now making their own independent bets on every fight.",
+                12
+            )}
+
+            ${renderGambleQrPanel(
+                "Scan to Bet",
+                "The spectator sportsbook is open while the players finish their selections."
+            )}
+        </div>
     `;
 }
 
@@ -5380,6 +6362,9 @@ function renderPools() {
                 match.round_number ===
                 state.event.current_round
         );
+
+    const current =
+        currentMatch();
 
 
     return `
@@ -5410,7 +6395,7 @@ function renderPools() {
                             );
 
 
-                        const current =
+                        const currentCard =
                             match.match_number ===
                             state.event.current_match_number;
 
@@ -5419,7 +6404,7 @@ function renderPools() {
                             <div
                                 class="
                                     pool-card
-                                    ${current ? "current" : ""}
+                                    ${currentCard ? "current" : ""}
                                 "
                                 style="
                                     --p1:
@@ -5431,7 +6416,7 @@ function renderPools() {
 
                                 <div class="pool-title">
                                     Fight ${match.match_number}
-                                    ${current ? " • UP NEXT" : ""}
+                                    ${currentCard ? " • UP NEXT" : ""}
                                 </div>
 
                                 <div class="pool-sides">
@@ -5476,6 +6461,15 @@ function renderPools() {
                 ).join("")
             }
 
+        </div>
+
+        <div class="scene-lower-two">
+            ${renderAudiencePoolPanel(current, false)}
+            ${renderAudienceLeaderboardMini(
+                "Audience Leaders",
+                "The crowd is betting on the same fight with a separate pool.",
+                6
+            )}
         </div>
     `;
 }
@@ -5539,6 +6533,15 @@ function renderArmyReveal(
                 isFinalWar
             )}
 
+        </div>
+
+        <div class="scene-lower-two">
+            ${renderAudiencePoolPanel(match, isFinalWar)}
+            ${renderAudienceLeaderboardMini(
+                "Audience Leaders",
+                "Separate spectator bankrolls reacting to this matchup.",
+                6
+            )}
         </div>
     `;
 }
@@ -5690,6 +6693,15 @@ function renderFightResult() {
             </div>
 
         </div>
+
+        <div class="scene-lower-two">
+            ${renderAudiencePoolPanel(match, false)}
+            ${renderAudienceLeaderboardMini(
+                "Audience Leaders",
+                "The crowd leaderboard updates when the Host settles this fight.",
+                6
+            )}
+        </div>
     `;
 }
 
@@ -5840,6 +6852,15 @@ function renderFinalBracket() {
             }
 
         </div>
+
+        <div class="scene-lower-two">
+            ${renderAudiencePoolPanel(current, true)}
+            ${renderAudienceLeaderboardMini(
+                "Audience Leaders",
+                "The crowd can continue betting all the way through Final War.",
+                6
+            )}
+        </div>
     `;
 }
 
@@ -5850,34 +6871,77 @@ function renderChampion() {
         state.event
         .final_war_champion_id;
 
+    const topAudience =
+        audienceLeaders(1)[0];
+
 
     return `
-        <div class="champion-scene">
+        <div class="champion-grid">
 
-            <div
-                class="champion-card"
-                style="
-                    --player:
-                    ${playerColor(championId)};
-                "
-            >
+            <div class="champion-scene">
 
-                <div class="crown">
-                    👑
+                <div
+                    class="champion-card"
+                    style="
+                        --player:
+                        ${playerColor(championId)};
+                    "
+                >
+
+                    <div class="crown">
+                        👑
+                    </div>
+
+                    <div class="champ-label">
+                        TABS War Chest Betting Special Champion
+                    </div>
+
+                    <div class="champ-name">
+                        ${escapeHtml(playerName(championId))}
+                    </div>
+
+                    <div class="scene-subtitle">
+                        DreamHarrier • Benefiting Extra Life
+                    </div>
+
                 </div>
 
-                <div class="champ-label">
-                    TABS War Chest Betting Special Champion
-                </div>
+            </div>
 
-                <div class="champ-name">
-                    ${escapeHtml(playerName(championId))}
-                </div>
+            <div class="audience-stack">
 
-                <div class="scene-subtitle">
-                    DreamHarrier • Benefiting Extra Life
-                </div>
+                <section class="audience-champion-card">
+                    <div class="trophy">🎰</div>
+                    <div class="audience-panel-title">
+                        Audience Gambling Champion
+                    </div>
 
+                    ${
+                        topAudience
+                        ? `
+                            <div class="winner-name">
+                                ${escapeHtml(topAudience.display_name)}
+                            </div>
+                            <div class="winner-money">
+                                ${money(topAudience.bankroll)}
+                            </div>
+                            <div class="audience-panel-copy">
+                                Finished #1 on the spectator leaderboard.
+                            </div>
+                          `
+                        : `
+                            <div class="audience-panel-copy">
+                                No audience leaderboard entries were recorded.
+                            </div>
+                          `
+                    }
+                </section>
+
+                ${renderAudienceLeaderboardMini(
+                    "Audience Final Top Board",
+                    "The crowd’s best gamblers of the show.",
+                    6
+                )}
             </div>
 
         </div>
