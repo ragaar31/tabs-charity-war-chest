@@ -5585,42 +5585,70 @@ input {
 
 .army-build-tier-card.is-pulsing {
     animation:
-        armyBuildTierOuterPulse 760ms cubic-bezier(.18,.76,.24,1) both;
+        armyBuildTierOuterPulse 760ms cubic-bezier(.18,.76,.24,1);
 }
 
 @keyframes armyBuildTierOuterPulse {
     0% {
-        border-color: rgba(255,255,255,.08);
-        box-shadow: 0 8px 18px rgba(0,0,0,.12);
+        border-color:
+            rgba(255,255,255,.09);
+        box-shadow:
+            0 8px 18px
+            rgba(0,0,0,.15);
     }
 
-    32% {
-        border-color: color-mix(
-            in srgb,
-            var(--player) 72%,
-            rgba(255,255,255,.10)
-        );
+    34% {
+        border-color:
+            color-mix(
+                in srgb,
+                var(--player) 72%,
+                rgba(255,255,255,.10)
+            );
         box-shadow:
-            0 0 0 1px color-mix(
+            0 0 0 1px
+            color-mix(
                 in srgb,
                 var(--player) 34%,
                 transparent
             ),
-            0 0 18px color-mix(
+            0 0 20px
+            color-mix(
                 in srgb,
-                var(--player) 24%,
+                var(--player) 25%,
                 transparent
             ),
-            0 0 34px color-mix(
+            0 0 36px
+            color-mix(
                 in srgb,
-                var(--player) 14%,
+                var(--player) 13%,
                 transparent
             );
     }
 
+    68% {
+        border-color:
+            color-mix(
+                in srgb,
+                var(--player) 26%,
+                rgba(255,255,255,.09)
+            );
+        box-shadow:
+            0 0 11px
+            color-mix(
+                in srgb,
+                var(--player) 10%,
+                transparent
+            ),
+            0 8px 18px
+            rgba(0,0,0,.13);
+    }
+
     100% {
-        border-color: rgba(255,255,255,.08);
-        box-shadow: 0 8px 18px rgba(0,0,0,.12);
+        border-color:
+            rgba(255,255,255,.09);
+        box-shadow:
+            0 8px 18px
+            rgba(0,0,0,.15);
     }
 }
 
@@ -12131,6 +12159,183 @@ function renderArmyBuildAudienceStrip(
 }
 
 
+function armyBuildFillIntensity(
+    progress
+) {
+
+    const value =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Number(
+                    progress
+                    ?? 0
+                )
+            )
+        );
+
+
+    if (value <= 0) {
+        return 0;
+    }
+
+
+    return Math.min(
+        1,
+        .06
+        +
+        Math.pow(
+            value,
+            1.08
+        )
+        *
+        .94
+    );
+}
+
+
+function armyBuildInsetGlow(
+    progress
+) {
+
+    const value =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Number(
+                    progress
+                    ?? 0
+                )
+            )
+        );
+
+
+    if (value <= 0) {
+        return 0;
+    }
+
+
+    return Math.min(
+        .34,
+        .02
+        +
+        Math.pow(
+            value,
+            .92
+        )
+        *
+        .20
+    );
+}
+
+
+function pulseArmyPlayerCard(
+    playerCard,
+    duration = 760
+) {
+
+    if (!playerCard) {
+        return;
+    }
+
+
+    playerCard.classList.remove(
+        "is-sending"
+    );
+
+
+    void playerCard.offsetWidth;
+
+
+    playerCard.classList.add(
+        "is-sending"
+    );
+
+
+    window.setTimeout(
+        () =>
+            playerCard
+                .classList
+                .remove(
+                    "is-sending"
+                ),
+        duration
+    );
+}
+
+
+function pulseArmyTierCard(
+    tierCard,
+    duration = 760
+) {
+
+    if (!tierCard) {
+        return;
+    }
+
+
+    tierCard.classList.remove(
+        "is-pulsing"
+    );
+
+
+    void tierCard.offsetWidth;
+
+
+    tierCard.classList.add(
+        "is-pulsing"
+    );
+
+
+    window.setTimeout(
+        () =>
+            tierCard
+                .classList
+                .remove(
+                    "is-pulsing"
+                ),
+        duration + 20
+    );
+}
+
+
+function pulseArmyTargetDot(
+    dot,
+    duration = 500
+) {
+
+    if (!dot) {
+        return;
+    }
+
+
+    dot.classList.remove(
+        "is-lit"
+    );
+
+
+    void dot.offsetWidth;
+
+
+    dot.classList.add(
+        "is-lit"
+    );
+
+
+    window.setTimeout(
+        () =>
+            dot
+                .classList
+                .remove(
+                    "is-lit"
+                ),
+        duration
+    );
+}
+
+
 function renderArmyBuildRow(
     entry,
     rank
@@ -12173,39 +12378,15 @@ function renderArmyBuildRow(
        The color wash is intentionally the only visual read on capacity.
     */
     const intensity =
-        (
-            progress <= 0
-                ? 0
-                : Math.min(
-                    1,
-                    .06
-                    +
-                    Math.pow(
-                        progress,
-                        1.08
-                    )
-                    *
-                    .94
-                )
+        armyBuildFillIntensity(
+            progress
         )
         .toFixed(3);
 
 
     const glow =
-        (
-            progress <= 0
-                ? 0
-                : Math.min(
-                    .34,
-                    .02
-                    +
-                    Math.pow(
-                        progress,
-                        .92
-                    )
-                    *
-                    .20
-                )
+        armyBuildInsetGlow(
+            progress
         )
         .toFixed(3);
 
@@ -12562,10 +12743,6 @@ function playArmyBuildRowAnimation(
         );
 
 
-    /*
-       For normal +1 / +10 controls this is one orb per unit.
-       Very large batched changes are capped to keep the broadcast readable.
-    */
     const orbCount =
         entry.establishing
         ? Math.min(
@@ -12581,21 +12758,111 @@ function playArmyBuildRowAnimation(
         );
 
 
-    if (playerCard) {
-
-        playerCard.classList.add(
-            "is-sending"
+    const fromProgress =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Number(
+                    entry.fromProgress
+                    ?? 0
+                )
+            )
         );
 
 
-        window.setTimeout(
-            () =>
-                playerCard
-                .classList
-                .remove(
-                    "is-sending"
-                ),
-            760
+    const toProgress =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Number(
+                    entry.toProgress
+                    ?? 0
+                )
+            )
+        );
+
+
+    const fromIntensity =
+        armyBuildFillIntensity(
+            fromProgress
+        );
+
+
+    const toIntensity =
+        armyBuildFillIntensity(
+            toProgress
+        );
+
+
+    const fromGlow =
+        armyBuildInsetGlow(
+            fromProgress
+        );
+
+
+    const toGlow =
+        armyBuildInsetGlow(
+            toProgress
+        );
+
+
+    /*
+       The new DOM was rendered with the new progress value. Before the
+       browser paints, put the persistent color wash back at the OLD
+       progress value so the actual army change can visibly ease from
+       old -> new instead of appearing instantly.
+    */
+    if (fill) {
+
+        fill.style.transition =
+            "none";
+
+        fill.style.opacity =
+            `${fromIntensity}`;
+    }
+
+
+    if (tierCard) {
+
+        tierCard.style.setProperty(
+            "--build-glow",
+            `${fromGlow}`
+        );
+    }
+
+
+    if (fill) {
+        void fill.offsetWidth;
+    }
+
+
+    /*
+       Directional choreography:
+
+       ADD:
+         Player card pulses -> orbs travel -> Army card / target pulse.
+
+       REMOVE:
+         Army card / target pulse -> orbs travel back -> Player card pulses.
+    */
+    if (reverse) {
+
+        pulseArmyTierCard(
+            tierCard
+        );
+
+        pulseArmyTargetDot(
+            dot
+        );
+
+    }
+
+    else {
+
+        pulseArmyPlayerCard(
+            playerCard
         );
     }
 
@@ -12681,104 +12948,61 @@ function playArmyBuildRowAnimation(
 
 
     /*
-       The card's actual progress is never shown numerically.
-       Animate only the strength of the player's color wash.
+       Start the persistent fill transition as the first orbs are moving.
+       It finishes at the REAL new capacity color and stays there.
+       The temporary pulse is completely separate from this value.
     */
     window.setTimeout(
         () => {
 
-            if (dot) {
-
-                dot.classList.add(
-                    "is-lit"
-                );
-
-
-                window.setTimeout(
-                    () =>
-                        dot.classList.remove(
-                            "is-lit"
-                        ),
-                    520
-                );
-            }
-
-
             if (fill) {
 
-                const progress =
-                    Math.max(
-                        0,
-                        Math.min(
-                            1,
-                            entry.toProgress
-                        )
-                    );
-
-
-                const intensity =
-                    progress <= 0
-                        ? 0
-                        : Math.min(
-                            1,
-                            .06
-                            +
-                            Math.pow(
-                                progress,
-                                1.08
-                            )
-                            *
-                            .94
-                        );
-
-
-                const glow =
-                    progress <= 0
-                        ? 0
-                        : Math.min(
-                            .34,
-                            .02
-                            +
-                            Math.pow(
-                                progress,
-                                .92
-                            )
-                            *
-                            .20
-                        );
-
+                fill.style.transition =
+                    "opacity 680ms cubic-bezier(.20,.72,.24,1)";
 
                 fill.style.opacity =
-                    `${intensity}`;
-
-
-                tierCard?.style
-                    .setProperty(
-                        "--build-glow",
-                        `${glow}`
-                    );
+                    `${toIntensity}`;
             }
 
 
             if (tierCard) {
 
-                tierCard.classList.add(
-                    "is-pulsing"
-                );
-
-
-                window.setTimeout(
-                    () =>
-                        tierCard.classList.remove(
-                            "is-pulsing"
-                        ),
-                    780
+                tierCard.style.setProperty(
+                    "--build-glow",
+                    `${toGlow}`
                 );
             }
         },
-        reverse
-        ? 140
-        : 260
+        150
+    );
+
+
+    /*
+       Arrival pulse. Reverse intentionally swaps the destination.
+    */
+    window.setTimeout(
+        () => {
+
+            if (reverse) {
+
+                pulseArmyPlayerCard(
+                    playerCard
+                );
+
+            }
+
+            else {
+
+                pulseArmyTargetDot(
+                    dot
+                );
+
+                pulseArmyTierCard(
+                    tierCard
+                );
+            }
+        },
+        420
     );
 }
 
