@@ -1703,6 +1703,162 @@ input {
     }
 }
 
+
+/* =========================================================
+   DRAFT ORDER REVEAL
+   ========================================================= */
+
+.draft-order-reveal-scene {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto minmax(0,1fr);
+    gap: 10px;
+}
+
+.draft-order-reveal-list {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            var(--order-count, 8),
+            minmax(0,1fr)
+        );
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.order-reveal-strip {
+    --player: #8b97ae;
+    position: relative;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 70px minmax(0,1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--player) 12%,
+                rgba(255,255,255,.05)
+            ),
+            rgba(255,255,255,.04) 35%
+        );
+    border: 1px solid rgba(255,255,255,.10);
+    border-left: 5px solid var(--player);
+    overflow: hidden;
+}
+
+.order-reveal-strip.pending-target {
+    opacity: 0;
+}
+
+.order-reveal-rank {
+    color: var(--player);
+    font-size: 1.45rem;
+    line-height: 1;
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+}
+
+.order-reveal-name {
+    min-width: 0;
+    font-size: 1.06rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-reveal-type {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .11em;
+    font-size: .64rem;
+    font-weight: 850;
+}
+
+.order-reveal-strip.order-locked {
+    animation:
+        orderLockedPulse 620ms
+        cubic-bezier(.18,.84,.22,1)
+        both;
+}
+
+@keyframes orderLockedPulse {
+    0% {
+        transform: scale(.99);
+        box-shadow: none;
+    }
+
+    46% {
+        transform: scale(1.012);
+        box-shadow:
+            0 0 28px
+            color-mix(
+                in srgb,
+                var(--player) 34%,
+                transparent
+            );
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: none;
+    }
+}
+
+.draft-order-flyer {
+    --player: #8b97ae;
+    position: fixed;
+    z-index: 4500;
+    display: grid;
+    grid-template-columns: 70px minmax(0,1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--player) 16%,
+                #222938
+            ),
+            #1a202c 42%
+        );
+    border: 1px solid rgba(255,255,255,.13);
+    border-left: 5px solid var(--player);
+    box-shadow:
+        0 16px 40px rgba(0,0,0,.44);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.draft-order-flyer .order-reveal-rank {
+    color: rgba(255,255,255,.35);
+}
+
+.order-reveal-locked-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-left: 10px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.055);
+    color: rgba(255,255,255,.76);
+    font-size: .67rem;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
 </style>
 </head>
 
@@ -1845,6 +2001,10 @@ let pendingDraftGliderStart = null;
 
 let newlyJoinedPlayerIds = [];
 
+let draftOrderRevealPending = false;
+let draftOrderRevealSourceRects = {};
+let draftOrderRevealRunning = false;
+
 
 function escapeHtml(value) {
 
@@ -1855,6 +2015,631 @@ function escapeHtml(value) {
         value ?? "";
 
     return div.innerHTML;
+}
+
+
+
+function draftPositionsChanged(
+    oldSnapshot,
+    newSnapshot
+) {
+
+    if (
+        !oldSnapshot
+        ||
+        !newSnapshot
+    ) {
+        return false;
+    }
+
+
+    const oldMap =
+        new Map(
+            (oldSnapshot.players ?? [])
+            .map(
+                player => [
+                    player.id,
+                    player.draft_position
+                    ?? null
+                ]
+            )
+        );
+
+
+    return (
+        (newSnapshot.players ?? [])
+        .some(
+            player =>
+                oldMap.get(
+                    player.id
+                )
+                !==
+                (
+                    player.draft_position
+                    ?? null
+                )
+        )
+    );
+}
+
+
+function captureDraftOrderSourceRects() {
+
+    const elements =
+        document.querySelectorAll(
+            "[data-order-player-id]"
+        );
+
+
+    const result = {};
+
+
+    for (const element of elements) {
+
+        const id =
+            element.dataset
+                .orderPlayerId;
+
+
+        if (!id) {
+            continue;
+        }
+
+
+        const rect =
+            element
+                .getBoundingClientRect();
+
+
+        result[id] = {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height
+        };
+    }
+
+
+    return result;
+}
+
+
+function shuffleArray(values) {
+
+    const result =
+        [...values];
+
+
+    for (
+        let index =
+            result.length - 1;
+
+        index > 0;
+
+        index--
+    ) {
+
+        const target =
+            Math.floor(
+                Math.random()
+                *
+                (index + 1)
+            );
+
+
+        [
+            result[index],
+            result[target]
+        ] = [
+            result[target],
+            result[index]
+        ];
+    }
+
+
+    return result;
+}
+
+
+function draftOrderTargetRects() {
+
+    const targets =
+        Array.from(
+            document.querySelectorAll(
+                ".order-reveal-strip"
+            )
+        );
+
+
+    return new Map(
+        targets.map(
+            element => {
+
+                const rect =
+                    element
+                    .getBoundingClientRect();
+
+
+                return [
+                    element.dataset
+                        .orderPlayerId,
+
+                    {
+                        element,
+                        left: rect.left,
+                        top: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    }
+                ];
+            }
+        )
+    );
+}
+
+
+function makeDraftOrderFlyer(
+    player,
+    sourceRect
+) {
+
+    const flyer =
+        document.createElement(
+            "div"
+        );
+
+
+    flyer.className =
+        "draft-order-flyer";
+
+
+    flyer.style.setProperty(
+        "--player",
+        playerColor(
+            player.id
+        )
+    );
+
+
+    flyer.dataset.playerId =
+        player.id;
+
+
+    flyer.innerHTML = `
+        <div class="order-reveal-rank">
+            ?
+        </div>
+
+        <div class="order-reveal-name">
+            ${escapeHtml(player.display_name)}
+        </div>
+
+        <div class="order-reveal-type">
+            ${
+                player.is_bot
+                ? "Chaos Gambler"
+                : "Player"
+            }
+        </div>
+    `;
+
+
+    Object.assign(
+        flyer.style,
+        {
+            left:
+                `${sourceRect.left}px`,
+
+            top:
+                `${sourceRect.top}px`,
+
+            width:
+                `${sourceRect.width}px`,
+
+            height:
+                `${sourceRect.height}px`
+        }
+    );
+
+
+    document.body.appendChild(
+        flyer
+    );
+
+
+    return flyer;
+}
+
+
+async function animateFlyerRect(
+    flyer,
+    fromRect,
+    toRect,
+    duration = 420,
+    easing =
+        "cubic-bezier(.2,.8,.2,1)"
+) {
+
+    const animation =
+        flyer.animate(
+            [
+                {
+                    left:
+                        `${fromRect.left}px`,
+                    top:
+                        `${fromRect.top}px`,
+                    width:
+                        `${fromRect.width}px`,
+                    height:
+                        `${fromRect.height}px`
+                },
+
+                {
+                    left:
+                        `${toRect.left}px`,
+                    top:
+                        `${toRect.top}px`,
+                    width:
+                        `${toRect.width}px`,
+                    height:
+                        `${toRect.height}px`
+                }
+            ],
+            {
+                duration,
+                easing,
+                fill: "forwards"
+            }
+        );
+
+
+    try {
+        await animation.finished;
+    }
+    catch {
+        // Harmless if a render interrupts.
+    }
+
+
+    Object.assign(
+        flyer.style,
+        {
+            left:
+                `${toRect.left}px`,
+            top:
+                `${toRect.top}px`,
+            width:
+                `${toRect.width}px`,
+            height:
+                `${toRect.height}px`
+        }
+    );
+}
+
+
+async function runDraftOrderReveal() {
+
+    if (
+        !draftOrderRevealPending
+        ||
+        draftOrderRevealRunning
+        ||
+        state?.event?.status !==
+            "draft_order"
+    ) {
+        return;
+    }
+
+
+    const targets =
+        draftOrderTargetRects();
+
+
+    if (!targets.size) {
+        return;
+    }
+
+
+    draftOrderRevealRunning = true;
+
+
+    const players =
+        [...state.players];
+
+
+    const targetRows =
+        [...targets.values()]
+        .sort(
+            (a,b) =>
+                a.top - b.top
+        );
+
+
+    const flyers = [];
+
+
+    for (
+        let index = 0;
+        index < players.length;
+        index++
+    ) {
+
+        const player =
+            players[index];
+
+
+        const fallback =
+            targetRows[
+                Math.min(
+                    index,
+                    targetRows.length - 1
+                )
+            ];
+
+
+        const source =
+            draftOrderRevealSourceRects[
+                player.id
+            ]
+            ?? {
+                left:
+                    fallback.left,
+
+                top:
+                    fallback.top,
+
+                width:
+                    fallback.width,
+
+                height:
+                    fallback.height
+            };
+
+
+        flyers.push({
+            player,
+            flyer:
+                makeDraftOrderFlyer(
+                    player,
+                    source
+                ),
+            rect:
+                source
+        });
+    }
+
+
+    const subtitle =
+        document.getElementById(
+            "draft-order-subtitle"
+        );
+
+
+    // First: collapse the original Lobby cards into randomized
+    // one-per-row strips.
+    let permutation =
+        shuffleArray(
+            targetRows
+        );
+
+
+    await Promise.all(
+        flyers.map(
+            async (
+                item,
+                index
+            ) => {
+
+                const target =
+                    permutation[index];
+
+
+                await animateFlyerRect(
+                    item.flyer,
+                    item.rect,
+                    target,
+                    650,
+                    "cubic-bezier(.16,.82,.22,1)"
+                );
+
+
+                item.rect =
+                    target;
+            }
+        )
+    );
+
+
+    // Then visibly scramble the strips several times.
+    for (
+        let pass = 0;
+        pass < 4;
+        pass++
+    ) {
+
+        permutation =
+            shuffleArray(
+                targetRows
+            );
+
+
+        await Promise.all(
+            flyers.map(
+                async (
+                    item,
+                    index
+                ) => {
+
+                    const target =
+                        permutation[index];
+
+
+                    await animateFlyerRect(
+                        item.flyer,
+                        item.rect,
+                        target,
+                        340,
+                        "cubic-bezier(.35,.02,.2,1)"
+                    );
+
+
+                    item.rect =
+                        target;
+                }
+            )
+        );
+
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    90
+                )
+        );
+    }
+
+
+    // Final settle: every player flies into their real draft
+    // position.
+    if (subtitle) {
+        subtitle.textContent =
+            "Locking final draft positions…";
+    }
+
+
+    await Promise.all(
+        flyers.map(
+            async item => {
+
+                const target =
+                    targets.get(
+                        item.player.id
+                    );
+
+
+                if (!target) {
+                    return;
+                }
+
+
+                const rank =
+                    item.flyer
+                    .querySelector(
+                        ".order-reveal-rank"
+                    );
+
+
+                if (rank) {
+
+                    rank.textContent =
+                        `#${item.player.draft_position}`;
+                }
+
+
+                await animateFlyerRect(
+                    item.flyer,
+                    item.rect,
+                    target,
+                    620,
+                    "cubic-bezier(.16,.88,.24,1)"
+                );
+
+
+                item.rect =
+                    target;
+            }
+        )
+    );
+
+
+    // Reveal the real DOM strips beneath the flyers and pulse
+    // them into their final locked state.
+    const finalStrips =
+        Array.from(
+            document.querySelectorAll(
+                ".order-reveal-strip"
+            )
+        );
+
+
+    finalStrips.forEach(
+        (
+            strip,
+            index
+        ) => {
+
+            setTimeout(
+                () => {
+
+                    strip.style.opacity =
+                        "1";
+
+                    strip.classList.remove(
+                        "pending-target"
+                    );
+
+                    strip.classList.add(
+                        "order-locked"
+                    );
+
+                },
+                index * 60
+            );
+        }
+    );
+
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                180
+            )
+    );
+
+
+    for (const item of flyers) {
+
+        const fade =
+            item.flyer.animate(
+                [
+                    { opacity: 1 },
+                    { opacity: 0 }
+                ],
+                {
+                    duration: 180,
+                    fill: "forwards"
+                }
+            );
+
+
+        try {
+            await fade.finished;
+        }
+        catch {
+            // Harmless.
+        }
+
+
+        item.flyer.remove();
+    }
+
+
+    if (subtitle) {
+
+        subtitle.innerHTML = `
+            Draft order locked.
+            <span class="order-reveal-locked-label">
+                Ready to Draft
+            </span>
+        `;
+    }
+
+
+    draftOrderRevealPending = false;
+    draftOrderRevealSourceRects = {};
+    draftOrderRevealRunning = false;
 }
 
 
@@ -2227,6 +3012,41 @@ async function refreshState(
         }
 
 
+        const enteringDraftOrder =
+            !initial
+            &&
+            data?.event?.status ===
+                "draft_order"
+            &&
+            (
+                oldState?.event?.status ===
+                    "lobby"
+                ||
+                oldState?.event?.status ===
+                    "locked"
+                ||
+                (
+                    oldState?.event?.status ===
+                        "draft_order"
+                    &&
+                    draftPositionsChanged(
+                        oldState,
+                        data
+                    )
+                )
+            );
+
+
+        if (enteringDraftOrder) {
+
+            draftOrderRevealSourceRects =
+                captureDraftOrderSourceRects();
+
+            draftOrderRevealPending =
+                true;
+        }
+
+
         const draftPick =
             !initial
             &&
@@ -2298,6 +3118,10 @@ async function refreshState(
 
         runDraftPostRenderAnimations();
 
+        if (draftOrderRevealPending) {
+            runDraftOrderReveal();
+        }
+
 
         maybeShowWinner();
         maybeShowPayout();
@@ -2339,8 +3163,10 @@ function phaseLabel() {
             return "LOBBY";
 
         case "locked":
+            return "LOCKING FIELD";
+
         case "draft_order":
-            return "DRAFT SETUP";
+            return "DRAFT ORDER";
 
         case "draft":
             return "DRAFT";
@@ -2439,6 +3265,16 @@ function footerStatus() {
         case "lobby":
             return `${state.players.length} / 8 players connected`;
 
+        case "locked":
+            return "Lobby locked • preparing draft order";
+
+        case "draft_order":
+            return (
+                draftOrderRevealPending
+                ? "Randomizing draft order"
+                : "Draft order locked • ready to begin"
+            );
+
         case "draft":
             return `Pick ${event.draft_pick_number}`;
 
@@ -2503,12 +3339,13 @@ function renderScene() {
     }
 
 
-    if (
-        status === "locked"
-        ||
-        status === "draft_order"
-    ) {
+    if (status === "locked") {
         return renderCastIntro();
+    }
+
+
+    if (status === "draft_order") {
+        return renderDraftOrderRevealScene();
     }
 
 
@@ -2609,6 +3446,118 @@ function renderLobby() {
 }
 
 
+function renderDraftOrderRevealScene() {
+
+    const ordered =
+        state.players
+        .slice()
+        .sort(
+            (a,b) =>
+                (
+                    a.draft_position
+                    ?? 99
+                )
+                -
+                (
+                    b.draft_position
+                    ?? 99
+                )
+        );
+
+
+    return `
+        <div class="draft-order-reveal-scene">
+
+            <div>
+
+                <div class="scene-kicker">
+                    The field is locked
+                </div>
+
+                <h1 class="scene-title">
+                    Draft Order
+                </h1>
+
+                <div
+                    id="draft-order-subtitle"
+                    class="scene-subtitle"
+                >
+                    ${
+                        draftOrderRevealPending
+                        ? "Randomizing draft positions…"
+                        : `
+                            Draft order locked.
+                            <span class="order-reveal-locked-label">
+                                Ready to Draft
+                            </span>
+                          `
+                    }
+                </div>
+
+            </div>
+
+
+            <div></div>
+
+
+            <div
+                class="draft-order-reveal-list"
+                style="
+                    --order-count:
+                    ${Math.max(
+                        1,
+                        ordered.length
+                    )};
+                "
+            >
+
+                ${
+                    ordered.map(
+                        player => `
+                            <div
+                                class="
+                                    order-reveal-strip
+                                    ${
+                                        draftOrderRevealPending
+                                        ? "pending-target"
+                                        : ""
+                                    }
+                                "
+                                data-order-player-id="${player.id}"
+                                style="
+                                    --player:
+                                    ${playerColor(player.id)};
+                                "
+                            >
+
+                                <div class="order-reveal-rank">
+                                    #${player.draft_position ?? "—"}
+                                </div>
+
+                                <div class="order-reveal-name">
+                                    ${escapeHtml(player.display_name)}
+                                </div>
+
+                                <div class="order-reveal-type">
+                                    ${
+                                        player.is_bot
+                                        ? "Chaos Gambler"
+                                        : "Player"
+                                    }
+                                </div>
+
+                            </div>
+                        `
+                    ).join("")
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
 function renderCastIntro() {
 
     return `
@@ -2664,6 +3613,7 @@ function renderCastGrid(
                                 player-card
                                 ${justJoined ? "lobby-join-card" : ""}
                             "
+                            data-order-player-id="${player.id}"
                             style="
                                 --player:
                                 ${playerColor(player.id)};
