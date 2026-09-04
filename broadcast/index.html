@@ -4356,6 +4356,47 @@ async function refreshState(
         }
 
 
+        /*
+           The Audience-enhanced get_broadcast_state() replacement
+           does not include draft_units. During Draft, load the legal
+           opening unit market separately so the existing Draft scene
+           can continue using state.draft_units exactly as before.
+        */
+        if (
+            data?.event?.status === "draft"
+        ) {
+
+            const {
+                data:
+                    draftUnits,
+                error:
+                    draftUnitsError
+            } =
+                await db.rpc(
+                    "get_broadcast_draft_units"
+                );
+
+
+            if (draftUnitsError) {
+
+                console.error(
+                    draftUnitsError
+                );
+
+            }
+
+            else if (
+                Array.isArray(
+                    draftUnits
+                )
+            ) {
+
+                data.draft_units =
+                    draftUnits;
+            }
+        }
+
+
         const oldState =
             state;
 
