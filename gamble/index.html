@@ -516,6 +516,19 @@ select {
         grid-template-columns: 1fr;
     }
 }
+
+.leave-event-button {
+    width: 100%;
+    margin-top: 8px;
+    background: rgba(255,255,255,.025);
+    color: var(--muted);
+}
+
+.leave-event-button:hover:not(:disabled) {
+    color: #fff;
+    background: rgba(255,255,255,.07);
+}
+
 </style>
 
 </head>
@@ -640,6 +653,13 @@ select {
             onclick="openLeaderboard()"
         >
             Audience Leaderboard
+        </button>
+
+        <button
+            class="secondary leave-event-button"
+            onclick="leaveAudienceEvent()"
+        >
+            Leave Event
         </button>
 
     </section>
@@ -2161,6 +2181,97 @@ function renderFinalResults(content) {
 
         </div>
     `;
+}
+
+
+function leaveAudienceEvent() {
+
+    const confirmed =
+        window.confirm(
+            "Leave this event on this device? "
+            +
+            "Your Audience Gambler record, bankroll, and completed betting history will remain in the event."
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    clearInterval(
+        pollTimer
+    );
+
+    pollTimer = null;
+    pollBusy = false;
+
+
+    localStorage.removeItem(
+        "tabsAudienceRoom"
+    );
+
+
+    const previousRoom =
+        roomCode;
+
+
+    roomCode = "";
+    state = null;
+    regularFightIndex = 0;
+    selectedSide = {};
+    lastResultKey = null;
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    url.searchParams.delete(
+        "room"
+    );
+
+
+    history.replaceState(
+        null,
+        "",
+        url.pathname
+        +
+        url.search
+        +
+        url.hash
+    );
+
+
+    document
+        .getElementById(
+            "game"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "join-panel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document
+        .getElementById(
+            "room-code"
+        )
+        .value =
+            previousRoom;
+
+
+    setJoinMessage("");
 }
 
 
