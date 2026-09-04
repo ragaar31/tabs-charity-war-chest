@@ -3441,6 +3441,683 @@ input {
     }
 }
 
+
+/* =========================================================
+   SHOP — LIVE WAR CHESTS + SHARED SKILL TREE
+   ========================================================= */
+
+.shop-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(330px, 26%)
+        minmax(0,1fr);
+    gap: 18px;
+}
+
+.shop-player-rail,
+.shop-tree-stage {
+    min-height: 0;
+}
+
+.shop-player-rail {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 12px;
+}
+
+.shop-player-rail-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.shop-player-rail-head .scene-kicker {
+    margin: 0;
+}
+
+.shop-rail-title {
+    font-size: 1.05rem;
+    font-weight: 950;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.shop-player-list {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 8px;
+}
+
+.shop-player-bar {
+    --player: #7c8aa6;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        42px
+        minmax(0,1fr)
+        auto;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 11px 9px 13px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    background:
+        linear-gradient(
+            110deg,
+            color-mix(
+                in srgb,
+                var(--player) 9%,
+                transparent
+            ),
+            rgba(255,255,255,.035) 48%
+        );
+    overflow: hidden;
+}
+
+.shop-player-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--player);
+}
+
+.shop-player-bar.shop-player-purchase {
+    animation:
+        shopPlayerPurchaseGlow
+        760ms
+        cubic-bezier(.16,.82,.24,1)
+        both;
+}
+
+@keyframes shopPlayerPurchaseGlow {
+    0% {
+        border-color:
+            rgba(255,255,255,.10);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
+    }
+
+    35% {
+        border-color:
+            color-mix(
+                in srgb,
+                var(--player) 78%,
+                white 12%
+            );
+        box-shadow:
+            0 0 25px
+            color-mix(
+                in srgb,
+                var(--player) 32%,
+                transparent
+            );
+    }
+
+    100% {
+        border-color:
+            rgba(255,255,255,.10);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
+    }
+}
+
+.shop-rank {
+    font-size: 1.08rem;
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+}
+
+.shop-player-main {
+    min-width: 0;
+}
+
+.shop-player-name {
+    font-size: .92rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shop-player-meta {
+    min-width: 0;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: .67rem;
+    font-weight: 750;
+}
+
+.shop-item-slots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.shop-item-slot {
+    width: 31px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    border: 1px dashed rgba(255,255,255,.15);
+    color: rgba(255,255,255,.24);
+    font-size: .51rem;
+    font-weight: 950;
+    line-height: 1;
+}
+
+.shop-item-slot.filled {
+    border-style: solid;
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 48%,
+            rgba(255,255,255,.18)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 16%,
+            rgba(255,255,255,.04)
+        );
+    color: #fff;
+}
+
+.shop-item-slot.shop-item-new {
+    animation:
+        shopItemPop
+        680ms
+        cubic-bezier(.16,.84,.24,1)
+        both;
+}
+
+@keyframes shopItemPop {
+    0% {
+        opacity: 0;
+        transform:
+            scale(.65)
+            translateY(4px);
+    }
+
+    55% {
+        opacity: 1;
+        transform:
+            scale(1.15)
+            translateY(-1px);
+        box-shadow:
+            0 0 14px
+            color-mix(
+                in srgb,
+                var(--player) 45%,
+                transparent
+            );
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            scale(1)
+            translateY(0);
+        box-shadow:
+            none;
+    }
+}
+
+.shop-money-value {
+    color: #fff;
+    font-size: 1.02rem;
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.shop-tree-stage {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 12px;
+}
+
+.shop-tree-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.shop-tree-header .scene-kicker {
+    margin-bottom: 4px;
+}
+
+.shop-tree-title {
+    margin: 0;
+    font-size: 2.1rem;
+    line-height: .95;
+    letter-spacing: -.035em;
+}
+
+.shop-tree-legend {
+    max-width: 360px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(255,255,255,.035);
+    text-align: right;
+}
+
+.shop-tree-legend strong {
+    display: block;
+    font-size: .78rem;
+    letter-spacing: .04em;
+}
+
+.shop-tree-legend span {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .65rem;
+}
+
+.shop-skill-tree {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            5,
+            minmax(0,1fr)
+        );
+    gap: 10px;
+}
+
+.shop-skill-branch {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    padding: 10px;
+    border-radius: 17px;
+    border: 1px solid rgba(255,255,255,.09);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.04),
+            rgba(255,255,255,.018)
+        );
+}
+
+.shop-branch-head {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 2px 8px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.shop-branch-icon {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: rgba(255,255,255,.045);
+    font-size: 1.05rem;
+    font-weight: 1000;
+}
+
+.shop-branch-name {
+    font-size: .84rem;
+    font-weight: 950;
+    letter-spacing: .02em;
+}
+
+.shop-branch-note {
+    margin-top: 2px;
+    color: #f2c94c;
+    font-size: .53rem;
+    font-weight: 900;
+    letter-spacing: .10em;
+}
+
+.shop-branch-path {
+    position: relative;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+    gap: 7px;
+    padding-top: 8px;
+}
+
+.shop-branch-path::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 8%;
+    bottom: 8%;
+    left: 17px;
+    width: 2px;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.07),
+            rgba(255,255,255,.18),
+            rgba(255,255,255,.07)
+        );
+}
+
+.shop-skill-node {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 5px;
+    padding: 8px 8px 7px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.085);
+    background: rgba(11,15,23,.90);
+    overflow: hidden;
+}
+
+.shop-skill-node::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%,-50%);
+    border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.26);
+    background: #111722;
+}
+
+.shop-skill-node.owned {
+    border-color: rgba(255,255,255,.15);
+    background:
+        linear-gradient(
+            130deg,
+            rgba(255,255,255,.06),
+            rgba(11,15,23,.90) 48%
+        );
+}
+
+.shop-skill-node.capstone {
+    border-width: 2px;
+}
+
+.shop-skill-node.mastery {
+    background:
+        linear-gradient(
+            130deg,
+            rgba(242,201,76,.075),
+            rgba(11,15,23,.90) 55%
+        );
+}
+
+.shop-skill-node.shop-skill-new {
+    animation:
+        shopSkillNodePulse
+        800ms
+        cubic-bezier(.16,.84,.24,1)
+        both;
+}
+
+@keyframes shopSkillNodePulse {
+    0% {
+        transform: scale(.97);
+        box-shadow:
+            0 0 0
+            rgba(255,255,255,0);
+    }
+
+    45% {
+        transform: scale(1.025);
+        border-color:
+            rgba(255,255,255,.32);
+        box-shadow:
+            0 0 20px
+            rgba(255,255,255,.11);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.shop-skill-node-head {
+    min-width: 0;
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 6px;
+    padding-left: 8px;
+}
+
+.shop-skill-name {
+    min-width: 0;
+    font-size: .72rem;
+    font-weight: 950;
+    line-height: 1.1;
+}
+
+.shop-skill-cost {
+    flex: 0 0 auto;
+    padding: 3px 5px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    color: #fff;
+    font-size: .52rem;
+    font-weight: 950;
+    line-height: 1;
+}
+
+.shop-skill-node.capstone
+.shop-skill-cost {
+    color: #f2c94c;
+}
+
+.shop-skill-node.mastery
+.shop-skill-cost {
+    background: rgba(242,201,76,.10);
+    border-color: rgba(242,201,76,.20);
+    color: #f7dd76;
+}
+
+.shop-skill-copy {
+    min-width: 0;
+    padding-left: 8px;
+    color: var(--muted);
+    font-size: .57rem;
+    line-height: 1.22;
+    overflow: hidden;
+}
+
+.shop-owner-rail {
+    min-height: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 8px;
+}
+
+.shop-owner-dot {
+    --owner: #7c8aa6;
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: var(--owner);
+    border: 1px solid rgba(255,255,255,.40);
+    box-shadow:
+        0 0 7px
+        color-mix(
+            in srgb,
+            var(--owner) 55%,
+            transparent
+        );
+}
+
+.shop-owner-dot.shop-owner-new {
+    animation:
+        shopOwnerPop
+        720ms
+        cubic-bezier(.12,.86,.22,1)
+        both;
+}
+
+@keyframes shopOwnerPop {
+    0% {
+        opacity: 0;
+        transform: scale(.25);
+    }
+
+    55% {
+        opacity: 1;
+        transform: scale(1.55);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.shop-owner-empty {
+    color: rgba(255,255,255,.18);
+    font-size: .65rem;
+}
+
+.shop-tree-loading {
+    grid-row: 1 / -1;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: .68rem;
+    text-align: center;
+}
+
+.shop-catalog {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+    gap: 9px;
+}
+
+.shop-catalog-card {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        38px
+        minmax(0,1fr);
+    gap: 9px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(255,255,255,.035);
+}
+
+.shop-catalog-icon {
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: rgba(255,255,255,.045);
+    font-size: .62rem;
+    font-weight: 1000;
+}
+
+.shop-catalog-card strong {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: .70rem;
+}
+
+.shop-catalog-card strong span {
+    color: #f2c94c;
+}
+
+.shop-catalog-card small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .57rem;
+    line-height: 1.2;
+}
+
+@media (max-width: 1500px) {
+    .shop-scene {
+        grid-template-columns:
+            minmax(300px, 27%)
+            minmax(0,1fr);
+        gap: 14px;
+    }
+
+    .shop-skill-tree {
+        gap: 7px;
+    }
+
+    .shop-skill-branch {
+        padding: 8px;
+    }
+
+    .shop-skill-name {
+        font-size: .66rem;
+    }
+
+    .shop-skill-copy {
+        font-size: .52rem;
+    }
+
+    .shop-player-bar {
+        padding-left: 11px;
+        grid-template-columns:
+            38px
+            minmax(0,1fr)
+            auto;
+    }
+}
+
 </style>
 </head>
 
@@ -4618,6 +5295,46 @@ async function refreshState(
 
 
         /*
+           Shop has a richer visual state than the general Broadcast
+           payload: live item inventory, Skill Tree ownership, and the
+           complete skill-node catalog.
+        */
+        if (
+            data?.event?.status === "shop"
+        ) {
+
+            const {
+                data:
+                    shopSceneState,
+                error:
+                    shopSceneError
+            } =
+                await db.rpc(
+                    "get_shop_scene_state",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (shopSceneError) {
+
+                console.error(
+                    shopSceneError
+                );
+
+            }
+
+            else if (shopSceneState) {
+
+                data.shop =
+                    shopSceneState;
+            }
+        }
+
+
+        /*
            The Audience-enhanced get_broadcast_state() replacement
            does not include draft_units. During Draft, load the legal
            opening unit market separately so the existing Draft scene
@@ -4878,6 +5595,7 @@ async function refreshState(
         renderBroadcast();
 
         runDraftPostRenderAnimations();
+        runShopPostRenderAnimations();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -5839,7 +6557,7 @@ function footerStatus() {
             return `Pick ${event.draft_pick_number}`;
 
         case "shop":
-            return `Players are shopping • ${audienceCount()} audience on deck`; 
+            return `Round ${event.current_round} Shop • War Chests are live`;
 
         case "army_build":
             return `${state.army_submission_players.length} / ${state.players.length} armies submitted`;
@@ -5915,9 +6633,14 @@ function renderScene() {
 
 
     if (
-        status === "draft_complete"
-        ||
         status === "shop"
+    ) {
+        return renderShopScene();
+    }
+
+
+    if (
+        status === "draft_complete"
         ||
         status === "army_build"
         ||
@@ -7322,6 +8045,1232 @@ function renderDraft() {
 
         </div>
     `;
+}
+
+
+
+const SHOP_BRANCH_META = {
+    high_roller: {
+        label: "High Roller",
+        icon: "$"
+    },
+    analyst: {
+        label: "Analyst",
+        icon: "◎"
+    },
+    broker: {
+        label: "Broker",
+        icon: "◇"
+    },
+    speculator: {
+        label: "Speculator",
+        icon: "✦"
+    },
+    quartermaster: {
+        label: "Quartermaster",
+        icon: "⚔",
+        note: "FINAL WAR"
+    }
+};
+
+
+const SHOP_SKILL_SHORT = {
+    high_roller:
+        "$1,500 / fight • $2,500 / round",
+
+    deep_pockets:
+        "$2,000 / fight • $3,500 / round",
+
+    all_in:
+        "Once / round: wager remaining allowance",
+
+    jackpot:
+        "+$2,000 War Chest",
+
+    scout_report:
+        "Inspect 1 exact army / round",
+
+    full_recon:
+        "Inspect both armies in 1 matchup",
+
+    closing_line:
+        "Move ≤$1,000 bet after pools reveal",
+
+    market_edge:
+        "+$2,000 War Chest",
+
+    insurance:
+        "50% loss recovery • max $500",
+
+    hedge_fund:
+        "Split 1 wager across both fighters",
+
+    no_sweat:
+        "Refund losing bet • max $1,000",
+
+    dividend:
+        "+$2,000 War Chest",
+
+    prop_bettor:
+        "1 prop / round • max $500",
+
+    parlay_license:
+        "2-leg pari-mutuel parlay",
+
+    moonshot:
+        "Upgrade the parlay to 3 legs",
+
+    big_score:
+        "+$2,000 War Chest",
+
+    free_agent:
+        "Permanent undrafted B / C / D recruit",
+
+    premium_contract:
+        "Permanent A-or-lower recruit",
+
+    black_market:
+        "Permanent Secret / Legacy recruit",
+
+    war_profits:
+        "+$2,000 War Chest"
+};
+
+
+function shopData() {
+
+    return (
+        state?.shop
+        ?? {
+            players: [],
+            skill_nodes: [],
+            skills: [],
+            items: []
+        }
+    );
+}
+
+
+function shopPlayersForSnapshot(
+    snapshot
+) {
+
+    return (
+        snapshot?.shop?.players
+        ??
+        snapshot?.players
+        ??
+        []
+    );
+}
+
+
+function sortShopPlayers(
+    players
+) {
+
+    return [...(players ?? [])]
+        .sort(
+            (a,b) =>
+                Number(b.war_chest ?? 0)
+                -
+                Number(a.war_chest ?? 0)
+                ||
+                Number(b.wins ?? 0)
+                -
+                Number(a.wins ?? 0)
+                ||
+                String(a.display_name ?? "")
+                .localeCompare(
+                    String(b.display_name ?? "")
+                )
+        );
+}
+
+
+function shopStandings() {
+
+    const players =
+        shopData().players?.length
+        ? shopData().players
+        : state.players;
+
+    return sortShopPlayers(
+        players
+    );
+}
+
+
+function shopPlayerById(
+    playerId
+) {
+
+    return (
+        shopData().players
+        ?.find(
+            player =>
+                player.id ===
+                playerId
+        )
+        ??
+        state.players
+        ?.find(
+            player =>
+                player.id ===
+                playerId
+        )
+        ??
+        null
+    );
+}
+
+
+function shopPlayerColor(
+    playerId
+) {
+
+    const player =
+        shopPlayerById(
+            playerId
+        );
+
+    return (
+        player?.color_code
+        ||
+        playerColor(
+            playerId
+        )
+    );
+}
+
+
+function shopItemCount(
+    snapshot,
+    playerId,
+    itemCode
+) {
+
+    return Number(
+        snapshot?.shop?.items
+        ?.find(
+            item =>
+                item.player_id ===
+                    playerId
+                &&
+                item.item_code ===
+                    itemCode
+        )
+        ?.quantity
+        ?? 0
+    );
+}
+
+
+function shopSkillRows(
+    snapshot = state
+) {
+
+    return (
+        snapshot?.shop?.skills
+        ?? []
+    );
+}
+
+
+function shopSkillOwned(
+    snapshot,
+    playerId,
+    nodeCode
+) {
+
+    return shopSkillRows(
+        snapshot
+    ).some(
+        row =>
+            row.player_id ===
+                playerId
+            &&
+            row.node_code ===
+                nodeCode
+    );
+}
+
+
+function shopHasPriorLiveSnapshot() {
+
+    return (
+        previousState?.event?.status ===
+        "shop"
+        &&
+        previousState?.shop
+    );
+}
+
+
+function shopSkillIsNew(
+    playerId,
+    nodeCode
+) {
+
+    if (!shopHasPriorLiveSnapshot()) {
+        return false;
+    }
+
+
+    return (
+        shopSkillOwned(
+            state,
+            playerId,
+            nodeCode
+        )
+        &&
+        !shopSkillOwned(
+            previousState,
+            playerId,
+            nodeCode
+        )
+    );
+}
+
+
+function shopPlayerChanged(
+    playerId
+) {
+
+    if (!shopHasPriorLiveSnapshot()) {
+        return false;
+    }
+
+
+    const current =
+        shopPlayersForSnapshot(
+            state
+        ).find(
+            player =>
+                player.id ===
+                playerId
+        );
+
+
+    const prior =
+        shopPlayersForSnapshot(
+            previousState
+        ).find(
+            player =>
+                player.id ===
+                playerId
+        );
+
+
+    if (
+        !current
+        ||
+        !prior
+    ) {
+        return false;
+    }
+
+
+    if (
+        Number(current.war_chest ?? 0)
+        !==
+        Number(prior.war_chest ?? 0)
+        ||
+        Number(current.skill_points ?? 0)
+        !==
+        Number(prior.skill_points ?? 0)
+    ) {
+        return true;
+    }
+
+
+    for (
+        const itemCode
+        of [
+            "reinforcements",
+            "mercenary"
+        ]
+    ) {
+
+        if (
+            shopItemCount(
+                state,
+                playerId,
+                itemCode
+            )
+            !==
+            shopItemCount(
+                previousState,
+                playerId,
+                itemCode
+            )
+        ) {
+            return true;
+        }
+    }
+
+
+    const currentSkillCount =
+        shopSkillRows(
+            state
+        )
+        .filter(
+            row =>
+                row.player_id ===
+                playerId
+        )
+        .length;
+
+
+    const priorSkillCount =
+        shopSkillRows(
+            previousState
+        )
+        .filter(
+            row =>
+                row.player_id ===
+                playerId
+        )
+        .length;
+
+
+    return (
+        currentSkillCount
+        !==
+        priorSkillCount
+    );
+}
+
+
+function renderShopItemSlots(
+    playerId
+) {
+
+    const currentItems = [];
+
+    const codes = [
+        "reinforcements",
+        "mercenary"
+    ];
+
+
+    for (
+        const code
+        of codes
+    ) {
+
+        const currentCount =
+            shopItemCount(
+                state,
+                playerId,
+                code
+            );
+
+
+        const priorCount =
+            shopHasPriorLiveSnapshot()
+            ? shopItemCount(
+                previousState,
+                playerId,
+                code
+              )
+            : currentCount;
+
+
+        for (
+            let index = 0;
+            index < currentCount;
+            index++
+        ) {
+
+            currentItems.push({
+                code,
+                isNew:
+                    index >=
+                    priorCount
+            });
+        }
+    }
+
+
+    const visible =
+        currentItems.slice(
+            0,
+            2
+        );
+
+
+    while (
+        visible.length < 2
+    ) {
+
+        visible.push({
+            code: null,
+            isNew: false
+        });
+    }
+
+
+    return `
+        <div class="shop-item-slots">
+
+            ${
+                visible.map(
+                    item => {
+
+                        if (!item.code) {
+
+                            return `
+                                <div class="shop-item-slot empty">
+                                    —
+                                </div>
+                            `;
+                        }
+
+
+                        const label =
+                            item.code ===
+                                "reinforcements"
+                            ? "+750"
+                            : "MERC";
+
+
+                        return `
+                            <div
+                                class="
+                                    shop-item-slot
+                                    filled
+                                    ${
+                                        item.isNew
+                                        ? "shop-item-new"
+                                        : ""
+                                    }
+                                "
+                            >
+                                ${label}
+                            </div>
+                        `;
+                    }
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderShopPlayerBar(
+    player,
+    index
+) {
+
+    const changed =
+        shopPlayerChanged(
+            player.id
+        );
+
+
+    return `
+        <div
+            class="
+                shop-player-bar
+                ${
+                    changed
+                    ? "shop-player-purchase"
+                    : ""
+                }
+            "
+            data-shop-player-id="${player.id}"
+            style="
+                --player:
+                ${shopPlayerColor(player.id)};
+            "
+        >
+
+            <div class="shop-rank">
+                #${index + 1}
+            </div>
+
+            <div class="shop-player-main">
+
+                <div class="shop-player-name">
+                    ${escapeHtml(player.display_name)}
+                </div>
+
+                <div class="shop-player-meta">
+                    <span>
+                        ${Number(player.skill_points ?? 0)} SP
+                    </span>
+
+                    ${renderShopItemSlots(player.id)}
+                </div>
+
+            </div>
+
+            <div
+                class="shop-money-value"
+                data-shop-money-player="${player.id}"
+            >
+                ${money(player.war_chest)}
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderShopSkillNode(
+    node
+) {
+
+    const owners =
+        shopSkillRows(
+            state
+        )
+        .filter(
+            row =>
+                row.node_code ===
+                node.code
+        )
+        .map(
+            row =>
+                shopPlayerById(
+                    row.player_id
+                )
+        )
+        .filter(Boolean);
+
+
+    const hasNewOwner =
+        owners.some(
+            player =>
+                shopSkillIsNew(
+                    player.id,
+                    node.code
+                )
+        );
+
+
+    const isMastery =
+        Number(node.node_order) === 4;
+
+
+    const isCapstone =
+        Number(node.sp_cost) === 2;
+
+
+    return `
+        <div
+            class="
+                shop-skill-node
+                ${
+                    owners.length
+                    ? "owned"
+                    : ""
+                }
+                ${
+                    isCapstone
+                    ? "capstone"
+                    : ""
+                }
+                ${
+                    isMastery
+                    ? "mastery"
+                    : ""
+                }
+                ${
+                    hasNewOwner
+                    ? "shop-skill-new"
+                    : ""
+                }
+            "
+            data-shop-node="${escapeHtml(node.code)}"
+        >
+
+            <div class="shop-skill-node-head">
+
+                <div class="shop-skill-name">
+                    ${escapeHtml(node.display_name)}
+                </div>
+
+                <div class="shop-skill-cost">
+                    ${
+                        isMastery
+                        ? "$2K"
+                        : `${node.sp_cost} SP`
+                    }
+                </div>
+
+            </div>
+
+            <div class="shop-skill-copy">
+                ${
+                    escapeHtml(
+                        SHOP_SKILL_SHORT[
+                            node.code
+                        ]
+                        ??
+                        node.description
+                        ??
+                        ""
+                    )
+                }
+            </div>
+
+            <div class="shop-owner-rail">
+
+                ${
+                    owners.length
+                    ? owners.map(
+                        owner => `
+                            <span
+                                class="
+                                    shop-owner-dot
+                                    ${
+                                        shopSkillIsNew(
+                                            owner.id,
+                                            node.code
+                                        )
+                                        ? "shop-owner-new"
+                                        : ""
+                                    }
+                                "
+                                style="
+                                    --owner:
+                                    ${shopPlayerColor(owner.id)};
+                                "
+                                title="${escapeHtml(owner.display_name)}"
+                            ></span>
+                        `
+                      ).join("")
+                    : `
+                        <span class="shop-owner-empty">
+                            —
+                        </span>
+                      `
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderShopBranch(
+    branchCode
+) {
+
+    const meta =
+        SHOP_BRANCH_META[
+            branchCode
+        ];
+
+
+    const nodes =
+        (shopData().skill_nodes ?? [])
+        .filter(
+            node =>
+                node.branch ===
+                branchCode
+        )
+        .sort(
+            (a,b) =>
+                Number(a.node_order)
+                -
+                Number(b.node_order)
+        );
+
+
+    return `
+        <section class="shop-skill-branch">
+
+            <div class="shop-branch-head">
+
+                <div class="shop-branch-icon">
+                    ${meta?.icon ?? "•"}
+                </div>
+
+                <div>
+
+                    <div class="shop-branch-name">
+                        ${meta?.label ?? branchCode}
+                    </div>
+
+                    ${
+                        meta?.note
+                        ? `
+                            <div class="shop-branch-note">
+                                ${meta.note}
+                            </div>
+                          `
+                        : ""
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="shop-branch-path">
+
+                ${
+                    nodes.length
+                    ? nodes.map(
+                        node =>
+                            renderShopSkillNode(
+                                node
+                            )
+                      ).join("")
+                    : `
+                        <div class="shop-tree-loading">
+                            Skill data loading…
+                        </div>
+                      `
+                }
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderShopCatalog() {
+
+    return `
+        <div class="shop-catalog">
+
+            <div class="shop-catalog-card">
+                <div class="shop-catalog-icon">
+                    SP
+                </div>
+                <div>
+                    <strong>
+                        Skill Point
+                        <span>$1,500</span>
+                    </strong>
+                    <small>
+                        +1 SP • max 1 bought per Shop
+                    </small>
+                </div>
+            </div>
+
+            <div class="shop-catalog-card">
+                <div class="shop-catalog-icon">
+                    +750
+                </div>
+                <div>
+                    <strong>
+                        Reinforcements
+                        <span>$750</span>
+                    </strong>
+                    <small>
+                        +$750 next regular-season army
+                    </small>
+                </div>
+            </div>
+
+            <div class="shop-catalog-card">
+                <div class="shop-catalog-icon">
+                    MERC
+                </div>
+                <div>
+                    <strong>
+                        Mercenary Contract
+                        <span>$750</span>
+                    </strong>
+                    <small>
+                        One undrafted B / C / D unit next fight
+                    </small>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderShopScene() {
+
+    const players =
+        shopStandings();
+
+
+    const branches = [
+        "high_roller",
+        "analyst",
+        "broker",
+        "speculator",
+        "quartermaster"
+    ];
+
+
+    return `
+        <div class="shop-scene">
+
+            <aside class="shop-player-rail">
+
+                <div class="shop-player-rail-head">
+
+                    <div class="scene-kicker">
+                        Live War Chests
+                    </div>
+
+                    <div class="shop-rail-title">
+                        Round ${state.event.current_round}
+                    </div>
+
+                </div>
+
+                <div class="shop-player-list">
+
+                    ${
+                        players.map(
+                            (player,index) =>
+                                renderShopPlayerBar(
+                                    player,
+                                    index
+                                )
+                        ).join("")
+                    }
+
+                </div>
+
+            </aside>
+
+
+            <main class="shop-tree-stage">
+
+                <div class="shop-tree-header">
+
+                    <div>
+
+                        <div class="scene-kicker">
+                            Round ${state.event.current_round} Shop
+                        </div>
+
+                        <h1 class="shop-tree-title">
+                            Skill Tree
+                        </h1>
+
+                    </div>
+
+                    <div class="shop-tree-legend">
+                        <strong>
+                            1 SP → 1 SP → 2 SP → 1 SP
+                        </strong>
+                        <span>
+                            Colored markers show each skill’s owners
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="shop-skill-tree">
+
+                    ${
+                        branches.map(
+                            branch =>
+                                renderShopBranch(
+                                    branch
+                                )
+                        ).join("")
+                    }
+
+                </div>
+
+
+                ${renderShopCatalog()}
+
+            </main>
+
+        </div>
+    `;
+}
+
+
+function runShopPostRenderAnimations() {
+
+    if (
+        state?.event?.status !==
+        "shop"
+    ) {
+        return;
+    }
+
+
+    if (
+        previousState?.event?.status !==
+        "shop"
+    ) {
+        return;
+    }
+
+
+    const currentPlayers =
+        sortShopPlayers(
+            shopPlayersForSnapshot(
+                state
+            )
+        );
+
+
+    const priorPlayers =
+        sortShopPlayers(
+            shopPlayersForSnapshot(
+                previousState
+            )
+        );
+
+
+    const priorIndex =
+        new Map(
+            priorPlayers.map(
+                (player,index) =>
+                    [
+                        player.id,
+                        index
+                    ]
+            )
+        );
+
+
+    const bars =
+        Array.from(
+            document.querySelectorAll(
+                ".shop-player-bar"
+            )
+        );
+
+
+    if (bars.length) {
+
+        const rect =
+            bars[0]
+            .getBoundingClientRect();
+
+
+        const list =
+            bars[0]
+            .parentElement;
+
+
+        const styles =
+            list
+            ? getComputedStyle(
+                list
+              )
+            : null;
+
+
+        const gap =
+            Number.parseFloat(
+                styles?.rowGap
+                ??
+                styles?.gap
+                ??
+                "0"
+            )
+            || 0;
+
+
+        const step =
+            rect.height
+            +
+            gap;
+
+
+        bars.forEach(
+            bar => {
+
+                const playerId =
+                    bar.dataset
+                    .shopPlayerId;
+
+
+                const newIndex =
+                    currentPlayers
+                    .findIndex(
+                        player =>
+                            player.id ===
+                            playerId
+                    );
+
+
+                const oldIndex =
+                    priorIndex.has(
+                        playerId
+                    )
+                    ? priorIndex.get(
+                        playerId
+                      )
+                    : newIndex;
+
+
+                const delta =
+                    oldIndex
+                    -
+                    newIndex;
+
+
+                if (!delta) {
+                    return;
+                }
+
+
+                bar.animate(
+                    [
+                        {
+                            transform:
+                                `translateY(${delta * step}px)`,
+                            zIndex: 8
+                        },
+                        {
+                            transform:
+                                "translateY(0)",
+                            zIndex: 1
+                        }
+                    ],
+                    {
+                        duration: 650,
+                        easing:
+                            "cubic-bezier(.16,.86,.25,1)"
+                    }
+                );
+            }
+        );
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-shop-money-player]"
+        )
+        .forEach(
+            node => {
+
+                const playerId =
+                    node.dataset
+                    .shopMoneyPlayer;
+
+
+                const current =
+                    currentPlayers.find(
+                        player =>
+                            player.id ===
+                            playerId
+                    );
+
+
+                const prior =
+                    priorPlayers.find(
+                        player =>
+                            player.id ===
+                            playerId
+                    );
+
+
+                if (
+                    !current
+                    ||
+                    !prior
+                ) {
+                    return;
+                }
+
+
+                const from =
+                    Number(
+                        prior.war_chest
+                        ?? 0
+                    );
+
+
+                const to =
+                    Number(
+                        current.war_chest
+                        ?? 0
+                    );
+
+
+                if (
+                    from ===
+                    to
+                ) {
+                    return;
+                }
+
+
+                const started =
+                    performance.now();
+
+
+                const duration =
+                    720;
+
+
+                const tick =
+                    now => {
+
+                        const progress =
+                            Math.min(
+                                1,
+                                (
+                                    now
+                                    -
+                                    started
+                                )
+                                /
+                                duration
+                            );
+
+
+                        const eased =
+                            1
+                            -
+                            Math.pow(
+                                1 - progress,
+                                3
+                            );
+
+
+                        const value =
+                            Math.round(
+                                from
+                                +
+                                (
+                                    to
+                                    -
+                                    from
+                                )
+                                *
+                                eased
+                            );
+
+
+                        node.textContent =
+                            money(
+                                value
+                            );
+
+
+                        if (
+                            progress < 1
+                        ) {
+
+                            requestAnimationFrame(
+                                tick
+                            );
+                        }
+                    };
+
+
+                requestAnimationFrame(
+                    tick
+                );
+            }
+        );
 }
 
 
