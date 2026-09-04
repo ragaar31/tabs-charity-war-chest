@@ -3864,7 +3864,7 @@ input {
 .shop-skill-anchor.shop-anchor-activate {
     animation:
         shopAnchorActivate
-        820ms
+        1080ms
         cubic-bezier(.16,.86,.24,1)
         both;
 }
@@ -3875,10 +3875,41 @@ input {
         background: #111722;
         border-color: rgba(255,255,255,.24);
         box-shadow: 0 0 0 rgba(0,0,0,0);
+        opacity: 1;
     }
 
-    38% {
-        transform: translate(-50%,-50%) scale(1.55);
+    26% {
+        transform: translate(-50%,-50%) scale(1.18);
+        background:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 58%,
+                #111722
+            );
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 72%,
+                white 8%
+            );
+        box-shadow:
+            0 0 0 3px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 12%,
+                transparent
+            ),
+            0 0 10px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 34%,
+                transparent
+            );
+        opacity: 1;
+    }
+
+    48% {
+        transform: translate(-50%,-50%) scale(1.56);
         background: var(--unlock-color);
         border-color:
             color-mix(
@@ -3887,18 +3918,49 @@ input {
                 white 10%
             );
         box-shadow:
-            0 0 0 5px
+            0 0 0 6px
             color-mix(
                 in srgb,
-                var(--unlock-color) 20%,
+                var(--unlock-color) 24%,
                 transparent
             ),
-            0 0 18px
+            0 0 20px
             color-mix(
                 in srgb,
-                var(--unlock-color) 55%,
+                var(--unlock-color) 58%,
                 transparent
             );
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-50%,-50%) scale(1.22);
+        background:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 52%,
+                #111722
+            );
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 48%,
+                rgba(255,255,255,.28)
+            );
+        box-shadow:
+            0 0 0 3px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 16%,
+                transparent
+            ),
+            0 0 12px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 24%,
+                transparent
+            );
+        opacity: .85;
     }
 
     100% {
@@ -3906,6 +3968,7 @@ input {
         background: #111722;
         border-color: rgba(255,255,255,.28);
         box-shadow: 0 0 0 rgba(0,0,0,0);
+        opacity: 1;
     }
 }
 
@@ -4162,7 +4225,7 @@ input {
 .shop-owner-dot.shop-owner-new {
     animation:
         shopOwnerFadeIn
-        520ms
+        720ms
         cubic-bezier(.18,.78,.24,1)
         both;
 }
@@ -4170,13 +4233,28 @@ input {
 @keyframes shopOwnerFadeIn {
     0% {
         opacity: 0;
-        transform: scale(.78);
+        transform: scale(.68);
         box-shadow: none;
+        filter: saturate(.8);
     }
 
-    55% {
-        opacity: .72;
-        transform: scale(.94);
+    42% {
+        opacity: .45;
+        transform: scale(.84);
+        filter: saturate(.95);
+    }
+
+    74% {
+        opacity: .86;
+        transform: scale(.98);
+        box-shadow:
+            0 0 5px
+            color-mix(
+                in srgb,
+                var(--owner) 26%,
+                transparent
+            );
+        filter: saturate(1);
     }
 
     100% {
@@ -4189,6 +4267,7 @@ input {
                 var(--owner) 55%,
                 transparent
             );
+        filter: saturate(1);
     }
 }
 
@@ -9636,12 +9715,27 @@ function animateShopSkillUnlock(
             );
 
 
-            // Stage 3: wait until the anchor pulse has fully
-            // faded, then gently fade in the permanent owner marker.
+            // Stage 3: as the anchor finishes easing out,
+            // gently fade in the permanent ownership marker.
             window.setTimeout(
                 () => {
 
                     if (pendingDot) {
+
+                        /*
+                           Keep the dot visually hidden for this frame so
+                           removing the pending class cannot cause a one-frame
+                           snap to full opacity.
+                        */
+                        pendingDot.style.opacity =
+                            "0";
+
+                        pendingDot.style.transform =
+                            "scale(.68)";
+
+                        pendingDot.style.boxShadow =
+                            "none";
+
 
                         pendingDot.classList.remove(
                             "shop-owner-pending"
@@ -9651,18 +9745,31 @@ function animateShopSkillUnlock(
                             "shop-owner-new"
                         );
 
-                        void pendingDot.offsetWidth;
 
-                        pendingDot.classList.add(
-                            "shop-owner-new"
+                        window.requestAnimationFrame(
+                            () => {
+
+                                pendingDot.classList.add(
+                                    "shop-owner-new"
+                                );
+
+                                window.setTimeout(
+                                    () => {
+                                        pendingDot.style.opacity = "";
+                                        pendingDot.style.transform = "";
+                                        pendingDot.style.boxShadow = "";
+                                    },
+                                    760
+                                );
+                            }
                         );
                     }
                 },
-                1430
+                1540
             );
 
 
-            // Stage 4: after the ownership marker has become readable,
+            // Stage 4: after the ownership marker has clearly appeared,
             // finish with the larger node-wide color pulse.
             window.setTimeout(
                 () => {
@@ -9677,7 +9784,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                1900
+                2240
             );
 
 
@@ -9693,7 +9800,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                3200
+                3600
             );
 
         },
