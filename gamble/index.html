@@ -753,11 +753,19 @@ select {
 }
 
 .aud-shop-owner-chip i {
-    width: 7px;
-    height: 7px;
+    width: 9px;
+    height: 9px;
     flex: 0 0 auto;
     border-radius: 999px;
     background: var(--owner);
+    border: 1px solid rgba(255,255,255,.45);
+    box-shadow:
+        0 0 7px
+        color-mix(
+            in srgb,
+            var(--owner) 48%,
+            transparent
+        );
 }
 
 </style>
@@ -951,6 +959,8 @@ let pollBusy = false;
 
 let regularFightIndex = 0;
 let selectedSide = {};
+let selectedBetAmount = {};
+let openShopBranches = new Set();
 let lastResultKey = null;
 
 
@@ -995,6 +1005,60 @@ function signedMoney(value) {
         amount > 0
         ? `+${money(amount)}`
         : `-${money(Math.abs(amount))}`
+    );
+}
+
+
+function rememberBetAmount(
+    matchId,
+    value
+) {
+
+    selectedBetAmount[
+        matchId
+    ] =
+        Number(value);
+}
+
+
+function rememberShopBranch(
+    branchCode,
+    isOpen
+) {
+
+    if (isOpen) {
+
+        openShopBranches.add(
+            branchCode
+        );
+
+    }
+
+    else {
+
+        openShopBranches.delete(
+            branchCode
+        );
+    }
+}
+
+
+function audienceShopPlayerColor(
+    player
+) {
+
+    const raw =
+        player?.color_code;
+
+
+    return (
+        PLAYER_COLORS[
+            raw
+        ]
+        ??
+        raw
+        ??
+        "#8b97ae"
     );
 }
 
@@ -1671,7 +1735,7 @@ function renderAudienceShopOwnerChips(
                             class="aud-shop-owner-chip"
                             style="
                                 --owner:
-                                ${owner.color_code ?? "#7c8aa6"};
+                                ${audienceShopPlayerColor(owner)};
                             "
                         >
                             <i></i>
@@ -1833,7 +1897,22 @@ function renderShopReference(
 
 
                             return `
-                                <details class="aud-shop-branch">
+                                <details
+                                    class="aud-shop-branch"
+                                    ${
+                                        openShopBranches.has(
+                                            branchCode
+                                        )
+                                        ? "open"
+                                        : ""
+                                    }
+                                    ontoggle="
+                                        rememberShopBranch(
+                                            '${branchCode}',
+                                            this.open
+                                        )
+                                    "
+                                >
 
                                     <summary>
 
@@ -1874,11 +1953,7 @@ function renderShopReference(
                                                             </strong>
 
                                                             <span>
-                                                                ${
-                                                                    Number(node.node_order) === 4
-                                                                    ? "$2,000"
-                                                                    : `${node.sp_cost} SP`
-                                                                }
+                                                                ${node.sp_cost} SP
                                                             </span>
 
                                                         </div>
@@ -2124,8 +2199,13 @@ function renderOpenMatch(
 
     const currentAmount =
         Number(
+            selectedBetAmount[
+                match.id
+            ]
+            ??
             bet?.amount
-            ?? 500
+            ??
+            500
         );
 
 
@@ -2219,6 +2299,12 @@ function renderOpenMatch(
 
                         <select
                             id="amount-${match.id}"
+                            onchange="
+                                rememberBetAmount(
+                                    '${match.id}',
+                                    this.value
+                                )
+                            "
                         >
                             ${
                                 [250,500,750,1000]
@@ -2372,6 +2458,14 @@ async function placeBet(
         if (error) {
             throw error;
         }
+
+
+        selectedBetAmount[
+            matchId
+        ] =
+            Number(
+                select.value
+            );
 
 
         if (message) {
@@ -2838,6 +2932,8 @@ function leaveAudienceEvent() {
     state = null;
     regularFightIndex = 0;
     selectedSide = {};
+    selectedBetAmount = {};
+    openShopBranches.clear();
     lastResultKey = null;
 
 
