@@ -3036,125 +3036,47 @@ input {
 
 .audience-mini-card.audience-join-card {
     animation:
-        audienceCardArrive 760ms cubic-bezier(.16,.86,.25,1) var(--audience-join-delay,0ms) both;
+        audienceSimpleArrive
+        560ms
+        cubic-bezier(.16,.82,.24,1)
+        var(--audience-join-delay,0ms)
+        both;
 }
 
-.audience-mini-card.audience-join-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    border: 1px solid rgba(255,255,255,.12);
-    box-shadow:
-        0 0 0 1px rgba(242,201,76,.34) inset,
-        0 0 0 0 rgba(242,201,76,0);
-    animation:
-        audienceCardFlash 880ms cubic-bezier(.16,.86,.25,1) var(--audience-join-delay,0ms) both;
-}
-
-.audience-mini-card.audience-join-card::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    top: -40%;
-    bottom: -40%;
-    left: -25%;
-    width: 40%;
-    opacity: 0;
-    transform: rotate(12deg);
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,.42), transparent);
-    filter: blur(3px);
-    animation:
-        audienceJoinSweep 740ms cubic-bezier(.18,.82,.28,1) calc(var(--audience-join-delay,0ms) + 60ms) both;
-}
-
-.audience-mini-card.audience-join-card > * {
-    position: relative;
-    z-index: 1;
-}
-
-.audience-join-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 2;
-    padding: 3px 7px;
-    border-radius: 999px;
-    background: #f2c94c;
-    color: #11151d;
-    font-size: .56rem;
-    font-weight: 1000;
-    letter-spacing: .1em;
-    line-height: 1;
-    opacity: 0;
-    transform: translateY(-5px) scale(.88);
-    animation:
-        audienceJoinBadge 1200ms cubic-bezier(.16,.84,.24,1) calc(var(--audience-join-delay,0ms) + 160ms) both;
-}
-
-@keyframes audienceCardArrive {
+@keyframes audienceSimpleArrive {
     0% {
         opacity: 0;
-        transform: translateY(18px) scale(.9);
+        transform:
+            translateY(10px)
+            scale(.94);
+        border-color:
+            rgba(255,255,255,.04);
+        box-shadow:
+            0 0 0
+            rgba(255,255,255,0);
     }
-    55% {
+
+    60% {
         opacity: 1;
-        transform: translateY(-3px) scale(1.03);
+        transform:
+            translateY(-1px)
+            scale(1.015);
+        border-color:
+            rgba(255,255,255,.20);
+        box-shadow:
+            0 8px 22px
+            rgba(0,0,0,.20);
     }
+
     100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes audienceCardFlash {
-    0% {
-        background: rgba(242,201,76,.24);
+        transform:
+            translateY(0)
+            scale(1);
+        border-color:
+            rgba(255,255,255,.08);
         box-shadow:
-            0 0 0 1px rgba(242,201,76,.55) inset,
-            0 0 0 0 rgba(242,201,76,.30);
-    }
-    38% {
-        background: rgba(242,201,76,.12);
-        box-shadow:
-            0 0 0 1px rgba(242,201,76,.75) inset,
-            0 0 22px 0 rgba(242,201,76,.22);
-    }
-    100% {
-        background: rgba(255,255,255,0);
-        box-shadow:
-            0 0 0 1px rgba(255,255,255,.10) inset,
-            0 0 0 0 rgba(242,201,76,0);
-    }
-}
-
-@keyframes audienceJoinSweep {
-    0% {
-        opacity: 0;
-        transform: translateX(-130%) rotate(12deg) scaleX(.9);
-    }
-    22% {
-        opacity: .8;
-    }
-    72% {
-        opacity: .36;
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(240%) rotate(12deg) scaleX(1.15);
-    }
-}
-
-@keyframes audienceJoinBadge {
-    0%, 100% {
-        opacity: 0;
-        transform: translateY(-5px) scale(.88);
-    }
-    16%, 78% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+            none;
     }
 }
 
@@ -4696,8 +4618,18 @@ function renderAudiencePreviewPanel(
     animateJoins = false
 ) {
 
-    const audience =
+    const preview =
         audiencePreview(limit);
+
+    /*
+       The Broadcast audience feed is newest-first.
+       In the Lobby, show it oldest-to-newest so new cards always
+       append to the right, then wrap naturally to the next row.
+    */
+    const audience =
+        animateJoins
+        ? [...preview].reverse()
+        : preview;
 
     const count =
         audienceCount();
@@ -4760,10 +4692,19 @@ function renderAudiencePreviewPanel(
                                             viewerKey
                                         );
 
+                                    /*
+                                       newlyJoinedAudienceKeys arrives newest-first.
+                                       Reverse it for animation timing so multiple
+                                       simultaneous joins animate left-to-right.
+                                    */
+                                    const chronologicalNewKeys =
+                                        [...newlyJoinedAudienceKeys]
+                                        .reverse();
+
                                     const joinIndex =
                                         Math.max(
                                             0,
-                                            newlyJoinedAudienceKeys.indexOf(
+                                            chronologicalNewKeys.indexOf(
                                                 viewerKey
                                             )
                                         );
@@ -4771,16 +4712,8 @@ function renderAudiencePreviewPanel(
                                     return `
                                         <div
                                             class="audience-mini-card ${justJoined ? "audience-join-card" : ""}"
-                                            style="--audience-join-delay:${joinIndex * 120}ms;"
+                                            style="--audience-join-delay:${joinIndex * 100}ms;"
                                         >
-                                            ${
-                                                justJoined
-                                                ? `
-                                                    <div class="audience-join-badge">JOINED</div>
-                                                  `
-                                                : ""
-                                            }
-
                                             <div class="audience-mini-name">
                                                 ${escapeHtml(viewer.display_name)}
                                             </div>
