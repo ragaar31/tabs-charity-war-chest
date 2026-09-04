@@ -961,6 +961,7 @@ let regularFightIndex = 0;
 let selectedSide = {};
 let selectedBetAmount = {};
 let openShopBranches = new Set();
+let audienceSelectFocused = false;
 let lastResultKey = null;
 
 
@@ -1005,6 +1006,35 @@ function signedMoney(value) {
         amount > 0
         ? `+${money(amount)}`
         : `-${money(Math.abs(amount))}`
+    );
+}
+
+
+function setAudienceSelectFocus(
+    focused
+) {
+
+    audienceSelectFocused =
+        Boolean(focused);
+}
+
+
+function audienceNativeSelectIsActive() {
+
+    const active =
+        document.activeElement;
+
+
+    return (
+        audienceSelectFocused
+        ||
+        (
+            active
+            &&
+            active.tagName === "SELECT"
+            &&
+            active.closest("#content")
+        )
     );
 }
 
@@ -1403,6 +1433,21 @@ async function refreshState(
             throw new Error(
                 "This browser has not joined the Audience pool."
             );
+        }
+
+
+        /*
+           Native select menus close if their DOM node is replaced.
+           While the viewer is actively using a betting dropdown,
+           keep the current DOM intact. The fresh state is still saved
+           above, and the next poll after blur will render normally.
+        */
+        if (
+            !initial
+            &&
+            audienceNativeSelectIsActive()
+        ) {
+            return;
         }
 
 
@@ -2299,6 +2344,16 @@ function renderOpenMatch(
 
                         <select
                             id="amount-${match.id}"
+                            onfocus="
+                                setAudienceSelectFocus(
+                                    true
+                                )
+                            "
+                            onblur="
+                                setAudienceSelectFocus(
+                                    false
+                                )
+                            "
                             onchange="
                                 rememberBetAmount(
                                     '${match.id}',
@@ -2934,6 +2989,7 @@ function leaveAudienceEvent() {
     selectedSide = {};
     selectedBetAmount = {};
     openShopBranches.clear();
+    audienceSelectFocused = false;
     lastResultKey = null;
 
 
