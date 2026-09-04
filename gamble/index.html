@@ -529,6 +529,237 @@ select {
     background: rgba(255,255,255,.07);
 }
 
+
+/* =========================================================
+   AUDIENCE SHOP / SKILL TREE REFERENCE
+   ========================================================= */
+
+.aud-shop-reference {
+    display: grid;
+    gap: 14px;
+}
+
+.aud-shop-hero {
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.065),
+            rgba(255,255,255,.025)
+        );
+}
+
+.aud-shop-hero .eyebrow {
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+.aud-shop-hero h2 {
+    margin: 5px 0 6px;
+}
+
+.aud-shop-hero p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.aud-shop-section-title {
+    margin-top: 4px;
+    font-size: .82rem;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.aud-shop-items {
+    display: grid;
+    gap: 9px;
+}
+
+.aud-shop-item {
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.035);
+}
+
+.aud-shop-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.aud-shop-item-top strong {
+    font-size: .95rem;
+}
+
+.aud-shop-item-top b {
+    color: #f2c94c;
+    font-size: .95rem;
+}
+
+.aud-shop-item p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.38;
+}
+
+.aud-shop-skill-key {
+    margin-top: -5px;
+    color: var(--muted);
+    font-size: .77rem;
+}
+
+.aud-shop-skill-key strong {
+    color: #fff;
+}
+
+.aud-shop-branches {
+    display: grid;
+    gap: 9px;
+}
+
+.aud-shop-branch {
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.03);
+}
+
+.aud-shop-branch summary {
+    display: grid;
+    grid-template-columns:
+        38px
+        minmax(0,1fr);
+    gap: 10px;
+    align-items: center;
+    padding: 12px 13px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.aud-shop-branch summary::-webkit-details-marker {
+    display: none;
+}
+
+.aud-shop-branch summary::after {
+    content: "+";
+    position: absolute;
+    right: 16px;
+    color: var(--muted);
+    font-weight: 950;
+}
+
+.aud-shop-branch[open] summary::after {
+    content: "–";
+}
+
+.aud-shop-branch summary {
+    position: relative;
+    padding-right: 40px;
+}
+
+.aud-shop-branch-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.045);
+    font-weight: 1000;
+}
+
+.aud-shop-branch summary strong {
+    display: block;
+}
+
+.aud-shop-branch summary small {
+    display: block;
+    margin-top: 3px;
+    color: #f2c94c;
+    font-size: .67rem;
+}
+
+.aud-shop-node-list {
+    display: grid;
+    gap: 7px;
+    padding: 0 10px 10px;
+}
+
+.aud-shop-node {
+    padding: 11px 12px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,.075);
+    background: rgba(8,11,17,.48);
+}
+
+.aud-shop-node-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.aud-shop-node-head strong {
+    font-size: .88rem;
+}
+
+.aud-shop-node-head span {
+    flex: 0 0 auto;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    color: #f2c94c;
+    font-size: .67rem;
+    font-weight: 900;
+}
+
+.aud-shop-node p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.38;
+}
+
+.aud-shop-owners {
+    margin-top: 9px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: .68rem;
+}
+
+.aud-shop-owner-chip {
+    --owner: #7c8aa6;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    color: #fff;
+}
+
+.aud-shop-owner-chip i {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: var(--owner);
+}
+
 </style>
 
 </head>
@@ -1057,6 +1288,44 @@ async function refreshState(
         }
 
 
+        if (
+            data?.event?.status ===
+            "shop"
+        ) {
+
+            const {
+                data:
+                    shopSceneState,
+                error:
+                    shopSceneError
+            } =
+                await db.rpc(
+                    "get_shop_scene_state",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (shopSceneError) {
+
+                console.error(
+                    shopSceneError
+                );
+
+            }
+
+            else if (
+                shopSceneState
+            ) {
+
+                data.shop =
+                    shopSceneState;
+            }
+        }
+
+
         state =
             data;
 
@@ -1112,8 +1381,10 @@ function phaseLabel() {
             return "Watching the Draft";
 
         case "shop":
+            return `Round ${e.current_round} Shop`;
+
         case "army_build":
-            return `Round ${e.current_round} Prep`;
+            return `Round ${e.current_round} Army Build`;
 
         case "betting_open":
             return `Round ${e.current_round} Betting Open`;
@@ -1230,6 +1501,18 @@ function renderContent() {
         state.event.status;
 
 
+    if (
+        status === "shop"
+    ) {
+
+        renderShopReference(
+            content
+        );
+
+        return;
+    }
+
+
     if (status === "betting_open") {
 
         renderRegularBetting(
@@ -1295,6 +1578,343 @@ function renderContent() {
     renderWaiting(
         content
     );
+}
+
+
+
+const AUDIENCE_SHOP_BRANCH_META = {
+    high_roller: {
+        label: "High Roller",
+        icon: "$"
+    },
+    analyst: {
+        label: "Analyst",
+        icon: "◎"
+    },
+    broker: {
+        label: "Broker",
+        icon: "◇"
+    },
+    speculator: {
+        label: "Speculator",
+        icon: "✦"
+    },
+    quartermaster: {
+        label: "Quartermaster",
+        icon: "⚔",
+        note: "These recruits survive into Final War."
+    }
+};
+
+
+function audienceShopOwners(
+    nodeCode
+) {
+
+    const shop =
+        state?.shop;
+
+
+    if (!shop) {
+        return [];
+    }
+
+
+    return (
+        shop.skills
+        ?? []
+    )
+    .filter(
+        row =>
+            row.node_code ===
+            nodeCode
+    )
+    .map(
+        row =>
+            shop.players
+            ?.find(
+                player =>
+                    player.id ===
+                    row.player_id
+            )
+    )
+    .filter(Boolean);
+}
+
+
+function renderAudienceShopOwnerChips(
+    nodeCode
+) {
+
+    const owners =
+        audienceShopOwners(
+            nodeCode
+        );
+
+
+    if (!owners.length) {
+        return "";
+    }
+
+
+    return `
+        <div class="aud-shop-owners">
+
+            <span>
+                Unlocked:
+            </span>
+
+            ${
+                owners.map(
+                    owner => `
+                        <span
+                            class="aud-shop-owner-chip"
+                            style="
+                                --owner:
+                                ${owner.color_code ?? "#7c8aa6"};
+                            "
+                        >
+                            <i></i>
+                            ${escapeHtml(owner.display_name)}
+                        </span>
+                    `
+                ).join("")
+            }
+
+        </div>
+    `;
+}
+
+
+function renderShopReference(
+    content
+) {
+
+    const shop =
+        state?.shop;
+
+
+    const branches = [
+        "high_roller",
+        "analyst",
+        "broker",
+        "speculator",
+        "quartermaster"
+    ];
+
+
+    content.innerHTML = `
+        ${resultBannerHtml()}
+
+        <section class="aud-shop-reference">
+
+            <div class="aud-shop-hero">
+
+                <div class="eyebrow">
+                    Round ${state.event.current_round}
+                </div>
+
+                <h2>
+                    Players Are Shopping
+                </h2>
+
+                <p>
+                    Competitors are spending War Chest on consumables
+                    and Skill Points. Audience betting opens after
+                    armies are built.
+                </p>
+
+            </div>
+
+
+            <div class="aud-shop-section-title">
+                Shop Items
+            </div>
+
+            <div class="aud-shop-items">
+
+                <article class="aud-shop-item">
+
+                    <div class="aud-shop-item-top">
+                        <strong>
+                            Skill Point
+                        </strong>
+                        <b>
+                            $1,500
+                        </b>
+                    </div>
+
+                    <p>
+                        Gain 1 SP. A player may buy at most
+                        one Skill Point during each Shop.
+                    </p>
+
+                </article>
+
+                <article class="aud-shop-item">
+
+                    <div class="aud-shop-item-top">
+                        <strong>
+                            Reinforcements
+                        </strong>
+                        <b>
+                            $750
+                        </b>
+                    </div>
+
+                    <p>
+                        Adds $750 to that player’s next
+                        regular-season army budget.
+                    </p>
+
+                </article>
+
+                <article class="aud-shop-item">
+
+                    <div class="aud-shop-item-top">
+                        <strong>
+                            Mercenary Contract
+                        </strong>
+                        <b>
+                            $750
+                        </b>
+                    </div>
+
+                    <p>
+                        Lets that player use one undrafted
+                        B / C / D unit in their next fight.
+                    </p>
+
+                </article>
+
+            </div>
+
+
+            <div class="aud-shop-section-title">
+                Skill Tree
+            </div>
+
+            <div class="aud-shop-skill-key">
+                Tier costs:
+                <strong>
+                    1 SP → 1 SP → 2 SP → 1 SP
+                </strong>
+            </div>
+
+
+            <div class="aud-shop-branches">
+
+                ${
+                    branches.map(
+                        branchCode => {
+
+                            const meta =
+                                AUDIENCE_SHOP_BRANCH_META[
+                                    branchCode
+                                ];
+
+
+                            const nodes =
+                                (
+                                    shop?.skill_nodes
+                                    ?? []
+                                )
+                                .filter(
+                                    node =>
+                                        node.branch ===
+                                        branchCode
+                                )
+                                .sort(
+                                    (a,b) =>
+                                        Number(a.node_order)
+                                        -
+                                        Number(b.node_order)
+                                );
+
+
+                            return `
+                                <details class="aud-shop-branch">
+
+                                    <summary>
+
+                                        <span class="aud-shop-branch-icon">
+                                            ${meta?.icon ?? "•"}
+                                        </span>
+
+                                        <span>
+                                            <strong>
+                                                ${meta?.label ?? branchCode}
+                                            </strong>
+
+                                            ${
+                                                meta?.note
+                                                ? `
+                                                    <small>
+                                                        ${meta.note}
+                                                    </small>
+                                                  `
+                                                : ""
+                                            }
+                                        </span>
+
+                                    </summary>
+
+                                    <div class="aud-shop-node-list">
+
+                                        ${
+                                            nodes.length
+                                            ? nodes.map(
+                                                node => `
+                                                    <article class="aud-shop-node">
+
+                                                        <div class="aud-shop-node-head">
+
+                                                            <strong>
+                                                                ${escapeHtml(node.display_name)}
+                                                            </strong>
+
+                                                            <span>
+                                                                ${
+                                                                    Number(node.node_order) === 4
+                                                                    ? "$2,000"
+                                                                    : `${node.sp_cost} SP`
+                                                                }
+                                                            </span>
+
+                                                        </div>
+
+                                                        <p>
+                                                            ${escapeHtml(node.description)}
+                                                        </p>
+
+                                                        ${
+                                                            renderAudienceShopOwnerChips(
+                                                                node.code
+                                                            )
+                                                        }
+
+                                                    </article>
+                                                `
+                                              ).join("")
+                                            : `
+                                                <div class="status">
+                                                    Skill information is loading.
+                                                </div>
+                                              `
+                                        }
+
+                                    </div>
+
+                                </details>
+                            `;
+                        }
+                    ).join("")
+                }
+
+            </div>
+
+        </section>
+    `;
 }
 
 
@@ -2089,8 +2709,6 @@ function renderWaiting(content) {
 
 
     else if (
-        status === "shop"
-        ||
         status === "army_build"
     ) {
 
