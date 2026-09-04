@@ -1665,6 +1665,20 @@ function renderActions() {
                     🎲 Fill to 8
                 </button>
 
+                <button
+                    class="secondary"
+                    onclick="addTestAudience()"
+                >
+                    🧪 Add 10 Test Audience
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="clearTestAudience()"
+                >
+                    Clear Test Audience
+                </button>
+
                 <button onclick="lockLobbyAndDetermineOrder()">
                     Lock Lobby &amp; Determine Draft Order
                 </button>
@@ -2854,6 +2868,84 @@ async function resolveChaosGamblers(
         chaosResolving =
             false;
     }
+}
+
+
+async function addTestAudience() {
+
+    if (
+        !currentEventId
+        ||
+        eventData?.status !== "lobby"
+    ) {
+        return;
+    }
+
+
+    setMessage(
+        "Adding 10 test Audience Gamblers..."
+    );
+
+
+    const { data, error } =
+        await db.rpc(
+            "add_test_audience_gamblers",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_count:
+                    10
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        `${Number(data ?? 0)} test Audience Gamblers added.`
+    );
+}
+
+
+async function clearTestAudience() {
+
+    if (!currentEventId) {
+        return;
+    }
+
+
+    const { data, error } =
+        await db.rpc(
+            "clear_test_audience_gamblers",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        `${Number(data ?? 0)} test Audience Gamblers removed.`
+    );
 }
 
 
