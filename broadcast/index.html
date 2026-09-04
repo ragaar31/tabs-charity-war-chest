@@ -2900,6 +2900,65 @@ input {
     }
 }
 
+
+/* =========================================================
+   LOBBY AUDIENCE COPY + STATIC QR POLISH
+   ========================================================= */
+
+.lobby-audience-panel .audience-panel {
+    padding-top: 15px;
+}
+
+.lobby-audience-panel .audience-panel-head {
+    align-items: center;
+}
+
+.lobby-audience-panel .audience-preview-grid {
+    margin-top: 12px;
+}
+
+/* Use the supplied QR artwork rather than the generated canvas. */
+.lobby-qr-image-wrap {
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    padding: 8px;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.lobby-qr-image {
+    display: block;
+    width: min(174px, 100%);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+.lobby-qr-link {
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.065);
+    border: 1px solid rgba(255,255,255,.10);
+    color: #ffffff;
+    font-size: .76rem;
+    line-height: 1.22;
+    font-weight: 800;
+    letter-spacing: .01em;
+    text-shadow: 0 1px 12px rgba(255,255,255,.16);
+}
+
+@media (max-width: 1320px) {
+    .lobby-qr-image {
+        width: min(158px, 100%);
+    }
+
+    .lobby-qr-link {
+        font-size: .70rem;
+    }
+}
+
 </style>
 </head>
 
@@ -4419,9 +4478,15 @@ function renderAudiencePreviewPanel(
                         ${title}
                     </div>
 
-                    <div class="audience-panel-copy">
-                        ${subtitle}
-                    </div>
+                    ${
+                        subtitle
+                        ? `
+                            <div class="audience-panel-copy">
+                                ${subtitle}
+                            </div>
+                          `
+                        : ""
+                    }
                 </div>
 
                 <div class="audience-count-pill">
@@ -4610,14 +4675,17 @@ function renderLobbyGambleQrPanel() {
 
     return `
         <section class="qr-panel lobby-qr-panel">
+
             <h3 class="lobby-qr-title">
                 Scan to Join as an Audience Gambler
             </h3>
 
-            <div class="qr-wrap">
-                <div class="qr-canvas-wrap">
-                    <canvas data-gamble-qr="true"></canvas>
-                </div>
+            <div class="lobby-qr-image-wrap">
+                <img
+                    class="lobby-qr-image"
+                    src="./audience-qr.png"
+                    alt="Audience Gambler QR code"
+                >
             </div>
 
             <div class="lobby-qr-room">
@@ -4627,6 +4695,7 @@ function renderLobbyGambleQrPanel() {
             <div class="lobby-qr-link">
                 ragaar31.github.io/tabs-charity-war-chest/gamble
             </div>
+
         </section>
     `;
 }
@@ -5087,8 +5156,7 @@ function renderLobby() {
             </h1>
 
             <div class="scene-subtitle">
-                Players are joining the betting special.
-                Audience Gamblers can join right now and compete on their own leaderboard.
+                Players and Audience Gamblers are joining the betting special.
             </div>
 
             <div class="lobby-player-stage">
@@ -5106,7 +5174,7 @@ function renderLobby() {
                 <div class="lobby-audience-panel">
                     ${renderAudiencePreviewPanel(
                         "Audience Lobby",
-                        "Smaller viewer cards appear here as spectators scan in for the gambling role.",
+                        "",
                         18
                     )}
                 </div>
