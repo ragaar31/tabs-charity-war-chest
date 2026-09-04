@@ -4041,6 +4041,50 @@ function renderEconomyReport() {
 
                 </div>
 
+                <div class="economy-detail-card">
+
+                    War Bonds
+
+                    <strong>
+                        ${economyReport.war_bond_wins ?? 0}
+                        /
+                        ${economyReport.war_bonds_used ?? 0}
+                        activated wins
+                    </strong>
+
+                    <div class="economy-mini">
+                        ${economyReport.war_bonds_bought ?? 0}
+                        bought
+                        •
+                        -$${Number(economyReport.war_bond_spend ?? 0).toLocaleString()}
+                        •
+                        +$${Number(economyReport.war_bond_payouts ?? 0).toLocaleString()}
+                        paid
+                    </div>
+
+                </div>
+
+                <div class="economy-detail-card">
+
+                    Rainy Day Funds
+
+                    <strong>
+                        ${economyReport.rainy_day_used ?? 0}
+                        triggered
+                    </strong>
+
+                    <div class="economy-mini">
+                        ${economyReport.rainy_day_bought ?? 0}
+                        bought
+                        •
+                        -$${Number(economyReport.rainy_day_spend ?? 0).toLocaleString()}
+                        •
+                        +$${Number(economyReport.rainy_day_payouts ?? 0).toLocaleString()}
+                        returned
+                    </div>
+
+                </div>
+
             </div>
 
 
