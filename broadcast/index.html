@@ -3180,6 +3180,86 @@ input {
     display: none;
 }
 
+
+/* =========================================================
+   DRAFT COMPLETE — FULL-HEIGHT AUDIENCE COLUMN
+   ========================================================= */
+
+.draft-complete-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(300px, .9fr);
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    column-gap: 18px;
+    row-gap: 18px;
+}
+
+.draft-complete-heading {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.draft-complete-heading .scene-kicker {
+    margin-bottom: 10px;
+}
+
+.draft-complete-heading .scene-subtitle {
+    margin-top: 14px;
+}
+
+.draft-complete-standings {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 0;
+}
+
+.draft-complete-audience {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    min-width: 0;
+    min-height: 0;
+    align-self: start;
+}
+
+/*
+   Reuse the exact Lobby QR card visually.
+   It stays square, uses audience-qr.png, and aligns to the right edge
+   of the Audience column.
+*/
+.draft-complete-audience .lobby-qr-panel {
+    justify-self: end;
+    align-self: start;
+}
+
+/*
+   The full-height right rail gives the 8-row leaderboard room to breathe,
+   while keeping the same card styling used elsewhere.
+*/
+.draft-complete-audience .audience-mini-leaders {
+    gap: 7px;
+}
+
+.draft-complete-audience .audience-leader-row {
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+@media (max-width: 1320px) {
+    .draft-complete-scene {
+        grid-template-columns:
+            minmax(0, 1.6fr)
+            minmax(280px, .9fr);
+        column-gap: 16px;
+    }
+}
+
 </style>
 </head>
 
@@ -5064,9 +5144,15 @@ function renderAudienceLeaderboardMini(
                         ${title}
                     </div>
 
-                    <div class="audience-panel-copy">
-                        ${subtitle}
-                    </div>
+                    ${
+                        subtitle
+                        ? `
+                            <div class="audience-panel-copy">
+                                ${subtitle}
+                            </div>
+                          `
+                        : ""
+                    }
                 </div>
 
                 <div class="audience-count-pill">
@@ -7012,6 +7098,50 @@ function renderStandingsPrep() {
                 "Final Skill Allocation is open before the Final War."
             ]
     }[status];
+
+
+    if (
+        status === "draft_complete"
+    ) {
+
+        return `
+            <div class="draft-complete-scene">
+
+                <div class="draft-complete-heading">
+
+                    <div class="scene-kicker">
+                        Current Standings
+                    </div>
+
+                    <h1 class="scene-title">
+                        ${copy?.[0] ?? "Standings"}
+                    </h1>
+
+                    <div class="scene-subtitle">
+                        ${copy?.[1] ?? ""}
+                    </div>
+
+                </div>
+
+                <div class="draft-complete-standings">
+                    ${renderLeaderboard()}
+                </div>
+
+                <aside class="audience-stack draft-complete-audience">
+
+                    ${renderAudienceLeaderboardMini(
+                        "Audience Leaders",
+                        "",
+                        8
+                    )}
+
+                    ${renderLobbyGambleQrPanel()}
+
+                </aside>
+
+            </div>
+        `;
+    }
 
 
     return `
