@@ -3864,8 +3864,8 @@ input {
 .shop-skill-anchor.shop-anchor-activate {
     animation:
         shopAnchorActivate
-        1080ms
-        cubic-bezier(.16,.86,.24,1)
+        720ms
+        cubic-bezier(.18,.82,.22,1)
         both;
 }
 
@@ -3963,28 +3963,28 @@ input {
         opacity: .9;
     }
 
-    86% {
-        transform: translate(-50%,-50%) scale(1.08);
+    84% {
+        transform: translate(-50%,-50%) scale(1.06);
         background:
             color-mix(
                 in srgb,
-                var(--unlock-color) 20%,
+                var(--unlock-color) 15%,
                 #111722
             );
         border-color:
             color-mix(
                 in srgb,
-                var(--unlock-color) 22%,
+                var(--unlock-color) 18%,
                 rgba(255,255,255,.28)
             );
         box-shadow:
-            0 0 7px
+            0 0 5px
             color-mix(
                 in srgb,
-                var(--unlock-color) 12%,
+                var(--unlock-color) 10%,
                 transparent
             );
-        opacity: .72;
+        opacity: .78;
     }
 
     100% {
@@ -3999,8 +3999,8 @@ input {
 .shop-skill-node.shop-node-unlock {
     animation:
         shopNodeUnlock
-        1080ms
-        cubic-bezier(.16,.86,.24,1)
+        760ms
+        cubic-bezier(.18,.82,.22,1)
         both;
 }
 
@@ -4015,24 +4015,24 @@ input {
         border-color: rgba(255,255,255,.10);
     }
 
-    55% {
+    48% {
         border-color:
             color-mix(
                 in srgb,
-                var(--unlock-color) 88%,
+                var(--unlock-color) 82%,
                 white 8%
             );
         box-shadow:
             0 0 0 2px
             color-mix(
                 in srgb,
-                var(--unlock-color) 24%,
+                var(--unlock-color) 18%,
                 transparent
             ),
-            0 0 30px
+            0 0 25px
             color-mix(
                 in srgb,
-                var(--unlock-color) 42%,
+                var(--unlock-color) 34%,
                 transparent
             );
         background:
@@ -4040,7 +4040,7 @@ input {
                 130deg,
                 color-mix(
                     in srgb,
-                    var(--unlock-color) 28%,
+                    var(--unlock-color) 23%,
                     rgba(11,15,23,.90)
                 ),
                 rgba(11,15,23,.92) 62%
@@ -4255,7 +4255,7 @@ input {
 .shop-owner-dot.shop-owner-new {
     animation:
         shopOwnerFadeIn
-        720ms
+        440ms
         cubic-bezier(.18,.78,.24,1)
         both;
 }
@@ -9662,7 +9662,7 @@ function launchShopSkillStreak(
                 }
             ],
             {
-                duration: 700,
+                duration: 520,
                 easing:
                     "cubic-bezier(.15,.85,.25,1)",
                 fill: "forwards"
@@ -9684,14 +9684,16 @@ function animateShopSkillUnlock(
 ) {
 
     /*
-       Readable staged sequence:
-       1. streak travels from player bar to node
-       2. anchor circle pulses in player color
-       3. ownership marker appears
-       4. whole skill node pulses in player color
+       Cohesive overlapping sequence:
+       - streak begins immediately
+       - anchor starts reacting before streak fully ends
+       - ownership fades in during anchor's tail
+       - node pulse overlaps ownership fade
+
+       This reads as one continuous transfer instead of four isolated beats.
     */
     const delay =
-        sequenceIndex * 320;
+        sequenceIndex * 220;
 
 
     window.setTimeout(
@@ -9752,7 +9754,7 @@ function animateShopSkillUnlock(
             );
 
 
-            // Stage 1: travel from the player bar to the skill.
+            // 0ms: launch the streak.
             launchShopSkillStreak(
                 playerBar,
                 skillAnchor,
@@ -9760,7 +9762,7 @@ function animateShopSkillUnlock(
             );
 
 
-            // Stage 2: let the streak arrive, then light the anchor.
+            // 300ms: circle starts reacting while the streak is still arriving.
             window.setTimeout(
                 () => {
 
@@ -9774,27 +9776,21 @@ function animateShopSkillUnlock(
                         "shop-anchor-activate"
                     );
                 },
-                560
+                300
             );
 
 
-            // Stage 3: as the anchor finishes easing out,
-            // gently fade in the permanent ownership marker.
+            // 760ms: ownership begins fading in during the circle's tail.
             window.setTimeout(
                 () => {
 
                     if (pendingDot) {
 
-                        /*
-                           Keep the dot visually hidden for this frame so
-                           removing the pending class cannot cause a one-frame
-                           snap to full opacity.
-                        */
                         pendingDot.style.opacity =
                             "0";
 
                         pendingDot.style.transform =
-                            "scale(.68)";
+                            "scale(.74)";
 
                         pendingDot.style.boxShadow =
                             "none";
@@ -9816,24 +9812,26 @@ function animateShopSkillUnlock(
                                     "shop-owner-new"
                                 );
 
+
                                 window.setTimeout(
                                     () => {
+
                                         pendingDot.style.opacity = "";
                                         pendingDot.style.transform = "";
                                         pendingDot.style.boxShadow = "";
+
                                     },
-                                    760
+                                    470
                                 );
                             }
                         );
                     }
                 },
-                1540
+                760
             );
 
 
-            // Stage 4: after the ownership marker has clearly appeared,
-            // finish with the larger node-wide color pulse.
+            // 940ms: card pulse begins before ownership fade is fully complete.
             window.setTimeout(
                 () => {
 
@@ -9847,11 +9845,11 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                2240
+                940
             );
 
 
-            // Clean temporary animation classes after the sequence.
+            // Cleanup well after the overlapping sequence has visually ended.
             window.setTimeout(
                 () => {
 
@@ -9863,7 +9861,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                3600
+                1900
             );
 
         },
@@ -10044,14 +10042,14 @@ function runShopPostRenderAnimations() {
            next 900ms poll cannot land on the tail of the animation.
         */
         const unlockSequenceDuration =
-            4050
+            2250
             +
             Math.max(
                 0,
                 unlocks.length - 1
             )
             *
-            320;
+            220;
 
 
         shopUnlockAnimationUntil =
