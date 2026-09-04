@@ -2097,6 +2097,183 @@ input {
     }
 }
 
+
+/* =========================================================
+   1920x1080 DRAFT LAYOUT — SPACE-USE PASS V2
+   ========================================================= */
+
+/* Keep the left rail useful, but let it use its full height.
+   The faction board becomes the main middle region and the
+   Last Pick / Up Next cards sit at the bottom. */
+
+.draft-layout {
+    grid-template-columns:
+        clamp(500px, 29vw, 555px)
+        minmax(0,1fr);
+    gap: 16px;
+}
+
+.draft-left {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    align-content: stretch;
+    gap: 12px;
+}
+
+.draft-roster-panel {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    padding: 15px;
+}
+
+.draft-current-roster {
+    height: 100%;
+    min-height: 0;
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+    grid-template-rows:
+        repeat(
+            2,
+            minmax(104px,1fr)
+        );
+    gap: 9px;
+}
+
+.draft-roster-card {
+    padding: 11px 10px 10px;
+    border-radius: 11px;
+}
+
+.draft-roster-card.empty {
+    font-size: 1.45rem;
+}
+
+.draft-roster-tier {
+    padding: 3px 6px;
+    font-size: .61rem;
+}
+
+.draft-roster-name {
+    margin-top: 8px;
+    font-size: .92rem;
+    line-height: 1.06;
+}
+
+.draft-roster-meta {
+    margin-top: 5px;
+    font-size: .69rem;
+}
+
+.draft-aux-grid {
+    align-self: end;
+    gap: 10px;
+}
+
+.last-pick,
+.next-up {
+    min-height: 84px;
+    padding: 12px 14px;
+}
+
+.last-pick strong,
+.next-up strong {
+    font-size: .96rem;
+}
+
+.next-up-item {
+    font-size: .80rem;
+}
+
+
+/* Push the right-side market much closer to the available
+   1920x1080 limits without changing the proven rectangle model. */
+
+.draft-market {
+    padding:
+        14px
+        14px
+        13px;
+}
+
+.market-board {
+    --market-tile:
+        clamp(
+            56px,
+            3.30vw,
+            64px
+        );
+
+    gap: 8px;
+}
+
+.market-band {
+    padding: 7px;
+}
+
+.market-band-grid {
+    gap: 4px;
+}
+
+.market-tile {
+    padding: 7px 6px 5px;
+}
+
+.market-tile-name {
+    font-size: .62rem;
+    line-height: 1.02;
+}
+
+.market-tile-cost {
+    font-size: .57rem;
+}
+
+.market-band-tab {
+    min-width: 80px;
+    padding: 6px 13px;
+    font-size: .76rem;
+}
+
+
+/* Preserve a safe fallback if the Browser Source is not truly
+   widescreen. */
+
+@media (max-aspect-ratio: 3/2) {
+
+    .draft-layout {
+        grid-template-columns:
+            minmax(430px, .86fr)
+            minmax(0,1.55fr);
+    }
+
+    .draft-current-roster {
+        grid-template-rows:
+            repeat(
+                2,
+                minmax(82px,1fr)
+            );
+    }
+
+    .market-board {
+        --market-tile:
+            clamp(
+                43px,
+                2.55vw,
+                50px
+            );
+    }
+}
+
 </style>
 </head>
 
