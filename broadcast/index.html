@@ -3080,6 +3080,106 @@ input {
     }
 }
 
+
+/* =========================================================
+   ADAPTIVE LOBBY AUDIENCE GRID
+   ========================================================= */
+
+.lobby-audience-panel > .audience-panel.audience-lobby-roster {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+}
+
+.audience-lobby-roster .lobby-audience-grid {
+    height: 100%;
+    min-height: 0;
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            var(--audience-cols,5),
+            minmax(0,1fr)
+        );
+    grid-template-rows:
+        repeat(
+            var(--audience-rows,1),
+            minmax(0,1fr)
+        );
+    gap: 7px;
+}
+
+.audience-lobby-roster .audience-mini-card {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px 9px;
+}
+
+.audience-lobby-roster.audience-density-compact
+.audience-mini-card {
+    padding: 6px 7px;
+    border-radius: 11px;
+}
+
+.audience-lobby-roster.audience-density-compact
+.audience-mini-name {
+    font-size: .72rem;
+}
+
+.audience-lobby-roster.audience-density-compact
+.audience-mini-meta {
+    margin-top: 3px;
+    font-size: .59rem;
+}
+
+.audience-lobby-roster.audience-density-dense
+.lobby-audience-grid {
+    gap: 5px;
+}
+
+.audience-lobby-roster.audience-density-dense
+.audience-mini-card {
+    padding: 4px 6px;
+    border-radius: 9px;
+}
+
+.audience-lobby-roster.audience-density-dense
+.audience-mini-name {
+    font-size: .64rem;
+}
+
+.audience-lobby-roster.audience-density-dense
+.audience-mini-meta {
+    margin-top: 2px;
+    font-size: .52rem;
+}
+
+.audience-lobby-roster.audience-density-ultra
+.lobby-audience-grid {
+    gap: 4px;
+}
+
+.audience-lobby-roster.audience-density-ultra
+.audience-mini-card {
+    padding: 3px 5px;
+    border-radius: 7px;
+}
+
+.audience-lobby-roster.audience-density-ultra
+.audience-mini-name {
+    font-size: .58rem;
+}
+
+.audience-lobby-roster.audience-density-ultra
+.audience-mini-meta {
+    display: none;
+}
+
 </style>
 </head>
 
@@ -4208,6 +4308,54 @@ async function refreshState(
         }
 
 
+        if (
+            data?.event?.status === "lobby"
+        ) {
+
+            const {
+                data:
+                    fullAudienceRoster,
+                error:
+                    audienceRosterError
+            } =
+                await db.rpc(
+                    "get_broadcast_audience_roster",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (audienceRosterError) {
+
+                console.error(
+                    audienceRosterError
+                );
+
+            }
+
+            else if (
+                Array.isArray(
+                    fullAudienceRoster
+                )
+            ) {
+
+                data.audience =
+                    data.audience
+                    ?? {};
+
+
+                data.audience.preview =
+                    fullAudienceRoster;
+
+
+                data.audience.count =
+                    fullAudienceRoster.length;
+            }
+        }
+
+
         const oldState =
             state;
 
@@ -4611,6 +4759,69 @@ function gambleJoinUrl() {
 }
 
 
+function audienceLobbyGridLayout(
+    count
+) {
+
+    let cols = 5;
+    let density = "audience-density-normal";
+
+
+    if (count > 10) {
+        cols = 6;
+    }
+
+
+    if (count > 18) {
+        cols = 7;
+        density =
+            "audience-density-compact";
+    }
+
+
+    if (count > 28) {
+        cols = 8;
+    }
+
+
+    if (count > 40) {
+        cols = 9;
+        density =
+            "audience-density-dense";
+    }
+
+
+    if (count > 54) {
+        cols = 10;
+    }
+
+
+    if (count > 70) {
+        cols = 11;
+        density =
+            "audience-density-ultra";
+    }
+
+
+    if (count > 88) {
+        cols = 12;
+    }
+
+
+    return {
+        cols,
+        rows:
+            Math.max(
+                1,
+                Math.ceil(
+                    count / cols
+                )
+            ),
+        density
+    };
+}
+
+
 function renderAudiencePreviewPanel(
     title = "Audience Lobby",
     subtitle = "Viewers can join as pure gamblers and chase their own leaderboard.",
@@ -4641,8 +4852,23 @@ function renderAudiencePreviewPanel(
         );
 
 
+    const lobbyLayout =
+        audienceLobbyGridLayout(
+            audience.length
+        );
+
+
     return `
-        <section class="audience-panel">
+        <section
+            class="
+                audience-panel
+                ${
+                    animateJoins
+                    ? `audience-lobby-roster ${lobbyLayout.density}`
+                    : ""
+                }
+            "
+        >
 
             <div class="audience-panel-head">
 
@@ -4672,7 +4898,26 @@ function renderAudiencePreviewPanel(
             ${
                 audience.length
                 ? `
-                    <div class="audience-preview-grid">
+                    <div
+                        class="
+                            audience-preview-grid
+                            ${
+                                animateJoins
+                                ? "lobby-audience-grid"
+                                : ""
+                            }
+                        "
+                        ${
+                            animateJoins
+                            ? `
+                                style="
+                                    --audience-cols:${lobbyLayout.cols};
+                                    --audience-rows:${lobbyLayout.rows};
+                                "
+                              `
+                            : ""
+                        }
+                    >
                         ${
                             audience.map(
                                 (viewer, index) => {
@@ -5386,7 +5631,7 @@ function renderLobby() {
                     ${renderAudiencePreviewPanel(
                         "Audience Lobby",
                         "",
-                        18,
+                        10000,
                         true
                     )}
                 </div>
