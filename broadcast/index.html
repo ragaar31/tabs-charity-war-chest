@@ -3818,20 +3818,7 @@ input {
 }
 
 .shop-branch-path::before {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    top: 8%;
-    bottom: 8%;
-    left: 17px;
-    width: 2px;
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.07),
-            rgba(255,255,255,.18),
-            rgba(255,255,255,.07)
-        );
+    content: none;
 }
 
 .shop-skill-node {
@@ -3853,16 +3840,190 @@ input {
 }
 
 .shop-skill-node::before {
-    content: "";
+    content: none;
+}
+
+.shop-skill-anchor {
+    --unlock-color: rgba(255,255,255,.7);
     position: absolute;
     left: 10px;
     top: 50%;
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     transform: translate(-50%,-50%);
     border-radius: 999px;
-    border: 2px solid rgba(255,255,255,.26);
+    border: 2px solid rgba(255,255,255,.24);
     background: #111722;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.shop-skill-node.owned .shop-skill-anchor {
+    border-color: rgba(255,255,255,.34);
+}
+
+.shop-skill-anchor.shop-anchor-activate {
+    animation:
+        shopAnchorActivate
+        520ms
+        cubic-bezier(.16,.86,.24,1)
+        both;
+}
+
+@keyframes shopAnchorActivate {
+    0% {
+        transform: translate(-50%,-50%) scale(1);
+        background: #111722;
+        border-color: rgba(255,255,255,.24);
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+
+    38% {
+        transform: translate(-50%,-50%) scale(1.55);
+        background: var(--unlock-color);
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 85%,
+                white 10%
+            );
+        box-shadow:
+            0 0 0 5px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 20%,
+                transparent
+            ),
+            0 0 18px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 55%,
+                transparent
+            );
+    }
+
+    100% {
+        transform: translate(-50%,-50%) scale(1);
+        background: #111722;
+        border-color: rgba(255,255,255,.28);
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+}
+
+.shop-skill-node.shop-node-unlock {
+    animation:
+        shopNodeUnlock
+        860ms
+        cubic-bezier(.16,.86,.24,1)
+        both;
+}
+
+@keyframes shopNodeUnlock {
+    0% {
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+        border-color: rgba(255,255,255,.085);
+    }
+
+    22% {
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+        border-color: rgba(255,255,255,.10);
+    }
+
+    55% {
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 78%,
+                white 12%
+            );
+        box-shadow:
+            0 0 24px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 24%,
+                transparent
+            );
+        background:
+            linear-gradient(
+                130deg,
+                color-mix(
+                    in srgb,
+                    var(--unlock-color) 18%,
+                    transparent
+                ),
+                rgba(11,15,23,.92) 58%
+            );
+    }
+
+    100% {
+        border-color: rgba(255,255,255,.15);
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+        background:
+            linear-gradient(
+                130deg,
+                rgba(255,255,255,.06),
+                rgba(11,15,23,.90) 48%
+            );
+    }
+}
+
+.shop-skill-streak {
+    --streak: #ffffff;
+    position: fixed;
+    z-index: 120;
+    height: 4px;
+    pointer-events: none;
+    border-radius: 999px;
+    transform-origin: left center;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--streak) 0%,
+                transparent
+            ) 0%,
+            color-mix(
+                in srgb,
+                var(--streak) 88%,
+                white 8%
+            ) 35%,
+            color-mix(
+                in srgb,
+                var(--streak) 0%,
+                transparent
+            ) 100%
+        );
+    box-shadow:
+        0 0 12px
+        color-mix(
+            in srgb,
+            var(--streak) 48%,
+            transparent
+        );
+}
+
+.shop-skill-streak::after {
+    content: "";
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background:
+        color-mix(
+            in srgb,
+            var(--streak) 85%,
+            white 10%
+        );
+    box-shadow:
+        0 0 12px
+        color-mix(
+            in srgb,
+            var(--streak) 60%,
+            transparent
+        );
 }
 
 .shop-skill-node.owned {
@@ -3990,6 +4151,12 @@ input {
             var(--owner) 55%,
             transparent
         );
+}
+
+.shop-owner-dot.shop-owner-pending {
+    opacity: 0;
+    transform: scale(.18);
+    box-shadow: none;
 }
 
 .shop-owner-dot.shop-owner-new {
@@ -8234,9 +8401,16 @@ function shopPlayerColor(
             playerId
         );
 
+    const rawColor =
+        player?.color_code;
+
     return (
-        player?.color_code
-        ||
+        PLAYER_COLORS[
+            rawColor
+        ]
+        ??
+        rawColor
+        ??
         playerColor(
             playerId
         )
@@ -8329,6 +8503,35 @@ function shopSkillIsNew(
             playerId,
             nodeCode
         )
+    );
+}
+
+
+function shopNewUnlocks() {
+
+    if (!shopHasPriorLiveSnapshot()) {
+        return [];
+    }
+
+
+    return shopSkillRows(
+        state
+    )
+    .filter(
+        row =>
+            !shopSkillOwned(
+                previousState,
+                row.player_id,
+                row.node_code
+            )
+    )
+    .map(
+        row => ({
+            playerId:
+                row.player_id,
+            nodeCode:
+                row.node_code
+        })
     );
 }
 
@@ -8641,16 +8844,6 @@ function renderShopSkillNode(
         .filter(Boolean);
 
 
-    const hasNewOwner =
-        owners.some(
-            player =>
-                shopSkillIsNew(
-                    player.id,
-                    node.code
-                )
-        );
-
-
     const isMastery =
         Number(node.node_order) === 4;
 
@@ -8678,14 +8871,14 @@ function renderShopSkillNode(
                     ? "mastery"
                     : ""
                 }
-                ${
-                    hasNewOwner
-                    ? "shop-skill-new"
-                    : ""
-                }
             "
             data-shop-node="${escapeHtml(node.code)}"
         >
+
+            <span
+                class="shop-skill-anchor"
+                data-shop-anchor="${escapeHtml(node.code)}"
+            ></span>
 
             <div class="shop-skill-node-head">
 
@@ -8694,11 +8887,7 @@ function renderShopSkillNode(
                 </div>
 
                 <div class="shop-skill-cost">
-                    ${
-                        isMastery
-                        ? "$2K"
-                        : `${node.sp_cost} SP`
-                    }
+                    ${node.sp_cost} SP
                 </div>
 
             </div>
@@ -8722,26 +8911,33 @@ function renderShopSkillNode(
                 ${
                     owners.length
                     ? owners.map(
-                        owner => `
-                            <span
-                                class="
-                                    shop-owner-dot
-                                    ${
-                                        shopSkillIsNew(
-                                            owner.id,
-                                            node.code
-                                        )
-                                        ? "shop-owner-new"
-                                        : ""
-                                    }
-                                "
-                                style="
-                                    --owner:
-                                    ${shopPlayerColor(owner.id)};
-                                "
-                                title="${escapeHtml(owner.display_name)}"
-                            ></span>
-                        `
+                        owner => {
+
+                            const isNewOwner =
+                                shopSkillIsNew(
+                                    owner.id,
+                                    node.code
+                                );
+
+                            return `
+                                <span
+                                    class="
+                                        shop-owner-dot
+                                        ${
+                                            isNewOwner
+                                            ? "shop-owner-pending"
+                                            : ""
+                                        }
+                                    "
+                                    data-shop-owner-id="${owner.id}"
+                                    style="
+                                        --owner:
+                                        ${shopPlayerColor(owner.id)};
+                                    "
+                                    title="${escapeHtml(owner.display_name)}"
+                                ></span>
+                            `;
+                        }
                       ).join("")
                     : `
                         <span class="shop-owner-empty">
@@ -8990,6 +9186,277 @@ function renderShopScene() {
 }
 
 
+function launchShopSkillStreak(
+    sourceEl,
+    targetEl,
+    color
+) {
+
+    if (
+        !sourceEl
+        ||
+        !targetEl
+    ) {
+        return;
+    }
+
+
+    const sourceRect =
+        sourceEl.getBoundingClientRect();
+
+    const targetRect =
+        targetEl.getBoundingClientRect();
+
+
+    const x1 =
+        sourceRect.right - 18;
+
+    const y1 =
+        sourceRect.top
+        +
+        sourceRect.height / 2;
+
+    const x2 =
+        targetRect.left
+        +
+        targetRect.width / 2;
+
+    const y2 =
+        targetRect.top
+        +
+        targetRect.height / 2;
+
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+
+    const length =
+        Math.max(
+            24,
+            Math.hypot(dx, dy)
+        );
+
+    const angle =
+        Math.atan2(dy, dx)
+        *
+        180
+        /
+        Math.PI;
+
+
+    const streak =
+        document.createElement(
+            "div"
+        );
+
+    streak.className =
+        "shop-skill-streak";
+
+    streak.style.left =
+        `${x1}px`;
+
+    streak.style.top =
+        `${y1}px`;
+
+    streak.style.width =
+        `${length}px`;
+
+    streak.style.setProperty(
+        "--streak",
+        color
+    );
+
+    streak.style.transform =
+        `translateY(-50%) rotate(${angle}deg)`;
+
+
+    document.body.appendChild(
+        streak
+    );
+
+
+    const animation =
+        streak.animate(
+            [
+                {
+                    opacity: 0,
+                    transform:
+                        `translateY(-50%) rotate(${angle}deg) scaleX(.08)`
+                },
+                {
+                    opacity: 1,
+                    offset: .2,
+                    transform:
+                        `translateY(-50%) rotate(${angle}deg) scaleX(1)`
+                },
+                {
+                    opacity: .96,
+                    offset: .72,
+                    transform:
+                        `translateY(-50%) rotate(${angle}deg) scaleX(1)`
+                },
+                {
+                    opacity: 0,
+                    transform:
+                        `translateY(-50%) rotate(${angle}deg) scaleX(1.02)`
+                }
+            ],
+            {
+                duration: 360,
+                easing:
+                    "cubic-bezier(.15,.85,.25,1)",
+                fill: "forwards"
+            }
+        );
+
+
+    animation.finished
+        .catch(() => {})
+        .finally(
+            () => streak.remove()
+        );
+}
+
+
+function animateShopSkillUnlock(
+    unlock,
+    sequenceIndex = 0
+) {
+
+    const delay =
+        sequenceIndex * 140;
+
+
+    window.setTimeout(
+        () => {
+
+            const playerId =
+                unlock.playerId;
+
+            const nodeCode =
+                unlock.nodeCode;
+
+            const color =
+                shopPlayerColor(
+                    playerId
+                );
+
+
+            const playerBar =
+                document.querySelector(
+                    `.shop-player-bar[data-shop-player-id="${playerId}"]`
+                );
+
+            const skillNode =
+                document.querySelector(
+                    `.shop-skill-node[data-shop-node="${nodeCode}"]`
+                );
+
+            const skillAnchor =
+                skillNode?.querySelector(
+                    ".shop-skill-anchor"
+                );
+
+            const pendingDot =
+                skillNode?.querySelector(
+                    `.shop-owner-dot.shop-owner-pending[data-shop-owner-id="${playerId}"]`
+                );
+
+
+            if (
+                !playerBar
+                ||
+                !skillNode
+                ||
+                !skillAnchor
+            ) {
+                return;
+            }
+
+
+            launchShopSkillStreak(
+                playerBar,
+                skillAnchor,
+                color
+            );
+
+
+            window.setTimeout(
+                () => {
+
+                    skillAnchor.style.setProperty(
+                        "--unlock-color",
+                        color
+                    );
+
+                    skillNode.style.setProperty(
+                        "--unlock-color",
+                        color
+                    );
+
+                    skillAnchor.classList.remove(
+                        "shop-anchor-activate"
+                    );
+
+                    skillNode.classList.remove(
+                        "shop-node-unlock"
+                    );
+
+                    void skillAnchor.offsetWidth;
+                    void skillNode.offsetWidth;
+
+                    skillAnchor.classList.add(
+                        "shop-anchor-activate"
+                    );
+
+                    skillNode.classList.add(
+                        "shop-node-unlock"
+                    );
+
+
+                    window.setTimeout(
+                        () => {
+                            if (pendingDot) {
+                                pendingDot.classList.remove(
+                                    "shop-owner-pending"
+                                );
+
+                                pendingDot.classList.remove(
+                                    "shop-owner-new"
+                                );
+
+                                void pendingDot.offsetWidth;
+
+                                pendingDot.classList.add(
+                                    "shop-owner-new"
+                                );
+                            }
+                        },
+                        340
+                    );
+
+
+                    window.setTimeout(
+                        () => {
+                            skillAnchor.classList.remove(
+                                "shop-anchor-activate"
+                            );
+
+                            skillNode.classList.remove(
+                                "shop-node-unlock"
+                            );
+                        },
+                        980
+                    );
+                },
+                180
+            );
+        },
+        delay
+    );
+}
+
+
 function runShopPostRenderAnimations() {
 
     if (
@@ -9141,6 +9608,18 @@ function runShopPostRenderAnimations() {
             }
         );
     }
+
+
+    const unlocks =
+        shopNewUnlocks();
+
+    unlocks.forEach(
+        (unlock, index) =>
+            animateShopSkillUnlock(
+                unlock,
+                index
+            )
+    );
 
 
     document
