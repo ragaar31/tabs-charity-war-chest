@@ -3260,6 +3260,187 @@ input {
     }
 }
 
+
+/* =========================================================
+   DRAFT COMPLETE — FULL-WIDTH PLAYERS + BOTTOM AUDIENCE BAND
+   ========================================================= */
+
+.draft-complete-scene.draft-complete-bottom-layout {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 14px;
+}
+
+.draft-complete-bottom-layout .draft-complete-heading {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.draft-complete-bottom-layout .draft-complete-standings {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Full-width standings, slightly tightened so the lower band has
+   a reliable home directly above the footer. */
+.draft-complete-bottom-layout
+.draft-complete-standings
+.leaderboard {
+    margin-top: 8px;
+    gap: 6px;
+}
+
+.draft-complete-bottom-layout
+.draft-complete-standings
+.leader-row {
+    min-height: 44px;
+    padding: 6px 14px;
+    grid-template-columns:
+        60px
+        minmax(0,1fr)
+        150px
+        110px;
+}
+
+.draft-complete-bottom-layout
+.draft-complete-standings
+.leader-rank {
+    font-size: 1.25rem;
+}
+
+.draft-complete-bottom-layout
+.draft-complete-standings
+.leader-name {
+    font-size: 1rem;
+}
+
+.draft-complete-bottom-layout
+.draft-complete-standings
+.leader-money {
+    font-size: 1.25rem;
+}
+
+/* Entire Audience section is the final scene row, so it always lives
+   immediately above the Broadcast footer. */
+.draft-complete-bottom-band {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        300px;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.draft-complete-audience-panel {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    padding: 14px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: rgba(20,25,36,.90);
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    overflow: hidden;
+}
+
+.draft-complete-audience-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.draft-complete-audience-row {
+    display: grid;
+    grid-template-columns:
+        repeat(8, minmax(0,1fr));
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.draft-complete-audience-card {
+    min-width: 0;
+    padding: 9px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.draft-complete-audience-rank {
+    color: #f2c94c;
+    font-size: .73rem;
+    font-weight: 950;
+}
+
+.draft-complete-audience-name {
+    margin-top: 4px;
+    min-width: 0;
+    font-size: .80rem;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.draft-complete-audience-money {
+    margin-top: 4px;
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.draft-complete-audience-foot {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: .68rem;
+    text-align: right;
+}
+
+/* Reuse the Lobby QR card exactly, now as the right-hand block
+   in the lower-third band. */
+.draft-complete-bottom-band .lobby-qr-panel {
+    width: 300px;
+    max-width: 300px;
+    justify-self: end;
+    align-self: stretch;
+}
+
+@media (max-width: 1500px) {
+    .draft-complete-audience-row {
+        grid-template-columns:
+            repeat(4, minmax(0,1fr));
+    }
+
+    .draft-complete-audience-card {
+        padding: 7px 9px;
+    }
+
+    .draft-complete-bottom-band {
+        grid-template-columns:
+            minmax(0,1fr)
+            280px;
+    }
+
+    .draft-complete-bottom-band .lobby-qr-panel {
+        width: 280px;
+        max-width: 280px;
+    }
+}
+
 </style>
 </head>
 
@@ -5112,6 +5293,82 @@ function renderAudiencePreviewPanel(
                 : `
                     <div class="audience-empty">
                         No Audience Gamblers yet. Scan in and become the first.
+                    </div>
+                  `
+            }
+
+        </section>
+    `;
+}
+
+
+function renderDraftCompleteAudienceRow(
+    limit = 8
+) {
+
+    const leaders =
+        audienceLeaders(limit);
+
+    const count =
+        audienceCount();
+
+
+    return `
+        <section class="draft-complete-audience-panel">
+
+            <div class="draft-complete-audience-head">
+
+                <div class="audience-panel-title">
+                    Audience Leaders
+                </div>
+
+                <div class="audience-count-pill">
+                    ${count}
+                    <span>Total</span>
+                </div>
+
+            </div>
+
+            ${
+                leaders.length
+                ? `
+                    <div class="draft-complete-audience-row">
+                        ${
+                            leaders.map(
+                                row => `
+                                    <div class="draft-complete-audience-card">
+
+                                        <div class="draft-complete-audience-rank">
+                                            #${row.rank}
+                                        </div>
+
+                                        <div class="draft-complete-audience-name">
+                                            ${escapeHtml(row.display_name)}
+                                        </div>
+
+                                        <div class="draft-complete-audience-money">
+                                            ${money(row.bankroll)}
+                                        </div>
+
+                                    </div>
+                                `
+                            ).join("")
+                        }
+                    </div>
+
+                    ${
+                        count > leaders.length
+                        ? `
+                            <div class="draft-complete-audience-foot">
+                                Top ${leaders.length} shown • ${count} total viewers
+                            </div>
+                          `
+                        : ""
+                    }
+                  `
+                : `
+                    <div class="audience-empty">
+                        No Audience Gamblers yet.
                     </div>
                   `
             }
@@ -7105,7 +7362,7 @@ function renderStandingsPrep() {
     ) {
 
         return `
-            <div class="draft-complete-scene">
+            <div class="draft-complete-scene draft-complete-bottom-layout">
 
                 <div class="draft-complete-heading">
 
@@ -7127,17 +7384,13 @@ function renderStandingsPrep() {
                     ${renderLeaderboard()}
                 </div>
 
-                <aside class="audience-stack draft-complete-audience">
+                <div class="draft-complete-bottom-band">
 
-                    ${renderAudienceLeaderboardMini(
-                        "Audience Leaders",
-                        "",
-                        8
-                    )}
+                    ${renderDraftCompleteAudienceRow(8)}
 
                     ${renderLobbyGambleQrPanel()}
 
-                </aside>
+                </div>
 
             </div>
         `;
