@@ -2563,65 +2563,79 @@ async function runDraftOrderReveal() {
         );
 
 
+    // Reveal every real strip first so there is always a visible
+    // layer underneath the flyer copies during the handoff.
     finalStrips.forEach(
         (
             strip,
             index
         ) => {
 
+            strip.style.opacity =
+                "1";
+
+            strip.classList.remove(
+                "pending-target"
+            );
+
+
             setTimeout(
                 () => {
-
-                    strip.style.opacity =
-                        "1";
-
-                    strip.classList.remove(
-                        "pending-target"
-                    );
-
                     strip.classList.add(
                         "order-locked"
                     );
-
                 },
-                index * 60
+                index * 55
             );
         }
     );
 
 
+    // Give the browser a full paint opportunity with the final strips
+    // visible before fading the animated flyer copies away.
     await new Promise(
         resolve =>
-            setTimeout(
-                resolve,
-                180
+            requestAnimationFrame(
+                () =>
+                    requestAnimationFrame(
+                        resolve
+                    )
             )
     );
 
 
-    for (const item of flyers) {
+    const flyerFades =
+        flyers.map(
+            item =>
+                item.flyer.animate(
+                    [
+                        { opacity: 1 },
+                        { opacity: 0 }
+                    ],
+                    {
+                        duration: 170,
+                        fill: "forwards"
+                    }
+                )
+        );
 
-        const fade =
-            item.flyer.animate(
-                [
-                    { opacity: 1 },
-                    { opacity: 0 }
-                ],
-                {
-                    duration: 180,
-                    fill: "forwards"
+
+    await Promise.all(
+        flyerFades.map(
+            async fade => {
+
+                try {
+                    await fade.finished;
                 }
-            );
+                catch {
+                    // Harmless.
+                }
+            }
+        )
+    );
 
 
-        try {
-            await fade.finished;
-        }
-        catch {
-            // Harmless.
-        }
-
-
+    for (const item of flyers) {
         item.flyer.remove();
     }
 
@@ -2974,6 +2988,28 @@ async function refreshState(
 
         const oldState =
             state;
+
+
+        // While the Draft Order shuffle/reveal is actively animating,
+        // do not let the normal ~900ms poll re-render the same scene.
+        // A mid-animation re-render recreates the hidden target strips
+        // and causes a brief blank flash when the flyer copies disappear.
+        //
+        // If the Host advances out of draft_order, allow that new phase
+        // through immediately.
+        if (
+            draftOrderRevealRunning
+            &&
+            oldState?.event?.status === "draft_order"
+            &&
+            data?.event?.status === "draft_order"
+        ) {
+
+            state =
+                data;
+
+            return;
+        }
 
 
         newlyJoinedPlayerIds = [];
