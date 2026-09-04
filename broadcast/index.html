@@ -2757,6 +2757,149 @@ input {
     margin-top: 10px;
 }
 
+
+/* =========================================================
+   LOBBY AUDIENCE LOWER-THIRD PASS
+   ========================================================= */
+
+.lobby-with-audience {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        auto
+        auto
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 14px;
+}
+
+.lobby-with-audience > .scene-kicker {
+    margin-bottom: 0;
+}
+
+.lobby-with-audience > .scene-subtitle {
+    margin-top: 0;
+}
+
+.lobby-player-stage {
+    min-height: 0;
+}
+
+.lobby-player-stage .cast-grid {
+    margin-top: 0;
+    min-height: 0;
+    align-content: start;
+}
+
+/* Bottom band is always the final row in the Lobby grid. */
+.lobby-bottom-band {
+    grid-row: 6;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 300px;
+    gap: 18px;
+    align-items: end;
+    min-height: 0;
+}
+
+.lobby-audience-panel {
+    align-self: stretch;
+    min-height: 0;
+}
+
+.lobby-audience-panel > .audience-panel {
+    height: 100%;
+    min-height: 0;
+}
+
+/* Audience UI should read as a neutral information layer,
+   not as another competitor/player color treatment. */
+.audience-panel::before,
+.qr-panel::before,
+.audience-strip-panel::before {
+    display: none;
+}
+
+.audience-panel,
+.qr-panel,
+.audience-strip-panel,
+.audience-champion-card {
+    border-color: rgba(255,255,255,.11);
+    box-shadow: 0 18px 40px rgba(0,0,0,.18);
+}
+
+.audience-count-pill {
+    border-color: rgba(255,255,255,.12);
+    background: rgba(255,255,255,.055);
+    color: #fff;
+}
+
+.audience-count-pill span {
+    color: var(--muted);
+}
+
+.lobby-qr-panel {
+    width: 300px;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    justify-self: end;
+    align-self: end;
+    padding: 14px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto
+        auto;
+    gap: 8px;
+}
+
+.lobby-qr-title {
+    font-size: .94rem;
+}
+
+.lobby-qr-panel .qr-wrap {
+    min-height: 0;
+    align-content: center;
+}
+
+.lobby-qr-panel .qr-canvas-wrap {
+    padding: 8px;
+}
+
+.lobby-qr-panel .qr-canvas-wrap canvas {
+    width: 174px;
+    height: 174px;
+}
+
+.lobby-qr-room {
+    font-size: .84rem;
+}
+
+.lobby-qr-link {
+    color: var(--muted);
+    font-size: .70rem;
+    line-height: 1.2;
+}
+
+@media (max-width: 1320px) {
+    .lobby-bottom-band {
+        grid-template-columns: minmax(0,1fr) 280px;
+    }
+
+    .lobby-qr-panel {
+        width: 280px;
+        max-width: 280px;
+    }
+
+    .lobby-qr-panel .qr-canvas-wrap canvas {
+        width: 158px;
+        height: 158px;
+    }
+}
+
 </style>
 </head>
 
@@ -4481,7 +4624,7 @@ function renderLobbyGambleQrPanel() {
                 Room <strong>${escapeHtml(roomCode || "------")}</strong>
             </div>
 
-            <div class="lobby-qr-link" data-gamble-url-label="base">
+            <div class="lobby-qr-link">
                 ragaar31.github.io/tabs-charity-war-chest/gamble
             </div>
         </section>
@@ -4948,26 +5091,24 @@ function renderLobby() {
                 Audience Gamblers can join right now and compete on their own leaderboard.
             </div>
 
-            <div class="lobby-layout">
+            <div class="lobby-player-stage">
+                ${renderCastGrid(
+                    state.players,
+                    false,
+                    true
+                )}
+            </div>
 
-                <div class="lobby-left-stack">
+            <div></div>
 
-                    <div class="lobby-player-stage">
-                        ${renderCastGrid(
-                            state.players,
-                            false,
-                            true
-                        )}
-                    </div>
+            <div class="lobby-bottom-band">
 
-                    <div class="lobby-audience-panel">
-                        ${renderAudiencePreviewPanel(
-                            "Audience Lobby",
-                            "Smaller viewer cards appear here as spectators scan in for the gambling role.",
-                            18
-                        )}
-                    </div>
-
+                <div class="lobby-audience-panel">
+                    ${renderAudiencePreviewPanel(
+                        "Audience Lobby",
+                        "Smaller viewer cards appear here as spectators scan in for the gambling role.",
+                        18
+                    )}
                 </div>
 
                 ${renderLobbyGambleQrPanel()}
