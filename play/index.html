@@ -1597,6 +1597,25 @@ body.player-connected main > p:last-of-type {
     }
 }
 
+
+.rainy-day-notice {
+    margin-bottom: 14px;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--player-rgb), .30);
+    background: rgba(var(--player-rgb), .09);
+}
+
+.rainy-day-notice strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.war-bond-active {
+    border-color: rgba(var(--player-rgb), .42);
+    background: rgba(var(--player-rgb), .10);
+}
+
 </style>
 </head>
 
@@ -1853,6 +1872,7 @@ let players = [];
 let picks = [];
 let units = [];
 let items = [];
+let consumableStatus = null;
 let matches = [];
 let roundStates = [];
 let armySubmission = null;
@@ -1925,37 +1945,37 @@ const shopItems = [
     {
         code: "skill-point",
         name: "Skill Point",
-        price: 1500,
+        price: 1000,
         description:
             "Gain 1 Skill Point. Maximum one purchased per Shop phase."
     },
     {
         code: "reinforcements",
         name: "Reinforcements",
-        price: 750,
+        price: 500,
         description:
             "+750 army points in one regular-season fight."
     },
     {
         code: "mercenary",
         name: "Mercenary Contract",
-        price: 750,
+        price: 500,
         description:
             "Use one undrafted B/C/D-tier unit in one regular-season fight."
     },
     {
         code: "war-bond",
         name: "War Bond",
-        price: 500,
+        price: 250,
         description:
-            "Activate before your fight. If you win, gain $1,000."
+            "Activate during Army Build. If you win your fight, gain $1,000."
     },
     {
         code: "rainy-day",
         name: "Rainy Day Fund",
-        price: 750,
+        price: 500,
         description:
-            "After a betting round where you lose at least $1,500, use this to gain $1,000."
+            "Automatically triggers after a round where your net betting loss is at least $1,500. Gain $1,000."
     }
 ];
 
@@ -3330,6 +3350,29 @@ async function loadState() {
         itemResult.data ?? [];
 
 
+    const consumableResult =
+        await db.rpc(
+            "get_my_consumable_status",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (consumableResult.error) {
+        console.error(
+            consumableResult.error
+        );
+        return;
+    }
+
+
+    consumableStatus =
+        consumableResult.data
+        ?? {};
+
+
     const matchResult =
         await db
             .from("matches")
@@ -4584,6 +4627,8 @@ function renderShop() {
 
 
     shop.innerHTML =
+        rainyDayNoticeHtml()
+        +
         shopItems.map(
             item => {
 
@@ -4665,7 +4710,14 @@ function renderShop() {
         );
 
 
-    if (items.length === 0) {
+    const activeItems =
+        items.filter(
+            item =>
+                item.quantity > 0
+        );
+
+
+    if (activeItems.length === 0) {
 
         inventory.innerHTML = `
             <p class="status">
@@ -4677,11 +4729,7 @@ function renderShop() {
     else {
 
         inventory.innerHTML =
-            items
-            .filter(
-                item =>
-                    item.quantity > 0
-            )
+            activeItems
             .map(
                 item => `
                     <div class="inventory-item">
@@ -5035,6 +5083,8 @@ function renderSkillTree() {
             }
         </div>
 
+        ${rainyDayNoticeHtml()}
+
         <div class="skill-points-summary">
             <span>Skill Points Available</span>
             <strong>${me.skill_points} SP</strong>
@@ -5362,6 +5412,203 @@ function itemQuantity(
         ?.quantity
         ?? 0
     );
+}
+
+
+function currentWarBondUse() {
+
+    return (
+        consumableStatus
+        ?.war_bond
+        ?? null
+    );
+}
+
+
+function warBondActivated() {
+
+    return (
+        currentWarBondUse()
+        ?.status ===
+        "activated"
+    );
+}
+
+
+function recentRainyDayUse() {
+
+    const uses =
+        consumableStatus
+        ?.recent_uses
+        ?? [];
+
+
+    let targetRound = null;
+
+
+    if (
+        eventData?.status === "shop"
+        &&
+        Number(eventData.current_round) > 1
+    ) {
+
+        targetRound =
+            Number(eventData.current_round)
+            -
+            1;
+    }
+
+
+    else if (
+        eventData?.status ===
+        "regular_complete"
+    ) {
+
+        targetRound = 3;
+    }
+
+
+    if (!targetRound) {
+        return null;
+    }
+
+
+    return (
+        uses.find(
+            row =>
+                row.item_code ===
+                    "rainy-day"
+                &&
+                row.status ===
+                    "paid"
+                &&
+                Number(row.round_number) ===
+                    targetRound
+        )
+        ?? null
+    );
+}
+
+
+function rainyDayNoticeHtml() {
+
+    const use =
+        recentRainyDayUse();
+
+
+    if (!use) {
+        return "";
+    }
+
+
+    return `
+        <div class="rainy-day-notice">
+
+            <strong>
+                ☔ Rainy Day Fund Triggered
+            </strong>
+
+            <div class="status">
+                Round ${use.round_number} betting net:
+                ${Number(use.betting_net).toLocaleString()}
+                • +$${Number(use.payout_amount).toLocaleString()}
+                returned to your War Chest.
+            </div>
+
+        </div>
+    `;
+}
+
+
+function warBondArmyControlHtml() {
+
+    const use =
+        currentWarBondUse();
+
+
+    if (
+        use?.status ===
+        "activated"
+    ) {
+
+        return `
+            <div class="consumable-option war-bond-active">
+
+                <strong>
+                    ✨ War Bond Active
+                </strong>
+
+                <div class="status">
+                    Win this fight to gain +$1,000.
+                    The War Bond has already been consumed.
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    if (
+        itemQuantity(
+            "war-bond"
+        ) <= 0
+    ) {
+
+        return "";
+    }
+
+
+    return `
+        <div class="consumable-option">
+
+            <strong>
+                War Bond
+            </strong>
+
+            <div class="status">
+                Commit one War Bond to this fight.
+                It is consumed immediately.
+                Win to gain +$1,000.
+            </div>
+
+            <button
+                style="margin-top:10px;"
+                onclick="activateWarBond()"
+            >
+                Activate War Bond
+            </button>
+
+        </div>
+    `;
+}
+
+
+async function activateWarBond() {
+
+    const {
+        data,
+        error
+    } =
+        await db.rpc(
+            "activate_war_bond",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        window.alert(
+            error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
 }
 
 
@@ -6051,6 +6298,8 @@ function renderArmyBuilder() {
                 The host can reopen it if you need to make a correction.
             </p>
 
+            ${warBondArmyControlHtml()}
+
             <div class="submitted-army">
 
                 ${zoneHtml}
@@ -6237,6 +6486,9 @@ function renderArmyBuilder() {
             </div>
 
         </div>
+
+
+        ${warBondArmyControlHtml()}
 
 
         ${
