@@ -5268,6 +5268,28 @@ input {
         border-color 300ms ease;
 }
 
+.army-build-tier-target-dot.is-submitted {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 70%,
+            white 30%
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 74%,
+            white 26%
+        );
+    box-shadow:
+        0 0 9px
+        color-mix(
+            in srgb,
+            var(--player) 28%,
+            transparent
+        );
+}
+
 .army-build-tier-target-dot.is-lit {
     transform: scale(1.35);
     border-color:
@@ -11872,6 +11894,123 @@ function armyBuildProgress(
 }
 
 
+function armyBuildComparableSignature(
+    entry
+) {
+
+    return [
+        Number(
+            entry?.total_units
+            ?? 0
+        ),
+        Number(
+            entry?.total_cost
+            ?? 0
+        ),
+        Number(
+            displayedArmyBudget(
+                entry
+            )
+        ),
+        entry?.submitted
+        ? 1
+        : 0
+    ].join(":");
+}
+
+
+function armyBuildPreviousEntryForRender(
+    playerId
+) {
+
+    return (
+        armyBuildEntriesForSnapshot(
+            previousState
+        )
+        .find(
+            entry =>
+                entry.player_id ===
+                playerId
+        )
+        ?? null
+    );
+}
+
+
+function armyBuildRenderProgress(
+    entry
+) {
+
+    const liveProgress =
+        armyBuildProgress(
+            entry
+        );
+
+
+    const samePhase =
+        previousState?.event?.status ===
+        "army_build";
+
+
+    const previousEntry =
+        armyBuildPreviousEntryForRender(
+            entry.player_id
+        );
+
+
+    if (
+        !samePhase
+        &&
+        entry?.submitted
+    ) {
+
+        return 0;
+    }
+
+
+    if (!previousEntry) {
+
+        const totalUnits =
+            Number(
+                entry?.total_units
+                ?? 0
+            );
+
+
+        if (
+            totalUnits <= 0
+            &&
+            !entry?.submitted
+        ) {
+
+            return liveProgress;
+        }
+
+
+        return 0;
+    }
+
+
+    if (
+        armyBuildComparableSignature(
+            previousEntry
+        )
+        !==
+        armyBuildComparableSignature(
+            entry
+        )
+    ) {
+
+        return armyBuildProgress(
+            previousEntry
+        );
+    }
+
+
+    return liveProgress;
+}
+
+
 function armyBuildAnimationSignature(
     snapshot,
     entry
@@ -12353,16 +12492,18 @@ function armyBuildFillIntensity(
 
 
     /*
-       Near-full armies should look near-full, and a capped army should
-       be exactly the player's color.
+       Keep the fill strong and readable, but not fully saturated.
+       A completely full army should read at about 75% of the player color.
     */
     if (value >= .999) {
-        return 1;
+        return .75;
     }
 
 
     return Math.min(
-        1,
+        .75,
+        .75
+        *
         Math.pow(
             value,
             .78
@@ -12753,20 +12894,30 @@ function renderArmyBuildRow(
         );
 
 
+    const renderProgress =
+        armyBuildRenderProgress(
+            entry
+        );
+
+
     /*
        No percentage or current army value is shown.
        The color wash is intentionally the only visual read on capacity.
+
+       Use renderProgress here so a changed row appears at its PREVIOUS
+       fill amount first, then visibly animates to the new amount rather
+       than flashing the new color for a frame before the animation starts.
     */
     const intensity =
         armyBuildFillIntensity(
-            progress
+            renderProgress
         )
         .toFixed(3);
 
 
     const glow =
         armyBuildInsetGlow(
-            progress
+            renderProgress
         )
         .toFixed(3);
 
@@ -12838,7 +12989,16 @@ function renderArmyBuildRow(
 
                 <div class="army-build-tier-right">
 
-                    <div class="army-build-tier-target-dot"></div>
+                    <div
+                        class="
+                            army-build-tier-target-dot
+                            ${
+                                submitted
+                                ? "is-submitted"
+                                : ""
+                            }
+                        "
+                    ></div>
 
                     <div
                         class="
