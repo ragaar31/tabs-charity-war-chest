@@ -3960,7 +3960,31 @@ input {
                 var(--unlock-color) 24%,
                 transparent
             );
-        opacity: .85;
+        opacity: .9;
+    }
+
+    86% {
+        transform: translate(-50%,-50%) scale(1.08);
+        background:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 20%,
+                #111722
+            );
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 22%,
+                rgba(255,255,255,.28)
+            );
+        box-shadow:
+            0 0 7px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 12%,
+                transparent
+            );
+        opacity: .72;
     }
 
     100% {
@@ -3995,14 +4019,20 @@ input {
         border-color:
             color-mix(
                 in srgb,
-                var(--unlock-color) 78%,
-                white 12%
+                var(--unlock-color) 88%,
+                white 8%
             );
         box-shadow:
-            0 0 24px
+            0 0 0 2px
             color-mix(
                 in srgb,
                 var(--unlock-color) 24%,
+                transparent
+            ),
+            0 0 30px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 42%,
                 transparent
             );
         background:
@@ -4010,10 +4040,10 @@ input {
                 130deg,
                 color-mix(
                     in srgb,
-                    var(--unlock-color) 18%,
-                    transparent
+                    var(--unlock-color) 28%,
+                    rgba(11,15,23,.90)
                 ),
-                rgba(11,15,23,.92) 58%
+                rgba(11,15,23,.92) 62%
             );
     }
 
@@ -4533,6 +4563,13 @@ let newlyJoinedAudienceKeys = [];
 let draftOrderRevealPending = false;
 let draftOrderRevealSourceRects = {};
 let draftOrderRevealRunning = false;
+
+/*
+   Skill unlock animations intentionally last several seconds.
+   Prevent the normal 900ms Broadcast poll from replacing the Shop DOM
+   before the current unlock animation has finished.
+*/
+let shopUnlockAnimationUntil = 0;
 
 
 function escapeHtml(value) {
@@ -5646,6 +5683,32 @@ async function refreshState(
 
         const oldState =
             state;
+
+
+        /*
+           Do the same for the Shop skill-unlock sequence.
+
+           The old behavior rebuilt the entire Shop scene every ~900ms,
+           which destroyed the animated circle/node halfway through:
+           beam -> circle -> DOM replacement -> ownership marker suddenly
+           present in the new markup.
+
+           Keep the current Shop DOM intact until the animation completes.
+           We deliberately DO NOT assign state = data here. If another
+           skill is purchased during the lock, the next normal refresh
+           will still see that change and animate it rather than swallowing
+           it inside a suppressed render.
+        */
+        if (
+            oldState?.event?.status === "shop"
+            &&
+            data?.event?.status === "shop"
+            &&
+            performance.now() <
+                shopUnlockAnimationUntil
+        ) {
+            return;
+        }
 
 
         // While the Draft Order shuffle/reveal is actively animating,
@@ -9965,6 +10028,38 @@ function runShopPostRenderAnimations() {
 
     const unlocks =
         shopNewUnlocks();
+
+
+    if (unlocks.length) {
+
+        /*
+           Current visual sequence:
+             streak        ~700ms
+             anchor starts 560ms
+             owner starts  1540ms
+             node starts   2240ms
+             cleanup       3600ms
+
+           Give the final queued unlock a little safety margin so the
+           next 900ms poll cannot land on the tail of the animation.
+        */
+        const unlockSequenceDuration =
+            4050
+            +
+            Math.max(
+                0,
+                unlocks.length - 1
+            )
+            *
+            320;
+
+
+        shopUnlockAnimationUntil =
+            performance.now()
+            +
+            unlockSequenceDuration;
+    }
+
 
     unlocks.forEach(
         (unlock, index) =>
