@@ -632,6 +632,15 @@ a { color: white; }
     }
 }
 
+
+.test-sp-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 8px 10px;
+    font-size: .78rem;
+    border: 1px dashed rgba(255,255,255,.18);
+}
+
 </style>
 </head>
 
@@ -2246,6 +2255,13 @@ function renderShopHost() {
                         Projected Army:
                         ${projectedArmyBudget(player).toLocaleString()}
                     </div>
+
+                    <button
+                        class="secondary test-sp-button"
+                        onclick="grantTestSkillPoint('${player.id}')"
+                    >
+                        🧪 +1 Test SP
+                    </button>
 
                     ${
                         player.debt > 0
@@ -4732,6 +4748,77 @@ async function settleFight() {
             "Fight settled. Next fight is ready for army reveal."
         );
     }
+
+
+    await loadState();
+}
+
+
+async function grantTestSkillPoint(
+    playerId
+) {
+
+    if (
+        !currentEventId
+        ||
+        eventData?.status !== "shop"
+    ) {
+        return;
+    }
+
+
+    const player =
+        players.find(
+            row =>
+                row.id ===
+                playerId
+        );
+
+
+    setMessage(
+        `Granting +1 test SP to ${
+            player?.display_name
+            ?? "player"
+        }...`
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await db.rpc(
+            "grant_test_skill_point",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_player_id:
+                    playerId
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        setMessage(
+            error.message
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        `${
+            player?.display_name
+            ?? "Player"
+        } now has ${Number(data ?? 0)} unspent SP.`
+    );
 
 
     await loadState();
