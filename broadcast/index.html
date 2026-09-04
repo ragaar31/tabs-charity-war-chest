@@ -5158,20 +5158,7 @@ input {
     width: 100%;
     z-index: 0;
     pointer-events: none;
-    background:
-        linear-gradient(
-            90deg,
-            color-mix(
-                in srgb,
-                var(--player) 88%,
-                transparent
-            ),
-            color-mix(
-                in srgb,
-                var(--player) 68%,
-                transparent
-            )
-        );
+    background: var(--player);
     opacity:
         var(--build-intensity);
     transition:
@@ -5562,6 +5549,78 @@ input {
 @media (max-width: 1500px) {
     .army-build-owner-label {
         font-size: .70rem;
+    }
+}
+
+
+
+/* =========================================================
+   ARMY BUILD — TIER GLOW / FILL POLISH
+   ========================================================= */
+
+.army-build-tier-card {
+    transition:
+        border-color 280ms ease,
+        box-shadow 280ms ease;
+}
+
+.army-build-tier-fill {
+    background: var(--player) !important;
+    opacity: var(--build-intensity);
+    transition:
+        opacity 520ms cubic-bezier(.22,.74,.24,1);
+}
+
+.army-build-tier-card::after {
+    box-shadow:
+        inset 0 0 22px color-mix(
+            in srgb,
+            var(--player) 34%,
+            transparent
+        );
+    opacity: var(--build-glow);
+    transition:
+        opacity 520ms cubic-bezier(.22,.74,.24,1);
+}
+
+.army-build-tier-card.is-pulsing {
+    animation:
+        armyBuildTierOuterPulse 760ms cubic-bezier(.18,.76,.24,1) both;
+}
+
+@keyframes armyBuildTierOuterPulse {
+    0% {
+        border-color: rgba(255,255,255,.08);
+        box-shadow: 0 8px 18px rgba(0,0,0,.12);
+    }
+
+    32% {
+        border-color: color-mix(
+            in srgb,
+            var(--player) 72%,
+            rgba(255,255,255,.10)
+        );
+        box-shadow:
+            0 0 0 1px color-mix(
+                in srgb,
+                var(--player) 34%,
+                transparent
+            ),
+            0 0 18px color-mix(
+                in srgb,
+                var(--player) 24%,
+                transparent
+            ),
+            0 0 34px color-mix(
+                in srgb,
+                var(--player) 14%,
+                transparent
+            );
+    }
+
+    100% {
+        border-color: rgba(255,255,255,.08);
+        box-shadow: 0 8px 18px rgba(0,0,0,.12);
     }
 }
 
@@ -12115,28 +12174,38 @@ function renderArmyBuildRow(
     */
     const intensity =
         (
-            .025
-            +
-            Math.pow(
-                progress,
-                .82
-            )
-            *
-            .58
+            progress <= 0
+                ? 0
+                : Math.min(
+                    1,
+                    .06
+                    +
+                    Math.pow(
+                        progress,
+                        1.08
+                    )
+                    *
+                    .94
+                )
         )
         .toFixed(3);
 
 
     const glow =
         (
-            .035
-            +
-            Math.pow(
-                progress,
-                .90
-            )
-            *
-            .38
+            progress <= 0
+                ? 0
+                : Math.min(
+                    .34,
+                    .02
+                    +
+                    Math.pow(
+                        progress,
+                        .92
+                    )
+                    *
+                    .20
+                )
         )
         .toFixed(3);
 
@@ -12648,25 +12717,35 @@ function playArmyBuildRowAnimation(
 
 
                 const intensity =
-                    .025
-                    +
-                    Math.pow(
-                        progress,
-                        .82
-                    )
-                    *
-                    .58;
+                    progress <= 0
+                        ? 0
+                        : Math.min(
+                            1,
+                            .06
+                            +
+                            Math.pow(
+                                progress,
+                                1.08
+                            )
+                            *
+                            .94
+                        );
 
 
                 const glow =
-                    .035
-                    +
-                    Math.pow(
-                        progress,
-                        .90
-                    )
-                    *
-                    .38;
+                    progress <= 0
+                        ? 0
+                        : Math.min(
+                            .34,
+                            .02
+                            +
+                            Math.pow(
+                                progress,
+                                .92
+                            )
+                            *
+                            .20
+                        );
 
 
                 fill.style.opacity =
@@ -12693,7 +12772,7 @@ function playArmyBuildRowAnimation(
                         tierCard.classList.remove(
                             "is-pulsing"
                         ),
-                    620
+                    780
                 );
             }
         },
