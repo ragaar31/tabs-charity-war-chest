@@ -2611,6 +2611,117 @@ input {
     gap: 18px;
 }
 
+.lobby-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 18px;
+    align-items: end;
+}
+
+.lobby-left-stack {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+.lobby-player-stage .cast-grid {
+    margin-top: 0;
+    grid-auto-rows: minmax(96px, auto);
+    min-height: 206px;
+    align-content: start;
+}
+
+.lobby-audience-panel {
+    align-self: end;
+    min-height: 150px;
+}
+
+.lobby-audience-panel .audience-preview-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.lobby-qr-panel {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    justify-self: end;
+    align-self: end;
+    padding: 16px;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 10px;
+}
+
+.lobby-qr-panel::before {
+    width: 3px;
+}
+
+.lobby-qr-title {
+    margin: 0;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.2;
+    font-weight: 900;
+}
+
+.lobby-qr-panel .qr-wrap {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    justify-items: center;
+    align-content: center;
+}
+
+.lobby-qr-panel .qr-canvas-wrap {
+    padding: 10px;
+    border-radius: 18px;
+    min-height: 0;
+}
+
+.lobby-qr-panel .qr-canvas-wrap canvas {
+    width: 180px;
+    height: 180px;
+}
+
+.lobby-qr-room {
+    text-align: center;
+    font-size: .92rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.lobby-qr-room strong {
+    color: #f2c94c;
+}
+
+.lobby-qr-link {
+    text-align: center;
+    color: #dfe6f3;
+    font-size: .8rem;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+@media (max-width: 1320px) {
+    .lobby-layout {
+        grid-template-columns: minmax(0, 1fr) 280px;
+    }
+
+    .lobby-player-stage .cast-grid {
+        min-height: 194px;
+    }
+
+    .lobby-qr-panel {
+        max-width: 280px;
+    }
+
+    .lobby-qr-panel .qr-canvas-wrap canvas {
+        width: 160px;
+        height: 160px;
+    }
+}
+
 .champion-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(300px, .9fr);
@@ -4352,6 +4463,32 @@ function renderGambleQrPanel(
 }
 
 
+function renderLobbyGambleQrPanel() {
+
+    return `
+        <section class="qr-panel lobby-qr-panel">
+            <h3 class="lobby-qr-title">
+                Scan to Join as an Audience Gambler
+            </h3>
+
+            <div class="qr-wrap">
+                <div class="qr-canvas-wrap">
+                    <canvas data-gamble-qr="true"></canvas>
+                </div>
+            </div>
+
+            <div class="lobby-qr-room">
+                Room <strong>${escapeHtml(roomCode || "------")}</strong>
+            </div>
+
+            <div class="lobby-qr-link" data-gamble-url-label="base">
+                ragaar31.github.io/tabs-charity-war-chest/gamble
+            </div>
+        </section>
+    `;
+}
+
+
 function renderAudiencePoolPanel(
     match,
     isFinalWar = false
@@ -4540,7 +4677,10 @@ function renderBroadcastDecorations() {
         )
         .forEach(
             node => {
-                node.textContent = url;
+                node.textContent =
+                    node.dataset.gambleUrlLabel === "base"
+                    ? "ragaar31.github.io/tabs-charity-war-chest/gamble"
+                    : url;
             }
         );
 
@@ -4808,24 +4948,29 @@ function renderLobby() {
                 Audience Gamblers can join right now and compete on their own leaderboard.
             </div>
 
-            ${renderCastGrid(
-                state.players,
-                false,
-                true
-            )}
+            <div class="lobby-layout">
 
-            <div class="scene-lower-two">
+                <div class="lobby-left-stack">
 
-                ${renderAudiencePreviewPanel(
-                    "Audience Lobby",
-                    "Smaller viewer cards appear here as spectators scan in for the gambling role.",
-                    18
-                )}
+                    <div class="lobby-player-stage">
+                        ${renderCastGrid(
+                            state.players,
+                            false,
+                            true
+                        )}
+                    </div>
 
-                ${renderGambleQrPanel(
-                    "Scan to Join",
-                    "Open the Audience portal, enter the room code, and start building a separate spectator bankroll."
-                )}
+                    <div class="lobby-audience-panel">
+                        ${renderAudiencePreviewPanel(
+                            "Audience Lobby",
+                            "Smaller viewer cards appear here as spectators scan in for the gambling role.",
+                            18
+                        )}
+                    </div>
+
+                </div>
+
+                ${renderLobbyGambleQrPanel()}
 
             </div>
 
