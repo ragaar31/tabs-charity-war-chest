@@ -3823,6 +3823,9 @@ input {
 
 .shop-skill-node {
     position: relative;
+    will-change:
+        transform,
+        box-shadow;
     z-index: 1;
     min-width: 0;
     min-height: 0;
@@ -3845,6 +3848,11 @@ input {
 
 .shop-skill-anchor {
     --unlock-color: rgba(255,255,255,.7);
+    will-change:
+        transform,
+        opacity,
+        filter,
+        box-shadow;
     position: absolute;
     left: 10px;
     top: 50%;
@@ -3865,134 +3873,124 @@ input {
     animation:
         shopAnchorActivate
         720ms
-        cubic-bezier(.18,.82,.22,1)
+        cubic-bezier(.33,.02,.24,1)
         both;
 }
 
 @keyframes shopAnchorActivate {
     0% {
-        transform: translate(-50%,-50%) scale(1);
+        transform:
+            translate(-50%,-50%)
+            scale(.96);
         background: #111722;
-        border-color: rgba(255,255,255,.24);
-        box-shadow: 0 0 0 rgba(0,0,0,0);
-        opacity: 1;
+        border-color:
+            rgba(255,255,255,.24);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
+        opacity: .92;
+        filter: brightness(1);
     }
 
-    26% {
-        transform: translate(-50%,-50%) scale(1.18);
+    18% {
+        transform:
+            translate(-50%,-50%)
+            scale(1.08);
         background:
-            color-mix(
-                in srgb,
-                var(--unlock-color) 58%,
-                #111722
-            );
-        border-color:
-            color-mix(
-                in srgb,
-                var(--unlock-color) 72%,
-                white 8%
-            );
-        box-shadow:
-            0 0 0 3px
-            color-mix(
-                in srgb,
-                var(--unlock-color) 12%,
-                transparent
-            ),
-            0 0 10px
             color-mix(
                 in srgb,
                 var(--unlock-color) 34%,
-                transparent
+                #111722
             );
-        opacity: 1;
-    }
-
-    48% {
-        transform: translate(-50%,-50%) scale(1.56);
-        background: var(--unlock-color);
         border-color:
             color-mix(
                 in srgb,
-                var(--unlock-color) 85%,
+                var(--unlock-color) 45%,
+                rgba(255,255,255,.30)
+            );
+        box-shadow:
+            0 0 8px
+            color-mix(
+                in srgb,
+                var(--unlock-color) 22%,
+                transparent
+            );
+        opacity: 1;
+        filter: brightness(1.08);
+    }
+
+    46% {
+        transform:
+            translate(-50%,-50%)
+            scale(1.48);
+        background:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 96%,
+                white 2%
+            );
+        border-color:
+            color-mix(
+                in srgb,
+                var(--unlock-color) 86%,
                 white 10%
             );
         box-shadow:
-            0 0 0 6px
+            0 0 0 5px
             color-mix(
                 in srgb,
-                var(--unlock-color) 24%,
+                var(--unlock-color) 20%,
                 transparent
             ),
-            0 0 20px
+            0 0 19px
             color-mix(
                 in srgb,
-                var(--unlock-color) 58%,
+                var(--unlock-color) 54%,
                 transparent
             );
         opacity: 1;
+        filter: brightness(1.18);
     }
 
-    70% {
-        transform: translate(-50%,-50%) scale(1.22);
+    72% {
+        transform:
+            translate(-50%,-50%)
+            scale(1.16);
         background:
             color-mix(
                 in srgb,
-                var(--unlock-color) 52%,
+                var(--unlock-color) 42%,
                 #111722
             );
         border-color:
             color-mix(
                 in srgb,
-                var(--unlock-color) 48%,
+                var(--unlock-color) 38%,
                 rgba(255,255,255,.28)
             );
         box-shadow:
-            0 0 0 3px
+            0 0 10px
             color-mix(
                 in srgb,
-                var(--unlock-color) 16%,
-                transparent
-            ),
-            0 0 12px
-            color-mix(
-                in srgb,
-                var(--unlock-color) 24%,
+                var(--unlock-color) 22%,
                 transparent
             );
         opacity: .9;
-    }
-
-    84% {
-        transform: translate(-50%,-50%) scale(1.06);
-        background:
-            color-mix(
-                in srgb,
-                var(--unlock-color) 15%,
-                #111722
-            );
-        border-color:
-            color-mix(
-                in srgb,
-                var(--unlock-color) 18%,
-                rgba(255,255,255,.28)
-            );
-        box-shadow:
-            0 0 5px
-            color-mix(
-                in srgb,
-                var(--unlock-color) 10%,
-                transparent
-            );
-        opacity: .78;
+        filter: brightness(1.08);
     }
 
     100% {
-        transform: translate(-50%,-50%) scale(1);
+        transform:
+            translate(-50%,-50%)
+            scale(1);
         background: #111722;
-        border-color: rgba(255,255,255,.28);
-        box-shadow: 0 0 0 rgba(0,0,0,0);
+        border-color:
+            rgba(255,255,255,.28);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
         opacity: 1;
+        filter: brightness(1);
     }
 }
 
@@ -4000,22 +3998,22 @@ input {
     animation:
         shopNodeUnlock
         760ms
-        cubic-bezier(.18,.82,.22,1)
+        cubic-bezier(.32,.02,.26,1)
         both;
 }
 
 @keyframes shopNodeUnlock {
     0% {
-        box-shadow: 0 0 0 rgba(0,0,0,0);
-        border-color: rgba(255,255,255,.085);
+        transform: scale(1);
+        border-color:
+            rgba(255,255,255,.15);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
     }
 
-    22% {
-        box-shadow: 0 0 0 rgba(0,0,0,0);
-        border-color: rgba(255,255,255,.10);
-    }
-
-    48% {
+    45% {
+        transform: scale(1.012);
         border-color:
             color-mix(
                 in srgb,
@@ -4023,44 +4021,97 @@ input {
                 white 8%
             );
         box-shadow:
-            0 0 0 2px
+            0 0 0 1px
             color-mix(
                 in srgb,
-                var(--unlock-color) 18%,
+                var(--unlock-color) 15%,
                 transparent
             ),
-            0 0 25px
+            0 0 24px
             color-mix(
                 in srgb,
-                var(--unlock-color) 34%,
+                var(--unlock-color) 31%,
                 transparent
-            );
-        background:
-            linear-gradient(
-                130deg,
-                color-mix(
-                    in srgb,
-                    var(--unlock-color) 23%,
-                    rgba(11,15,23,.90)
-                ),
-                rgba(11,15,23,.92) 62%
             );
     }
 
     100% {
-        border-color: rgba(255,255,255,.15);
-        box-shadow: 0 0 0 rgba(0,0,0,0);
-        background:
-            linear-gradient(
-                130deg,
-                rgba(255,255,255,.06),
-                rgba(11,15,23,.90) 48%
-            );
+        transform: scale(1);
+        border-color:
+            rgba(255,255,255,.15);
+        box-shadow:
+            0 0 0
+            rgba(0,0,0,0);
     }
+}
+
+.shop-skill-node::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+        color-mix(
+            in srgb,
+            var(--unlock-color, transparent) 24%,
+            transparent
+        );
+    opacity: 0;
+    will-change:
+        opacity,
+        filter;
+}
+
+.shop-skill-node.shop-node-unlock::after {
+    animation:
+        shopNodeColorWash
+        760ms
+        cubic-bezier(.32,.02,.26,1)
+        both;
+}
+
+@keyframes shopNodeColorWash {
+    0% {
+        opacity: 0;
+        filter:
+            saturate(.9)
+            brightness(1);
+    }
+
+    42% {
+        opacity: .82;
+        filter:
+            saturate(1.12)
+            brightness(1.08);
+    }
+
+    100% {
+        opacity: 0;
+        filter:
+            saturate(1)
+            brightness(1);
+    }
+}
+
+.shop-skill-node-head,
+.shop-skill-copy,
+.shop-owner-rail {
+    position: relative;
+    z-index: 1;
+}
+
+.shop-skill-anchor {
+    z-index: 2;
 }
 
 .shop-skill-streak {
     --streak: #ffffff;
+    will-change:
+        transform,
+        opacity,
+        filter;
     position: fixed;
     z-index: 120;
     height: 4px;
@@ -4231,6 +4282,10 @@ input {
 
 .shop-owner-dot {
     --owner: #7c8aa6;
+    will-change:
+        transform,
+        opacity,
+        filter;
     width: 9px;
     height: 9px;
     flex: 0 0 auto;
@@ -4255,36 +4310,51 @@ input {
 .shop-owner-dot.shop-owner-new {
     animation:
         shopOwnerFadeIn
-        440ms
-        cubic-bezier(.18,.78,.24,1)
+        460ms
+        cubic-bezier(.25,.04,.24,1)
         both;
 }
 
 @keyframes shopOwnerFadeIn {
     0% {
         opacity: 0;
-        transform: scale(.68);
-        box-shadow: none;
-        filter: saturate(.8);
-    }
-
-    42% {
-        opacity: .45;
-        transform: scale(.84);
-        filter: saturate(.95);
-    }
-
-    74% {
-        opacity: .86;
-        transform: scale(.98);
+        transform: scale(.72);
         box-shadow:
-            0 0 5px
+            0 0 0
+            rgba(0,0,0,0);
+        filter:
+            saturate(.82)
+            brightness(.92);
+    }
+
+    34% {
+        opacity: .36;
+        transform: scale(.84);
+        box-shadow:
+            0 0 3px
             color-mix(
                 in srgb,
-                var(--owner) 26%,
+                var(--owner) 16%,
                 transparent
             );
-        filter: saturate(1);
+        filter:
+            saturate(.9)
+            brightness(.96);
+    }
+
+    72% {
+        opacity: .84;
+        transform: scale(.97);
+        box-shadow:
+            0 0 6px
+            color-mix(
+                in srgb,
+                var(--owner) 38%,
+                transparent
+            );
+        filter:
+            saturate(1)
+            brightness(1.02);
     }
 
     100% {
@@ -4297,7 +4367,9 @@ input {
                 var(--owner) 55%,
                 transparent
             );
-        filter: saturate(1);
+        filter:
+            saturate(1)
+            brightness(1);
     }
 }
 
@@ -9641,30 +9713,46 @@ function launchShopSkillStreak(
                 {
                     opacity: 0,
                     transform:
-                        `translateY(-50%) rotate(${angle}deg) scaleX(.08)`
+                        `translateY(-50%) rotate(${angle}deg) scaleX(.02)`,
+                    filter:
+                        "blur(1.6px)"
+                },
+                {
+                    opacity: .72,
+                    offset: .18,
+                    transform:
+                        `translateY(-50%) rotate(${angle}deg) scaleX(.28)`,
+                    filter:
+                        "blur(.9px)"
                 },
                 {
                     opacity: 1,
-                    offset: .2,
+                    offset: .62,
                     transform:
-                        `translateY(-50%) rotate(${angle}deg) scaleX(1)`
+                        `translateY(-50%) rotate(${angle}deg) scaleX(.94)`,
+                    filter:
+                        "blur(0px)"
                 },
                 {
-                    opacity: .96,
-                    offset: .72,
+                    opacity: .84,
+                    offset: .82,
                     transform:
-                        `translateY(-50%) rotate(${angle}deg) scaleX(1)`
+                        `translateY(-50%) rotate(${angle}deg) scaleX(1)`,
+                    filter:
+                        "blur(.15px)"
                 },
                 {
                     opacity: 0,
                     transform:
-                        `translateY(-50%) rotate(${angle}deg) scaleX(1.02)`
+                        `translateY(-50%) rotate(${angle}deg) scaleX(1.015)`,
+                    filter:
+                        "blur(1px)"
                 }
             ],
             {
-                duration: 520,
+                duration: 540,
                 easing:
-                    "cubic-bezier(.15,.85,.25,1)",
+                    "cubic-bezier(.22,.61,.28,1)",
                 fill: "forwards"
             }
         );
@@ -9776,7 +9864,7 @@ function animateShopSkillUnlock(
                         "shop-anchor-activate"
                     );
                 },
-                300
+                270
             );
 
 
@@ -9827,11 +9915,11 @@ function animateShopSkillUnlock(
                         );
                     }
                 },
-                760
+                720
             );
 
 
-            // 940ms: card pulse begins before ownership fade is fully complete.
+            // 900ms: card pulse begins while ownership fade is still resolving.
             window.setTimeout(
                 () => {
 
@@ -9845,7 +9933,7 @@ function animateShopSkillUnlock(
                         "shop-node-unlock"
                     );
                 },
-                940
+                900
             );
 
 
