@@ -3538,7 +3538,7 @@ input {
 .shop-player-bar.shop-player-purchase {
     animation:
         shopPlayerPurchaseGlow
-        760ms
+        1050ms
         cubic-bezier(.16,.82,.24,1)
         both;
 }
@@ -3864,7 +3864,7 @@ input {
 .shop-skill-anchor.shop-anchor-activate {
     animation:
         shopAnchorActivate
-        520ms
+        820ms
         cubic-bezier(.16,.86,.24,1)
         both;
 }
@@ -3912,7 +3912,7 @@ input {
 .shop-skill-node.shop-node-unlock {
     animation:
         shopNodeUnlock
-        860ms
+        1080ms
         cubic-bezier(.16,.86,.24,1)
         both;
 }
@@ -4162,7 +4162,7 @@ input {
 .shop-owner-dot.shop-owner-new {
     animation:
         shopOwnerPop
-        720ms
+        820ms
         cubic-bezier(.12,.86,.22,1)
         both;
 }
@@ -9302,7 +9302,7 @@ function launchShopSkillStreak(
                 }
             ],
             {
-                duration: 360,
+                duration: 700,
                 easing:
                     "cubic-bezier(.15,.85,.25,1)",
                 fill: "forwards"
@@ -9323,8 +9323,15 @@ function animateShopSkillUnlock(
     sequenceIndex = 0
 ) {
 
+    /*
+       Readable staged sequence:
+       1. streak travels from player bar to node
+       2. anchor circle pulses in player color
+       3. ownership marker appears
+       4. whole skill node pulses in player color
+    */
     const delay =
-        sequenceIndex * 140;
+        sequenceIndex * 320;
 
 
     window.setTimeout(
@@ -9374,6 +9381,18 @@ function animateShopSkillUnlock(
             }
 
 
+            skillAnchor.style.setProperty(
+                "--unlock-color",
+                color
+            );
+
+            skillNode.style.setProperty(
+                "--unlock-color",
+                color
+            );
+
+
+            // Stage 1: travel from the player bar to the skill.
             launchShopSkillStreak(
                 playerBar,
                 skillAnchor,
@@ -9381,18 +9400,71 @@ function animateShopSkillUnlock(
             );
 
 
+            // Stage 2: let the streak arrive, then light the anchor.
             window.setTimeout(
                 () => {
 
-                    skillAnchor.style.setProperty(
-                        "--unlock-color",
-                        color
+                    skillAnchor.classList.remove(
+                        "shop-anchor-activate"
                     );
 
-                    skillNode.style.setProperty(
-                        "--unlock-color",
-                        color
+                    void skillAnchor.offsetWidth;
+
+                    skillAnchor.classList.add(
+                        "shop-anchor-activate"
                     );
+                },
+                560
+            );
+
+
+            // Stage 3: after the anchor has had time to pulse,
+            // reveal the permanent ownership marker.
+            window.setTimeout(
+                () => {
+
+                    if (pendingDot) {
+
+                        pendingDot.classList.remove(
+                            "shop-owner-pending"
+                        );
+
+                        pendingDot.classList.remove(
+                            "shop-owner-new"
+                        );
+
+                        void pendingDot.offsetWidth;
+
+                        pendingDot.classList.add(
+                            "shop-owner-new"
+                        );
+                    }
+                },
+                1320
+            );
+
+
+            // Stage 4: finish with a clear node-wide pulse.
+            window.setTimeout(
+                () => {
+
+                    skillNode.classList.remove(
+                        "shop-node-unlock"
+                    );
+
+                    void skillNode.offsetWidth;
+
+                    skillNode.classList.add(
+                        "shop-node-unlock"
+                    );
+                },
+                1450
+            );
+
+
+            // Clean temporary animation classes after the sequence.
+            window.setTimeout(
+                () => {
 
                     skillAnchor.classList.remove(
                         "shop-anchor-activate"
@@ -9401,60 +9473,15 @@ function animateShopSkillUnlock(
                     skillNode.classList.remove(
                         "shop-node-unlock"
                     );
-
-                    void skillAnchor.offsetWidth;
-                    void skillNode.offsetWidth;
-
-                    skillAnchor.classList.add(
-                        "shop-anchor-activate"
-                    );
-
-                    skillNode.classList.add(
-                        "shop-node-unlock"
-                    );
-
-
-                    window.setTimeout(
-                        () => {
-                            if (pendingDot) {
-                                pendingDot.classList.remove(
-                                    "shop-owner-pending"
-                                );
-
-                                pendingDot.classList.remove(
-                                    "shop-owner-new"
-                                );
-
-                                void pendingDot.offsetWidth;
-
-                                pendingDot.classList.add(
-                                    "shop-owner-new"
-                                );
-                            }
-                        },
-                        340
-                    );
-
-
-                    window.setTimeout(
-                        () => {
-                            skillAnchor.classList.remove(
-                                "shop-anchor-activate"
-                            );
-
-                            skillNode.classList.remove(
-                                "shop-node-unlock"
-                            );
-                        },
-                        980
-                    );
                 },
-                180
+                2700
             );
+
         },
         delay
     );
 }
+
 
 
 function runShopPostRenderAnimations() {
