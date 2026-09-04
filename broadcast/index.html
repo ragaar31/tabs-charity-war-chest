@@ -3613,7 +3613,7 @@ input {
 }
 
 .shop-item-slot {
-    width: 31px;
+    width: 36px;
     height: 20px;
     display: grid;
     place-items: center;
@@ -4391,7 +4391,7 @@ input {
     display: grid;
     grid-template-columns:
         repeat(
-            3,
+            5,
             minmax(0,1fr)
         );
     gap: 9px;
@@ -5749,6 +5749,51 @@ async function refreshState(
 
                 data.draft_units =
                     draftUnits;
+            }
+        }
+
+
+        if (
+            data?.latest_settlement
+            ?.match_id
+        ) {
+
+            const {
+                data:
+                    matchConsumables,
+                error:
+                    matchConsumablesError
+            } =
+                await db.rpc(
+                    "get_broadcast_match_consumables",
+                    {
+                        p_code:
+                            roomCode,
+
+                        p_match_id:
+                            data.latest_settlement
+                            .match_id
+                    }
+                );
+
+
+            if (matchConsumablesError) {
+
+                console.error(
+                    matchConsumablesError
+                );
+
+            }
+
+            else {
+
+                data.latest_settlement
+                    .consumables =
+                        Array.isArray(
+                            matchConsumables
+                        )
+                        ? matchConsumables
+                        : [];
             }
         }
 
@@ -9023,7 +9068,9 @@ function shopPlayerChanged(
         const itemCode
         of [
             "reinforcements",
-            "mercenary"
+            "mercenary",
+            "war-bond",
+            "rainy-day"
         ]
     ) {
 
@@ -9085,7 +9132,9 @@ function renderShopItemSlots(
 
     const codes = [
         "reinforcements",
-        "mercenary"
+        "mercenary",
+        "war-bond",
+        "rainy-day"
     ];
 
 
@@ -9167,7 +9216,13 @@ function renderShopItemSlots(
                             item.code ===
                                 "reinforcements"
                             ? "+750"
-                            : "MERC";
+                            : item.code ===
+                                "mercenary"
+                            ? "MERC"
+                            : item.code ===
+                                "war-bond"
+                            ? "BOND"
+                            : "RAIN";
 
 
                         return `
@@ -9475,7 +9530,7 @@ function renderShopCatalog() {
                 <div>
                     <strong>
                         Skill Point
-                        <span>$1,500</span>
+                        <span>$1,000</span>
                     </strong>
                     <small>
                         +1 SP • max 1 bought per Shop
@@ -9490,10 +9545,10 @@ function renderShopCatalog() {
                 <div>
                     <strong>
                         Reinforcements
-                        <span>$750</span>
+                        <span>$500</span>
                     </strong>
                     <small>
-                        +$750 next regular-season army
+                        +750 next regular-season army
                     </small>
                 </div>
             </div>
@@ -9504,11 +9559,41 @@ function renderShopCatalog() {
                 </div>
                 <div>
                     <strong>
-                        Mercenary Contract
-                        <span>$750</span>
+                        Mercenary
+                        <span>$500</span>
                     </strong>
                     <small>
                         One undrafted B / C / D unit next fight
+                    </small>
+                </div>
+            </div>
+
+            <div class="shop-catalog-card">
+                <div class="shop-catalog-icon">
+                    BOND
+                </div>
+                <div>
+                    <strong>
+                        War Bond
+                        <span>$250</span>
+                    </strong>
+                    <small>
+                        Activate before fight • win = +$1,000
+                    </small>
+                </div>
+            </div>
+
+            <div class="shop-catalog-card">
+                <div class="shop-catalog-icon">
+                    RAIN
+                </div>
+                <div>
+                    <strong>
+                        Rainy Day
+                        <span>$500</span>
+                    </strong>
+                    <small>
+                        Auto +$1,000 after a -$1,500 betting round
                     </small>
                 </div>
             </div>
@@ -11336,6 +11421,32 @@ function settlementResults(
     }
 
 
+    for (
+        const item of
+        settlement.consumables ?? []
+    ) {
+
+        const label =
+            item.item_code ===
+                "war-bond"
+            ? "War Bond"
+            : item.item_code ===
+                "rainy-day"
+            ? "Rainy Day Fund"
+            : "Consumable";
+
+
+        add(
+            item.player_id,
+            Number(
+                item.payout_amount
+                ?? 0
+            ),
+            label
+        );
+    }
+
+
     return result;
 }
 
@@ -11458,7 +11569,7 @@ function maybeShowPayout() {
                 </h2>
 
                 <p>
-                    Bet results, completed advanced wagers, and the $500 battle purse.
+                    Bet results, item bonuses, completed advanced wagers, and the $500 battle purse.
                 </p>
 
             </div>
