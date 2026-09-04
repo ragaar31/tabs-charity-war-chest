@@ -590,7 +590,17 @@ a { color: white; }
     position: fixed;
     z-index: 1000;
     top: 18px;
-    right: 18px;
+
+    /*
+       Match the right edge of:
+       main { width:min(1100px,94%); margin:auto; }
+    */
+    right:
+        max(
+            3vw,
+            calc((100vw - 1100px) / 2)
+        );
+
     width: 142px;
     height: 142px;
     display: grid;
@@ -602,23 +612,20 @@ a { color: white; }
     box-shadow: 0 14px 40px rgba(0,0,0,.35);
 }
 
-.player-join-qr canvas {
+.player-join-qr img {
     display: block;
-    width: 126px;
-    height: 126px;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 @media (max-width: 900px) {
     .player-join-qr {
         position: absolute;
+        right: 3vw;
         width: 116px;
         height: 116px;
         padding: 7px;
-    }
-
-    .player-join-qr canvas {
-        width: 102px;
-        height: 102px;
     }
 
     main {
@@ -637,7 +644,10 @@ a { color: white; }
     class="player-join-qr hidden"
     title="Player join QR code"
 >
-    <canvas id="player-join-qr-canvas"></canvas>
+    <img
+        src="./player-join-qr.png"
+        alt="Player join QR code"
+    >
 </div>
 
 <main>
@@ -772,7 +782,6 @@ a { color: white; }
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <script src="../js/supabase-client.js"></script>
 
 <script>
@@ -1539,47 +1548,6 @@ async function loadState() {
 
 
 
-function playerJoinUrl() {
-
-    if (!eventData?.code) {
-        return null;
-    }
-
-
-    try {
-
-        const url =
-            new URL(
-                "../play/",
-                window.location.href
-            );
-
-
-        url.searchParams.set(
-            "room",
-            eventData.code
-        );
-
-
-        return url.toString();
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        return (
-            "../play/?room="
-            +
-            encodeURIComponent(
-                eventData.code
-            )
-        );
-    }
-}
-
-
 function renderPlayerJoinQr() {
 
     const wrap =
@@ -1588,25 +1556,14 @@ function renderPlayerJoinQr() {
         );
 
 
-    const canvas =
-        document.getElementById(
-            "player-join-qr-canvas"
-        );
+    if (!wrap) {
+        return;
+    }
 
 
-    const url =
-        playerJoinUrl();
+    if (!eventData?.code) {
 
-
-    if (
-        !wrap
-        ||
-        !canvas
-        ||
-        !url
-    ) {
-
-        wrap?.classList.add(
+        wrap.classList.add(
             "hidden"
         );
 
@@ -1616,31 +1573,6 @@ function renderPlayerJoinQr() {
 
     wrap.classList.remove(
         "hidden"
-    );
-
-
-    if (!window.QRCode) {
-        return;
-    }
-
-
-    QRCode.toCanvas(
-        canvas,
-        url,
-        {
-            width: 126,
-            margin: 1,
-            color: {
-                dark: "#10131a",
-                light: "#ffffff"
-            }
-        },
-        error => {
-
-            if (error) {
-                console.error(error);
-            }
-        }
     );
 }
 
