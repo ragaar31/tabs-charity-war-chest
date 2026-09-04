@@ -2959,6 +2959,205 @@ input {
     }
 }
 
+
+/* =========================================================
+   LOBBY AUDIENCE QR FIT + AUDIENCE JOIN ANIMATION
+   ========================================================= */
+
+.lobby-qr-panel {
+    grid-template-rows: auto minmax(0,1fr) auto auto;
+    gap: 6px;
+    padding: 12px;
+}
+
+.lobby-qr-title {
+    font-size: .88rem;
+    line-height: 1.12;
+}
+
+.lobby-qr-image-wrap {
+    width: min(100%, 156px);
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    justify-self: center;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    padding: 6px;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.lobby-qr-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+.lobby-qr-room {
+    font-size: .82rem;
+    line-height: 1.05;
+}
+
+.lobby-qr-link {
+    padding: 6px 8px;
+    font-size: .74rem;
+    line-height: 1.14;
+    letter-spacing: .005em;
+}
+
+@media (max-width: 1320px) {
+    .lobby-qr-panel {
+        padding: 11px;
+        gap: 6px;
+    }
+
+    .lobby-qr-title {
+        font-size: .84rem;
+    }
+
+    .lobby-qr-image-wrap {
+        width: min(100%, 146px);
+    }
+
+    .lobby-qr-link {
+        font-size: .69rem;
+    }
+}
+
+.audience-mini-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.audience-mini-card.audience-join-card {
+    animation:
+        audienceCardArrive 760ms cubic-bezier(.16,.86,.25,1) var(--audience-join-delay,0ms) both;
+}
+
+.audience-mini-card.audience-join-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow:
+        0 0 0 1px rgba(242,201,76,.34) inset,
+        0 0 0 0 rgba(242,201,76,0);
+    animation:
+        audienceCardFlash 880ms cubic-bezier(.16,.86,.25,1) var(--audience-join-delay,0ms) both;
+}
+
+.audience-mini-card.audience-join-card::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: -40%;
+    bottom: -40%;
+    left: -25%;
+    width: 40%;
+    opacity: 0;
+    transform: rotate(12deg);
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.42), transparent);
+    filter: blur(3px);
+    animation:
+        audienceJoinSweep 740ms cubic-bezier(.18,.82,.28,1) calc(var(--audience-join-delay,0ms) + 60ms) both;
+}
+
+.audience-mini-card.audience-join-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.audience-join-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: #f2c94c;
+    color: #11151d;
+    font-size: .56rem;
+    font-weight: 1000;
+    letter-spacing: .1em;
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(-5px) scale(.88);
+    animation:
+        audienceJoinBadge 1200ms cubic-bezier(.16,.84,.24,1) calc(var(--audience-join-delay,0ms) + 160ms) both;
+}
+
+@keyframes audienceCardArrive {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(.9);
+    }
+    55% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.03);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes audienceCardFlash {
+    0% {
+        background: rgba(242,201,76,.24);
+        box-shadow:
+            0 0 0 1px rgba(242,201,76,.55) inset,
+            0 0 0 0 rgba(242,201,76,.30);
+    }
+    38% {
+        background: rgba(242,201,76,.12);
+        box-shadow:
+            0 0 0 1px rgba(242,201,76,.75) inset,
+            0 0 22px 0 rgba(242,201,76,.22);
+    }
+    100% {
+        background: rgba(255,255,255,0);
+        box-shadow:
+            0 0 0 1px rgba(255,255,255,.10) inset,
+            0 0 0 0 rgba(242,201,76,0);
+    }
+}
+
+@keyframes audienceJoinSweep {
+    0% {
+        opacity: 0;
+        transform: translateX(-130%) rotate(12deg) scaleX(.9);
+    }
+    22% {
+        opacity: .8;
+    }
+    72% {
+        opacity: .36;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(240%) rotate(12deg) scaleX(1.15);
+    }
+}
+
+@keyframes audienceJoinBadge {
+    0%, 100% {
+        opacity: 0;
+        transform: translateY(-5px) scale(.88);
+    }
+    16%, 78% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 </style>
 </head>
 
@@ -3100,6 +3299,7 @@ let draftPlayerJustChanged = false;
 let pendingDraftGliderStart = null;
 
 let newlyJoinedPlayerIds = [];
+let newlyJoinedAudienceKeys = [];
 
 let draftOrderRevealPending = false;
 let draftOrderRevealSourceRects = {};
@@ -4113,6 +4313,7 @@ async function refreshState(
 
 
         newlyJoinedPlayerIds = [];
+        newlyJoinedAudienceKeys = [];
 
 
         if (
@@ -4144,6 +4345,45 @@ async function refreshState(
                 .map(
                     player =>
                         player.id
+                );
+
+
+            const priorAudienceKeys =
+                new Set(
+                    (oldState?.audience?.preview ?? [])
+                    .map(
+                        viewer =>
+                            String(
+                                viewer.id
+                                ?? viewer.audience_id
+                                ?? viewer.user_id
+                                ?? viewer.display_name
+                            )
+                    )
+                );
+
+
+            newlyJoinedAudienceKeys =
+                (data?.audience?.preview ?? [])
+                .filter(
+                    viewer =>
+                        !priorAudienceKeys.has(
+                            String(
+                                viewer.id
+                                ?? viewer.audience_id
+                                ?? viewer.user_id
+                                ?? viewer.display_name
+                            )
+                        )
+                )
+                .map(
+                    viewer =>
+                        String(
+                            viewer.id
+                            ?? viewer.audience_id
+                            ?? viewer.user_id
+                            ?? viewer.display_name
+                        )
                 );
         }
 
@@ -4452,7 +4692,8 @@ function gambleJoinUrl() {
 function renderAudiencePreviewPanel(
     title = "Audience Lobby",
     subtitle = "Viewers can join as pure gamblers and chase their own leaderboard.",
-    limit = 18
+    limit = 18,
+    animateJoins = false
 ) {
 
     const audience =
@@ -4502,22 +4743,59 @@ function renderAudiencePreviewPanel(
                     <div class="audience-preview-grid">
                         ${
                             audience.map(
-                                viewer => `
-                                    <div class="audience-mini-card">
-                                        <div class="audience-mini-name">
-                                            ${escapeHtml(viewer.display_name)}
-                                        </div>
+                                (viewer, index) => {
 
-                                        <div class="audience-mini-meta">
+                                    const viewerKey =
+                                        String(
+                                            viewer.id
+                                            ?? viewer.audience_id
+                                            ?? viewer.user_id
+                                            ?? viewer.display_name
+                                        );
+
+                                    const justJoined =
+                                        animateJoins
+                                        &&
+                                        newlyJoinedAudienceKeys.includes(
+                                            viewerKey
+                                        );
+
+                                    const joinIndex =
+                                        Math.max(
+                                            0,
+                                            newlyJoinedAudienceKeys.indexOf(
+                                                viewerKey
+                                            )
+                                        );
+
+                                    return `
+                                        <div
+                                            class="audience-mini-card ${justJoined ? "audience-join-card" : ""}"
+                                            style="--audience-join-delay:${joinIndex * 120}ms;"
+                                        >
                                             ${
-                                                viewer.rank
-                                                ? `#${viewer.rank} • `
+                                                justJoined
+                                                ? `
+                                                    <div class="audience-join-badge">JOINED</div>
+                                                  `
                                                 : ""
                                             }
-                                            ${money(viewer.bankroll ?? 10000)}
+
+                                            <div class="audience-mini-name">
+                                                ${escapeHtml(viewer.display_name)}
+                                            </div>
+
+                                            <div class="audience-mini-meta">
+                                                ${
+                                                    viewer.rank
+                                                    ? `#${viewer.rank} • `
+                                                    : ""
+                                                }
+                                                ${money(viewer.bankroll ?? 10000)}
+                                            </div>
                                         </div>
-                                    </div>
-                                `
+                                    `;
+                                }
                             ).join("")
                         }
                     </div>
@@ -5175,7 +5453,8 @@ function renderLobby() {
                     ${renderAudiencePreviewPanel(
                         "Audience Lobby",
                         "",
-                        18
+                        18,
+                        true
                     )}
                 </div>
 
