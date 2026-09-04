@@ -4835,6 +4835,596 @@ input {
     }
 }
 
+
+/* =========================================================
+   ARMY BUILD V2 — COMPACT LIVE CONSTRUCTION BOARD
+   ========================================================= */
+
+.army-build-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 11px;
+}
+
+.army-build-header {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        440px;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.army-build-heading {
+    align-self: center;
+}
+
+.army-build-heading .scene-kicker {
+    margin-bottom: 7px;
+}
+
+.army-build-heading .scene-title {
+    margin-bottom: 8px;
+}
+
+.army-build-heading .scene-subtitle {
+    margin-top: 0;
+}
+
+.army-build-qr {
+    min-width: 0;
+    min-height: 104px;
+    padding: 10px 11px 10px 15px;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        92px;
+    gap: 13px;
+    align-items: center;
+    border-radius: 17px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: rgba(20,25,36,.90);
+    box-shadow: 0 12px 28px rgba(0,0,0,.18);
+}
+
+.army-build-qr-copy {
+    min-width: 0;
+}
+
+.army-build-qr-kicker {
+    color: var(--muted);
+    font-size: .62rem;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+.army-build-qr-title {
+    margin-top: 3px;
+    font-size: .96rem;
+    font-weight: 950;
+}
+
+.army-build-qr-room {
+    margin-top: 8px;
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.army-build-qr-room strong {
+    color: #f2c94c;
+}
+
+.army-build-qr-url {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .58rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-qr-image-wrap {
+    width: 92px;
+    height: 92px;
+    padding: 5px;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.army-build-qr-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.army-build-board {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 6px;
+}
+
+.army-build-row {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1.24fr)
+        minmax(310px,.90fr);
+    gap: 9px;
+    align-items: stretch;
+}
+
+.army-build-player-card,
+.army-build-tier-card {
+    position: relative;
+    min-width: 0;
+    min-height: 48px;
+    border-radius: 13px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(20,25,36,.90);
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,.15);
+}
+
+.army-build-player-card {
+    display: grid;
+    grid-template-columns:
+        52px
+        minmax(0,1fr)
+        128px
+        72px;
+    gap: 10px;
+    align-items: center;
+    padding: 0 13px 0 0;
+}
+
+.army-build-player-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--player);
+}
+
+.army-build-player-card.is-sending {
+    box-shadow:
+        0 0 0 1px
+        color-mix(
+            in srgb,
+            var(--player) 48%,
+            transparent
+        ),
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--player) 20%,
+            transparent
+        );
+}
+
+.army-build-rank {
+    padding-left: 13px;
+    font-size: .88rem;
+    font-weight: 1000;
+}
+
+.army-build-name {
+    min-width: 0;
+    font-size: .88rem;
+    font-weight: 920;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-money {
+    font-size: .98rem;
+    font-weight: 950;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-wins {
+    color: #b8c8ea;
+    font-size: .70rem;
+    font-weight: 720;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.army-build-tier-card {
+    --build-intensity: .035;
+    --build-glow: .06;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        auto;
+    gap: 10px;
+    align-items: center;
+    padding: 0 11px 0 12px;
+    isolation: isolate;
+    transition:
+        border-color 340ms ease,
+        box-shadow 420ms ease;
+}
+
+.army-build-tier-fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--player) 88%,
+                transparent
+            ),
+            color-mix(
+                in srgb,
+                var(--player) 68%,
+                transparent
+            )
+        );
+    opacity:
+        var(--build-intensity);
+    transition:
+        opacity 620ms
+        cubic-bezier(.20,.72,.24,1);
+}
+
+.army-build-tier-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow:
+        inset 0 0 24px
+        color-mix(
+            in srgb,
+            var(--player) 40%,
+            transparent
+        );
+    opacity:
+        var(--build-glow);
+    transition:
+        opacity 620ms
+        cubic-bezier(.20,.72,.24,1);
+}
+
+.army-build-tier-card.is-pulsing {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 55%,
+            rgba(255,255,255,.10)
+        );
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--player) 18%,
+            transparent
+        );
+}
+
+.army-build-tier-left,
+.army-build-tier-right {
+    position: relative;
+    z-index: 2;
+}
+
+.army-build-tier-left {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.army-build-tier-badge {
+    min-width: 56px;
+    padding: 5px 9px;
+    display: inline-flex;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--tier-color) 45%,
+            rgba(255,255,255,.10)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--tier-color) 14%,
+            rgba(255,255,255,.03)
+        );
+    font-size: .67rem;
+    font-weight: 950;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.army-build-tier-cap {
+    color: #eef3ff;
+    font-size: .78rem;
+    font-weight: 850;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-tier-right {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.army-build-tier-target-dot {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.23);
+    background: rgba(255,255,255,.045);
+    transition:
+        transform 300ms ease,
+        background 300ms ease,
+        box-shadow 320ms ease,
+        border-color 300ms ease;
+}
+
+.army-build-tier-target-dot.is-lit {
+    transform: scale(1.35);
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 72%,
+            white 28%
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 84%,
+            white 16%
+        );
+    box-shadow:
+        0 0 15px
+        color-mix(
+            in srgb,
+            var(--player) 62%,
+            transparent
+        ),
+        0 0 0 4px
+        color-mix(
+            in srgb,
+            var(--player) 16%,
+            transparent
+        );
+}
+
+.army-build-tier-pill {
+    padding: 5px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(255,255,255,.045);
+    color: #cbd6ec;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.army-build-tier-pill.submitted {
+    color: #fff;
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 42%,
+            rgba(255,255,255,.09)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 12%,
+            rgba(255,255,255,.035)
+        );
+}
+
+.army-build-flight-orb {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    margin-top: -5px;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 9999;
+    background:
+        radial-gradient(
+            circle at 35% 35%,
+            white 0%,
+            color-mix(
+                in srgb,
+                var(--orb-color) 84%,
+                white 16%
+            ) 38%,
+            var(--orb-color) 72%,
+            transparent 100%
+        );
+    box-shadow:
+        0 0 12px
+        color-mix(
+            in srgb,
+            var(--orb-color) 66%,
+            transparent
+        );
+}
+
+.army-build-flight-orb.reverse {
+    filter: saturate(.62);
+}
+
+.army-build-audience-strip {
+    min-width: 0;
+    min-height: 72px;
+    padding: 8px 10px;
+    display: grid;
+    grid-template-columns:
+        132px
+        minmax(0,1fr)
+        auto;
+    gap: 9px;
+    align-items: stretch;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(20,25,36,.90);
+}
+
+.army-build-audience-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 4px;
+}
+
+.army-build-audience-label strong {
+    font-size: .77rem;
+}
+
+.army-build-audience-label span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .60rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.army-build-audience-cards {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 6px;
+}
+
+.army-build-audience-card {
+    min-width: 0;
+    padding: 7px 8px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.075);
+    background: rgba(255,255,255,.035);
+}
+
+.army-build-audience-rank {
+    color: #f2c94c;
+    font-size: .54rem;
+    font-weight: 950;
+}
+
+.army-build-audience-name {
+    margin-top: 2px;
+    min-width: 0;
+    font-size: .64rem;
+    font-weight: 850;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.army-build-audience-money {
+    margin-top: 2px;
+    font-size: .60rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.army-build-audience-more {
+    align-self: center;
+    min-width: 32px;
+    color: var(--muted);
+    font-size: .63rem;
+    font-weight: 850;
+    text-align: center;
+}
+
+.army-build-audience-empty {
+    grid-column: 1 / -1;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: .70rem;
+}
+
+@media (max-width: 1500px) {
+
+    .army-build-header {
+        grid-template-columns:
+            minmax(0,1fr)
+            395px;
+    }
+
+    .army-build-qr {
+        grid-template-columns:
+            minmax(0,1fr)
+            82px;
+        min-height: 94px;
+    }
+
+    .army-build-qr-image-wrap {
+        width: 82px;
+        height: 82px;
+    }
+
+    .army-build-row {
+        grid-template-columns:
+            minmax(0,1.20fr)
+            minmax(290px,.88fr);
+    }
+
+    .army-build-player-card {
+        grid-template-columns:
+            46px
+            minmax(0,1fr)
+            112px
+            58px;
+    }
+
+    .army-build-audience-strip {
+        grid-template-columns:
+            118px
+            minmax(0,1fr)
+            auto;
+    }
+}
+
 </style>
 </head>
 
@@ -11027,12 +11617,12 @@ function collectArmyBuildAnimations(
         );
 
 
+    const samePhase =
+        oldSnapshot?.event?.status ===
+        "army_build";
+
+
     return nextEntries
-        .filter(
-            entry => Boolean(
-                entry?.submitted
-            )
-        )
         .map(
             entry => {
 
@@ -11041,19 +11631,137 @@ function collectArmyBuildAnimations(
                         entry.player_id
                     );
 
-                const changed =
-                    !previous
-                    || !previous.submitted
-                    || Number(
-                        previous.total_cost
-                        ?? 0
-                    )
-                    !==
+
+                /*
+                   When entering Army Build, don't treat every existing bot
+                   submission as dozens of individual live edits. Give each
+                   already-submitted army a short establishing burst instead.
+                */
+                if (
+                    !samePhase
+                    &&
+                    entry.submitted
+                ) {
+
+                    return {
+                        playerId:
+                            entry.player_id,
+
+                        unitDelta:
+                            Math.min(
+                                5,
+                                Math.max(
+                                    1,
+                                    Number(
+                                        entry.total_units
+                                        ?? 1
+                                    )
+                                )
+                            ),
+
+                        fromProgress:
+                            0,
+
+                        toProgress:
+                            armyBuildProgress(
+                                entry
+                            ),
+
+                        submissionChanged:
+                            true,
+
+                        establishing:
+                            true
+                    };
+                }
+
+
+                if (!previous) {
+
+                    const totalUnits =
+                        Number(
+                            entry.total_units
+                            ?? 0
+                        );
+
+
+                    if (
+                        totalUnits <= 0
+                        &&
+                        !entry.submitted
+                    ) {
+                        return null;
+                    }
+
+
+                    return {
+                        playerId:
+                            entry.player_id,
+
+                        unitDelta:
+                            Math.min(
+                                totalUnits,
+                                12
+                            ),
+
+                        fromProgress:
+                            0,
+
+                        toProgress:
+                            armyBuildProgress(
+                                entry
+                            ),
+
+                        submissionChanged:
+                            Boolean(
+                                entry.submitted
+                            )
+                    };
+                }
+
+
+                const currentUnits =
                     Number(
-                        entry.total_cost
+                        entry.total_units
                         ?? 0
-                    )
-                    || Number(
+                    );
+
+
+                const previousUnits =
+                    Number(
+                        previous.total_units
+                        ?? 0
+                    );
+
+
+                const unitDelta =
+                    currentUnits
+                    -
+                    previousUnits;
+
+
+                const fromProgress =
+                    armyBuildProgress(
+                        previous
+                    );
+
+
+                const toProgress =
+                    armyBuildProgress(
+                        entry
+                    );
+
+
+                const submissionChanged =
+                    !previous.submitted
+                    &&
+                    Boolean(
+                        entry.submitted
+                    );
+
+
+                const budgetChanged =
+                    Number(
                         displayedArmyBudget(
                             previous
                         )
@@ -11066,7 +11774,23 @@ function collectArmyBuildAnimations(
                     );
 
 
-                if (!changed) {
+                const progressChanged =
+                    Math.abs(
+                        toProgress
+                        -
+                        fromProgress
+                    ) > .001;
+
+
+                if (
+                    unitDelta === 0
+                    &&
+                    !submissionChanged
+                    &&
+                    !budgetChanged
+                    &&
+                    !progressChanged
+                ) {
                     return null;
                 }
 
@@ -11075,21 +11799,136 @@ function collectArmyBuildAnimations(
                     playerId:
                         entry.player_id,
 
-                    fromProgress:
-                        previous?.submitted
-                        ? armyBuildProgress(
-                            previous
-                          )
-                        : 0,
+                    unitDelta,
 
-                    toProgress:
-                        armyBuildProgress(
-                            entry
-                        )
+                    fromProgress,
+
+                    toProgress,
+
+                    submissionChanged,
+
+                    establishing:
+                        false
                 };
             }
         )
         .filter(Boolean);
+}
+
+
+function renderArmyBuildQrPanel() {
+
+    return `
+        <section class="army-build-qr">
+
+            <div class="army-build-qr-copy">
+
+                <div class="army-build-qr-kicker">
+                    Audience Gamblers
+                </div>
+
+                <div class="army-build-qr-title">
+                    Scan to join the action
+                </div>
+
+                <div class="army-build-qr-room">
+                    Room
+                    <strong>
+                        ${escapeHtml(roomCode || "------")}
+                    </strong>
+                </div>
+
+                <div class="army-build-qr-url">
+                    ragaar31.github.io/tabs-charity-war-chest/gamble
+                </div>
+
+            </div>
+
+            <div class="army-build-qr-image-wrap">
+                <img
+                    class="army-build-qr-image"
+                    src="./audience-qr.png"
+                    alt="Audience Gambler QR code"
+                >
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderArmyBuildAudienceStrip(
+    limit = 8
+) {
+
+    const leaders =
+        audienceLeaders(
+            limit
+        );
+
+    const count =
+        audienceCount();
+
+
+    return `
+        <section class="army-build-audience-strip">
+
+            <div class="army-build-audience-label">
+
+                <strong>
+                    Audience Leaders
+                </strong>
+
+                <span>
+                    ${count} total
+                </span>
+
+            </div>
+
+            <div class="army-build-audience-cards">
+
+                ${
+                    leaders.length
+                    ? leaders.map(
+                        row => `
+                            <div class="army-build-audience-card">
+
+                                <div class="army-build-audience-rank">
+                                    #${row.rank}
+                                </div>
+
+                                <div class="army-build-audience-name">
+                                    ${escapeHtml(row.display_name)}
+                                </div>
+
+                                <div class="army-build-audience-money">
+                                    ${money(row.bankroll)}
+                                </div>
+
+                            </div>
+                        `
+                      ).join("")
+                    : `
+                        <div class="army-build-audience-empty">
+                            No Audience Gamblers yet.
+                        </div>
+                      `
+                }
+
+            </div>
+
+            ${
+                count > leaders.length
+                ? `
+                    <div class="army-build-audience-more">
+                        +${count - leaders.length}
+                    </div>
+                  `
+                : ""
+            }
+
+        </section>
+    `;
 }
 
 
@@ -11103,50 +11942,59 @@ function renderArmyBuildRow(
             entry.player_id
         );
 
+
     const color =
         playerColor(
             entry.player_id
         );
 
+
     const tier =
         tierMetaForBudget(
             entry.base_army_budget
-            ?? entry.army_budget
+            ??
+            entry.army_budget
         );
+
 
     const budget =
         displayedArmyBudget(
             entry
         );
 
+
     const progress =
         armyBuildProgress(
             entry
         );
 
-    const percent =
-        Math.round(
-            progress * 100
-        );
+
+    /*
+       No percentage or current army value is shown.
+       The color wash is intentionally the only visual read on capacity.
+    */
+    const intensity =
+        (
+            .035
+            +
+            progress * .48
+        )
+        .toFixed(3);
+
+
+    const glow =
+        (
+            .06
+            +
+            progress * .30
+        )
+        .toFixed(3);
+
 
     const submitted =
         Boolean(
             entry.submitted
         );
-
-    const progressCopy =
-        submitted
-        ? `${Number(entry.total_cost ?? 0).toLocaleString()} / ${Number(budget).toLocaleString()} pts • ${percent}% full`
-        : "Hidden build in progress • fill reveals on submission";
-
-    const capCopy =
-        submitted && entry.reinforcements_used
-        ? `Reinforced cap ${Number(budget).toLocaleString()} • +750`
-        : `${Number(budget).toLocaleString()} max army`;
-
-    const fillOpacity =
-        (0.14 + progress * 0.26)
-        .toFixed(3);
 
 
     return `
@@ -11156,6 +12004,8 @@ function renderArmyBuildRow(
             style="
                 --player: ${color};
                 --tier-color: ${tier.color};
+                --build-intensity: ${intensity};
+                --build-glow: ${glow};
             "
         >
 
@@ -11165,14 +12015,8 @@ function renderArmyBuildRow(
                     #${rank}
                 </div>
 
-                <div class="army-build-player-main">
-                    <div class="army-build-name">
-                        ${escapeHtml(player?.display_name ?? "Player")}
-                    </div>
-
-                    <div class="army-build-player-meta">
-                        ${submitted ? "Army submitted" : "Army in progress"}
-                    </div>
+                <div class="army-build-name">
+                    ${escapeHtml(player?.display_name ?? "Player")}
                 </div>
 
                 <div class="army-build-money">
@@ -11180,48 +12024,50 @@ function renderArmyBuildRow(
                 </div>
 
                 <div class="army-build-wins">
-                    ${player?.wins ?? 0} wins
+                    ${player?.wins ?? 0}
+                    win${player?.wins === 1 ? "" : "s"}
                 </div>
 
             </div>
 
             <div class="army-build-tier-card">
 
-                <div class="army-build-tier-fill" style="width:${percent}%; opacity:${fillOpacity};"></div>
+                <div class="army-build-tier-fill"></div>
 
-                <div class="army-build-tier-head">
+                <div class="army-build-tier-left">
 
-                    <div class="army-build-tier-topline">
-                        <div class="army-build-tier-badge">
-                            Tier ${tier.label}
-                        </div>
-
-                        <div class="army-build-tier-title">
-                            ${tier.title}
-                        </div>
+                    <div class="army-build-tier-badge">
+                        Tier ${tier.label}
                     </div>
 
-                    <div class="army-build-tier-subcopy">
-                        Broadcast hides the exact composition, but this lane shows army capacity and commitment.
+                    <div class="army-build-tier-cap">
+                        ${Number(budget).toLocaleString()}
+                        max
                     </div>
 
                 </div>
 
-                <div class="army-build-tier-status">
+                <div class="army-build-tier-right">
+
                     <div class="army-build-tier-target-dot"></div>
-                    <div class="army-build-tier-pill ${submitted ? "submitted" : "pending"}">
-                        ${submitted ? "Submitted" : "Building"}
-                    </div>
-                </div>
 
-                <div class="army-build-tier-foot">
-                    <div class="army-build-tier-progress-copy">
-                        ${progressCopy}
+                    <div
+                        class="
+                            army-build-tier-pill
+                            ${
+                                submitted
+                                ? "submitted"
+                                : "pending"
+                            }
+                        "
+                    >
+                        ${
+                            submitted
+                            ? "Submitted"
+                            : "Building"
+                        }
                     </div>
 
-                    <div class="army-build-tier-cap-copy">
-                        ${capCopy}
-                    </div>
                 </div>
 
             </div>
@@ -11242,36 +12088,49 @@ function renderArmyBuildScene() {
     return `
         <div class="army-build-scene">
 
-            <div class="army-build-heading">
+            <div class="army-build-header">
 
-                <div class="scene-kicker">
-                    Current Standings
+                <div class="army-build-heading">
+
+                    <div class="scene-kicker">
+                        Current Standings
+                    </div>
+
+                    <h1 class="scene-title">
+                        Round ${state.event.current_round} Army Build
+                    </h1>
+
+                    <div class="scene-subtitle">
+                        ${state.army_submission_players.length}
+                        of
+                        ${state.players.length}
+                        armies submitted.
+                    </div>
+
                 </div>
 
-                <h1 class="scene-title">
-                    Round ${state.event.current_round} Army Build
-                </h1>
-
-                <div class="scene-subtitle">
-                    ${state.army_submission_players.length} of ${state.players.length} armies submitted.
-                </div>
+                ${renderArmyBuildQrPanel()}
 
             </div>
 
             <div class="army-build-board">
-                ${entries.map(
-                    (entry, index) =>
-                        renderArmyBuildRow(
+
+                ${
+                    entries.map(
+                        (
                             entry,
-                            index + 1
-                        )
-                ).join("")}
+                            index
+                        ) =>
+                            renderArmyBuildRow(
+                                entry,
+                                index + 1
+                            )
+                    ).join("")
+                }
+
             </div>
 
-            <div class="army-build-bottom-band">
-                ${renderDraftCompleteAudienceRow(8)}
-                ${renderLobbyGambleQrPanel()}
-            </div>
+            ${renderArmyBuildAudienceStrip(8)}
 
         </div>
     `;
@@ -11284,7 +12143,8 @@ function launchArmyBuildOrb(
     startY,
     endX,
     endY,
-    delay = 0
+    delay = 0,
+    reverse = false
 ) {
 
     window.setTimeout(
@@ -11295,13 +12155,23 @@ function launchArmyBuildOrb(
                     "div"
                 );
 
+
             orb.className =
-                "army-build-flight-orb";
+                `
+                    army-build-flight-orb
+                    ${
+                        reverse
+                        ? "reverse"
+                        : ""
+                    }
+                `;
+
 
             orb.style.setProperty(
                 "--orb-color",
                 color
             );
+
 
             orb.style.left =
                 `${startX}px`;
@@ -11309,55 +12179,88 @@ function launchArmyBuildOrb(
             orb.style.top =
                 `${startY}px`;
 
+
             document.body.appendChild(
                 orb
             );
 
+
             const dx =
-                endX - startX;
+                endX
+                -
+                startX;
+
 
             const dy =
-                endY - startY;
+                endY
+                -
+                startY;
 
-            const drift =
-                -12 + (
-                    delay * 0.02
-                );
+
+            const arc =
+                reverse
+                ? 8
+                : -10;
+
 
             const animation =
                 orb.animate(
                     [
                         {
                             transform:
-                                "translate(0px,0px) scale(.45)",
+                                "translate(0px,0px) scale(.38)",
                             opacity: 0
                         },
+
                         {
                             transform:
-                                `translate(${dx * .42}px, ${dy * .26 + drift}px) scale(.96)`,
-                            opacity: .95,
-                            offset: .54
+                                `translate(${dx * .28}px, ${dy * .22 + arc}px) scale(.92)`,
+                            opacity:
+                                reverse
+                                ? .58
+                                : .96,
+                            offset: .36
                         },
+
                         {
                             transform:
-                                `translate(${dx}px, ${dy}px) scale(.72)`,
+                                `translate(${dx * .72}px, ${dy * .70 - arc * .35}px) scale(.82)`,
+                            opacity:
+                                reverse
+                                ? .48
+                                : .92,
+                            offset: .72
+                        },
+
+                        {
+                            transform:
+                                `translate(${dx}px, ${dy}px) scale(.48)`,
                             opacity: 0
                         }
                     ],
+
                     {
-                        duration: 580,
+                        duration:
+                            reverse
+                            ? 460
+                            : 500,
+
                         easing:
-                            "cubic-bezier(.18,.82,.24,1)",
-                        fill: "forwards"
+                            "cubic-bezier(.22,.62,.26,1)",
+
+                        fill:
+                            "forwards"
                     }
                 );
+
 
             animation.finished
                 .catch(
                     () => null
                 )
                 .then(
-                    () => orb.remove()
+                    () =>
+                        orb.remove()
                 );
         },
         delay
@@ -11374,122 +12277,247 @@ function playArmyBuildRowAnimation(
             `[data-army-player-id="${entry.playerId}"]`
         );
 
+
     if (!row) {
         return;
     }
+
 
     const playerCard =
         row.querySelector(
             ".army-build-player-card"
         );
 
+
     const tierCard =
         row.querySelector(
             ".army-build-tier-card"
         );
+
 
     const fill =
         row.querySelector(
             ".army-build-tier-fill"
         );
 
+
     const dot =
         row.querySelector(
             ".army-build-tier-target-dot"
         );
 
+
     const startRect =
-        playerCard?.getBoundingClientRect();
+        playerCard
+        ?.getBoundingClientRect();
+
 
     const endRect =
-        dot?.getBoundingClientRect();
+        dot
+        ?.getBoundingClientRect();
+
 
     const color =
         playerColor(
             entry.playerId
         );
 
-    if (fill) {
-        fill.style.width =
-            `${Math.max(0, entry.fromProgress * 100)}%`;
-        fill.style.opacity =
-            `${0.14 + Math.max(0, entry.fromProgress) * 0.26}`;
-    }
+
+    const reverse =
+        Number(
+            entry.unitDelta
+            ?? 0
+        ) < 0;
+
+
+    const rawCount =
+        Math.abs(
+            Number(
+                entry.unitDelta
+                ?? 0
+            )
+        );
+
+
+    /*
+       For normal +1 / +10 controls this is one orb per unit.
+       Very large batched changes are capped to keep the broadcast readable.
+    */
+    const orbCount =
+        entry.establishing
+        ? Math.min(
+            5,
+            Math.max(
+                1,
+                rawCount
+            )
+          )
+        : Math.min(
+            16,
+            rawCount
+        );
+
 
     if (playerCard) {
+
         playerCard.classList.add(
             "is-sending"
         );
+
+
         window.setTimeout(
             () =>
-                playerCard.classList.remove(
+                playerCard
+                .classList
+                .remove(
                     "is-sending"
                 ),
-            560
+            520
         );
     }
 
-    if (startRect && endRect) {
 
-        const startX =
-            startRect.right - 34;
-        const startY =
-            startRect.top + startRect.height / 2;
-        const endX =
-            endRect.left + endRect.width / 2;
-        const endY =
-            endRect.top + endRect.height / 2;
+    if (
+        startRect
+        &&
+        endRect
+        &&
+        orbCount > 0
+    ) {
 
-        [0, 90, 180].forEach(
-            delay =>
-                launchArmyBuildOrb(
-                    color,
-                    startX,
-                    startY,
-                    endX,
-                    endY,
-                    delay
-                )
-        );
+        const playerX =
+            startRect.right
+            -
+            24;
+
+
+        const playerY =
+            startRect.top
+            +
+            startRect.height
+            /
+            2;
+
+
+        const targetX =
+            endRect.left
+            +
+            endRect.width
+            /
+            2;
+
+
+        const targetY =
+            endRect.top
+            +
+            endRect.height
+            /
+            2;
+
+
+        for (
+            let index = 0;
+            index < orbCount;
+            index++
+        ) {
+
+            const stagger =
+                Math.min(
+                    360,
+                    index * 54
+                );
+
+
+            launchArmyBuildOrb(
+                color,
+
+                reverse
+                ? targetX
+                : playerX,
+
+                reverse
+                ? targetY
+                : playerY,
+
+                reverse
+                ? playerX
+                : targetX,
+
+                reverse
+                ? playerY
+                : targetY,
+
+                stagger,
+
+                reverse
+            );
+        }
     }
 
+
+    /*
+       The card's actual progress is never shown numerically.
+       Animate only the strength of the player's color wash.
+    */
     window.setTimeout(
         () => {
 
             if (dot) {
+
                 dot.classList.add(
                     "is-lit"
                 );
+
+
                 window.setTimeout(
                     () =>
                         dot.classList.remove(
                             "is-lit"
                         ),
-                    640
+                    520
                 );
             }
 
+
             if (fill) {
-                fill.style.width =
-                    `${Math.max(0, entry.toProgress * 100)}%`;
+
+                const intensity =
+                    (
+                        .035
+                        +
+                        Math.max(
+                            0,
+                            entry.toProgress
+                        )
+                        *
+                        .48
+                    );
+
+
                 fill.style.opacity =
-                    `${0.14 + Math.max(0, entry.toProgress) * 0.26}`;
+                    `${intensity}`;
             }
 
+
             if (tierCard) {
+
                 tierCard.classList.add(
                     "is-pulsing"
                 );
+
+
                 window.setTimeout(
                     () =>
                         tierCard.classList.remove(
                             "is-pulsing"
                         ),
-                    780
+                    620
                 );
             }
         },
-        230
+        reverse
+        ? 140
+        : 260
     );
 }
 
@@ -11499,31 +12527,47 @@ function runArmyBuildPostRenderAnimations() {
     if (
         state?.event?.status !==
             "army_build"
-        || !armyBuildPendingAnimations.length
+        ||
+        !armyBuildPendingAnimations
+            .length
     ) {
         return;
     }
 
-    const queue =
-        armyBuildPendingAnimations.slice();
 
-    armyBuildPendingAnimations = [];
+    const queue =
+        armyBuildPendingAnimations
+        .slice();
+
+
+    armyBuildPendingAnimations =
+        [];
+
+
     armyBuildAnimationUntil =
         performance.now()
-        + 1100
-        + queue.length * 110;
+        +
+        900
+        +
+        queue.length
+        *
+        90;
+
 
     queue.forEach(
         (
             entry,
             index
         ) => {
+
             window.setTimeout(
                 () =>
                     playArmyBuildRowAnimation(
                         entry
                     ),
-                index * 110
+                index
+                *
+                90
             );
         }
     );
