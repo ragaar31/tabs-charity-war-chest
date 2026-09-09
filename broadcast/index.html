@@ -7569,6 +7569,49 @@ input {
     }
 }
 
+
+/* =========================================================
+   BATTLE SHOW — FIXED 16:9 GAMEPLAY OPENING
+   ========================================================= */
+
+.battle-show-scene {
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+}
+
+.battle-key-frame {
+    width:
+        min(
+            100%,
+            calc(
+                (
+                    100vh - 190px
+                )
+                *
+                16 / 9
+                +
+                16px
+            )
+        );
+    height: auto;
+    justify-self: center;
+    align-self: start;
+}
+
+.battle-chroma-window {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9;
+    background: #00FF00;
+}
+
+.fight-winner-battle-layer
+.battle-key-frame {
+    justify-self: center;
+}
+
 </style>
 </head>
 
@@ -8888,6 +8931,41 @@ async function refreshState(
 
                 data.betting_scene =
                     bettingSceneState;
+            }
+        }
+
+
+        if (
+            data?.event?.status === "fight"
+        ) {
+
+            const {
+                data:
+                    battleShowState,
+                error:
+                    battleShowError
+            } =
+                await db.rpc(
+                    "get_broadcast_battle_show_state",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (battleShowError) {
+
+                console.error(
+                    battleShowError
+                );
+
+            }
+
+            else if (battleShowState) {
+
+                data.battle_show =
+                    battleShowState;
             }
         }
 
@@ -10604,10 +10682,10 @@ function renderScene() {
         if (
             match
             &&
-            fightBattleShowActiveKey ===
-                fightRevealKey(
-                    match
-                )
+            state?.battle_show?.revealed
+            &&
+            state?.battle_show?.match_id ===
+                match.id
         ) {
 
             return renderBattleShow(
@@ -19835,77 +19913,7 @@ function runFightRevealPostRenderAnimation() {
                 );
         },
         3450
-    );
-
-
-    /*
-       Once the full Army + Audience reveal has had time to land,
-       automatically hand the Broadcast over to the keyed Battle Window.
-    */
-    window.setTimeout(
-        () => {
-
-            const latestMatch =
-                currentMatch();
-
-
-            if (
-                state?.event?.status !==
-                    "fight"
-                ||
-                !latestMatch
-                ||
-                latestMatch.winner_player_id
-                ||
-                fightRevealKey(
-                    latestMatch
-                )
-                !==
-                key
-            ) {
-                return;
-            }
-
-
-            fightBattleShowActiveKey =
-                key;
-
-
-            renderBroadcast();
-
-
-            const battleShow =
-                document.querySelector(
-                    ".battle-show-scene"
-                );
-
-
-            battleShow?.animate(
-                [
-                    {
-                        opacity:
-                            0,
-                        transform:
-                            "scale(.992)"
-                    },
-                    {
-                        opacity:
-                            1,
-                        transform:
-                            "scale(1)"
-                    }
-                ],
-                {
-                    duration:
-                        480,
-                    easing:
-                        "cubic-bezier(.18,.78,.24,1)"
-                }
-            );
-        },
-        3650
-    );
-}
+    );}
 
 
 
