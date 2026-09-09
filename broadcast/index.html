@@ -6419,6 +6419,306 @@ input {
     }
 }
 
+
+/* =========================================================
+   POOLS LOCKED — FULL-STAGE MARKET REVEAL
+   ========================================================= */
+
+.pools-reveal-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 14px;
+}
+
+.pools-reveal-heading .scene-kicker {
+    margin-bottom: 7px;
+}
+
+.pools-reveal-heading .scene-title {
+    margin-bottom: 7px;
+}
+
+.pools-reveal-heading .scene-subtitle {
+    margin-top: 0;
+}
+
+.pools-reveal-grid {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+    grid-template-rows:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+    gap: 12px;
+}
+
+.pool-reveal-card {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    padding: 12px 14px 14px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 8px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.10);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(25,31,43,.97),
+            rgba(17,22,31,.97)
+        );
+    overflow: hidden;
+    box-shadow:
+        0 10px 24px
+        rgba(0,0,0,.17);
+}
+
+.pool-reveal-card.current {
+    border-color:
+        rgba(255,255,255,.25);
+    box-shadow:
+        0 0 0 1px
+        rgba(255,255,255,.06),
+        0 12px 28px
+        rgba(0,0,0,.20);
+}
+
+.pool-reveal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pool-reveal-fight-label {
+    color: #dfe7f8;
+    font-size: .68rem;
+    font-weight: 950;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+.pool-reveal-up-next,
+.pool-reveal-locked {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: .53rem;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.pool-reveal-up-next {
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.21);
+    background: rgba(255,255,255,.08);
+}
+
+.pool-reveal-locked {
+    color: #8795ad;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.025);
+}
+
+.pool-reveal-versus {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        44px
+        minmax(0,1fr);
+    gap: 12px;
+    align-items: stretch;
+}
+
+.pool-reveal-fighter {
+    --fighter-color: #8aa0ff;
+    --pool-ratio: 1;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 6px;
+}
+
+.pool-reveal-amount {
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.16rem;
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+}
+
+.pool-reveal-meter {
+    position: relative;
+    min-height: 0;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,.075);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.022),
+            rgba(0,0,0,.10)
+        );
+    overflow: hidden;
+}
+
+.pool-reveal-meter-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .30;
+    background:
+        linear-gradient(
+            to top,
+            rgba(255,255,255,.06) 1px,
+            transparent 1px
+        );
+    background-size:
+        100%
+        25%;
+}
+
+.pool-reveal-fill {
+    position: absolute;
+    inset: 0;
+    transform-origin:
+        center bottom;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(
+                in srgb,
+                var(--fighter-color) 76%,
+                white 24%
+            ),
+            var(--fighter-color)
+        );
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.32),
+        0 0 20px
+        color-mix(
+            in srgb,
+            var(--fighter-color) 18%,
+            transparent
+        );
+}
+
+.pool-reveal-house-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 21%;
+    height: 1px;
+    border-top:
+        1px dashed
+        rgba(255,255,255,.24);
+    pointer-events: none;
+}
+
+.pool-reveal-house-line span {
+    position: absolute;
+    right: 5px;
+    bottom: 3px;
+    color: rgba(255,255,255,.42);
+    font-size: .39rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+}
+
+.pool-reveal-name {
+    min-width: 0;
+    min-height: 27px;
+    padding: 5px 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--fighter-color) 36%,
+            rgba(255,255,255,.06)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--fighter-color) 10%,
+            rgba(255,255,255,.025)
+        );
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 930;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pool-reveal-vs {
+    align-self: center;
+    justify-self: center;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.035);
+    color: #8390a7;
+    font-size: .62rem;
+    font-weight: 1000;
+}
+
+@media (max-width: 1500px) {
+
+    .pool-reveal-card {
+        padding:
+            10px 12px 12px;
+    }
+
+    .pool-reveal-versus {
+        grid-template-columns:
+            minmax(0,1fr)
+            38px
+            minmax(0,1fr);
+        gap: 9px;
+    }
+
+    .pool-reveal-vs {
+        width: 36px;
+        height: 36px;
+    }
+
+    .pool-reveal-amount {
+        font-size: 1.02rem;
+    }
+
+    .pool-reveal-name {
+        font-size: .66rem;
+    }
+}
+
 </style>
 </head>
 
@@ -6592,6 +6892,9 @@ let armyBuildLastAnimationSignatures = new Map();
 let bettingPendingAnimations = [];
 let bettingAnimationUntil = 0;
 let bettingSeenActionSignatures = new Map();
+
+let poolsRevealPlayedKey = null;
+let poolsRevealAnimationUntil = 0;
 
 
 function escapeHtml(value) {
@@ -7894,6 +8197,18 @@ async function refreshState(
         }
 
 
+        if (
+            oldState?.event?.status === "betting_locked"
+            &&
+            data?.event?.status === "betting_locked"
+            &&
+            performance.now() <
+                poolsRevealAnimationUntil
+        ) {
+            return;
+        }
+
+
         newlyJoinedPlayerIds = [];
         newlyJoinedAudienceKeys = [];
 
@@ -8272,6 +8587,7 @@ async function refreshState(
         runShopPostRenderAnimations();
         runArmyBuildPostRenderAnimations();
         runBettingPostRenderAnimations();
+        runPoolsRevealPostRenderAnimation();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -16875,124 +17191,645 @@ function runBettingPostRenderAnimations() {
 }
 
 
-function renderPools() {
+function poolsRevealKey() {
 
-    const roundMatches =
-        state.matches.filter(
-            match =>
-                match.round_number ===
-                state.event.current_round
+    return [
+        state?.event?.id
+        ?? roomCode
+        ?? "event",
+
+        state?.event?.current_round
+        ?? 0
+    ].join(":");
+}
+
+
+function poolRevealBarRatio(
+    amount,
+    matchupMax
+) {
+
+    const value =
+        Math.max(
+            1000,
+            Number(
+                amount
+                ?? 1000
+            )
         );
 
-    const current =
-        currentMatch();
+
+    const maximum =
+        Math.max(
+            1000,
+            Number(
+                matchupMax
+                ?? 1000
+            )
+        );
+
+
+    /*
+       House seed is the visible floor rather than a zero-height bar.
+       This keeps a side with only the $1,000 seed visibly present.
+    */
+    const normalized =
+        value
+        /
+        maximum;
+
+
+    return Math.max(
+        .22,
+        Math.min(
+            1,
+            normalized
+        )
+    );
+}
+
+
+function renderPoolRevealFighter(
+    match,
+    playerId,
+    amount,
+    ratio,
+    side,
+    animate
+) {
+
+    const color =
+        playerColor(
+            playerId
+        );
+
+
+    const player =
+        playerById(
+            playerId
+        );
+
+
+    const startAmount =
+        1000;
 
 
     return `
-        <div class="scene-kicker">
-            Round ${state.event.current_round}
-        </div>
+        <div
+            class="
+                pool-reveal-fighter
+                ${side}
+            "
+            style="
+                --fighter-color:${color};
+                --pool-ratio:${ratio};
+            "
+        >
 
-        <h1 class="scene-title">
-            The Pools Are Locked
-        </h1>
-
-        <div class="scene-subtitle">
-            House-seeded pools are public. Armies reveal one fight at a time.
-        </div>
-
-        <div class="pool-grid">
-
-            ${
-                roundMatches.map(
-                    match => {
-
-                        const pool =
-                            state.betting_pools
-                            .find(
-                                row =>
-                                    row.match_id ===
-                                    match.id
-                            );
-
-
-                        const currentCard =
-                            match.match_number ===
-                            state.event.current_match_number;
-
-
-                        return `
-                            <div
-                                class="
-                                    pool-card
-                                    ${currentCard ? "current" : ""}
-                                "
-                                style="
-                                    --p1:
-                                    ${playerColor(match.player1_id)};
-                                    --p2:
-                                    ${playerColor(match.player2_id)};
-                                "
-                            >
-
-                                <div class="pool-title">
-                                    Fight ${match.match_number}
-                                    ${currentCard ? " • UP NEXT" : ""}
-                                </div>
-
-                                <div class="pool-sides">
-
-                                    <div class="pool-side one">
-
-                                        <div class="pool-name">
-                                            ${escapeHtml(
-                                                playerName(
-                                                    match.player1_id
-                                                )
-                                            )}
-                                        </div>
-
-                                        <div class="pool-money">
-                                            ${money(pool?.player1_pool ?? 1000)}
-                                        </div>
-
-                                    </div>
-
-                                    <div class="pool-side two">
-
-                                        <div class="pool-name">
-                                            ${escapeHtml(
-                                                playerName(
-                                                    match.player2_id
-                                                )
-                                            )}
-                                        </div>
-
-                                        <div class="pool-money">
-                                            ${money(pool?.player2_pool ?? 1000)}
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        `;
+            <div class="pool-reveal-amount">
+                <span
+                    data-pool-count
+                    data-start-value="${startAmount}"
+                    data-final-value="${Number(amount)}"
+                >
+                    ${
+                        money(
+                            animate
+                            ? startAmount
+                            : amount
+                        )
                     }
-                ).join("")
-            }
+                </span>
+            </div>
 
-        </div>
+            <div class="pool-reveal-meter">
 
-        <div class="scene-lower-two">
-            ${renderAudiencePoolPanel(current, false)}
-            ${renderAudienceLeaderboardMini(
-                "Audience Leaders",
-                "The crowd is betting on the same fight with a separate pool.",
-                6
-            )}
+                <div class="pool-reveal-meter-grid"></div>
+
+                <div
+                    class="pool-reveal-fill"
+                    data-pool-reveal-fill
+                    style="
+                        transform:
+                            scaleY(
+                                ${animate ? 0 : ratio}
+                            );
+                    "
+                ></div>
+
+                <div class="pool-reveal-house-line">
+                    <span>
+                        HOUSE
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="pool-reveal-name">
+                ${escapeHtml(
+                    player?.display_name
+                    ?? "Player"
+                )}
+            </div>
+
         </div>
     `;
+}
+
+
+function renderPoolRevealCard(
+    match,
+    animate
+) {
+
+    const pool =
+        state.betting_pools
+        .find(
+            row =>
+                row.match_id ===
+                match.id
+        );
+
+
+    const p1Amount =
+        Number(
+            pool?.player1_pool
+            ?? 1000
+        );
+
+
+    const p2Amount =
+        Number(
+            pool?.player2_pool
+            ?? 1000
+        );
+
+
+    const matchupMax =
+        Math.max(
+            p1Amount,
+            p2Amount,
+            1000
+        );
+
+
+    const p1Ratio =
+        poolRevealBarRatio(
+            p1Amount,
+            matchupMax
+        );
+
+
+    const p2Ratio =
+        poolRevealBarRatio(
+            p2Amount,
+            matchupMax
+        );
+
+
+    const isCurrent =
+        Number(
+            match.match_number
+        )
+        ===
+        Number(
+            state.event.current_match_number
+        );
+
+
+    return `
+        <article
+            class="
+                pool-reveal-card
+                ${isCurrent ? "current" : ""}
+            "
+            data-pool-reveal-match="${match.id}"
+        >
+
+            <div class="pool-reveal-card-header">
+
+                <div class="pool-reveal-fight-label">
+                    Fight ${match.match_number}
+                </div>
+
+                ${
+                    isCurrent
+                    ? `
+                        <div class="pool-reveal-up-next">
+                            Up Next
+                        </div>
+                      `
+                    : `
+                        <div class="pool-reveal-locked">
+                            Locked
+                        </div>
+                      `
+                }
+
+            </div>
+
+            <div class="pool-reveal-versus">
+
+                ${
+                    renderPoolRevealFighter(
+                        match,
+                        match.player1_id,
+                        p1Amount,
+                        p1Ratio,
+                        "one",
+                        animate
+                    )
+                }
+
+                <div class="pool-reveal-vs">
+                    VS
+                </div>
+
+                ${
+                    renderPoolRevealFighter(
+                        match,
+                        match.player2_id,
+                        p2Amount,
+                        p2Ratio,
+                        "two",
+                        animate
+                    )
+                }
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderPools() {
+
+    const roundMatches =
+        state.matches
+        .filter(
+            match =>
+                match.round_number ===
+                state.event.current_round
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                Number(a.match_number)
+                -
+                Number(b.match_number)
+        );
+
+
+    const key =
+        poolsRevealKey();
+
+
+    const animate =
+        poolsRevealPlayedKey !==
+        key;
+
+
+    return `
+        <div class="pools-reveal-scene">
+
+            <div class="pools-reveal-heading">
+
+                <div class="scene-kicker">
+                    Round ${state.event.current_round}
+                </div>
+
+                <h1 class="scene-title">
+                    The Pools Are Locked
+                </h1>
+
+                <div class="scene-subtitle">
+                    The betting market is revealed.
+                    Armies remain hidden until each fight.
+                </div>
+
+            </div>
+
+            <div class="pools-reveal-grid">
+
+                ${
+                    roundMatches.map(
+                        match =>
+                            renderPoolRevealCard(
+                                match,
+                                animate
+                            )
+                    ).join("")
+                }
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function animatePoolRevealNumber(
+    element,
+    fromValue,
+    toValue,
+    duration,
+    delay
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    window.setTimeout(
+        () => {
+
+            const start =
+                Number(
+                    fromValue
+                    ?? 1000
+                );
+
+
+            const end =
+                Number(
+                    toValue
+                    ?? start
+                );
+
+
+            const began =
+                performance.now();
+
+
+            function frame(
+                now
+            ) {
+
+                const progress =
+                    Math.min(
+                        1,
+                        (
+                            now
+                            -
+                            began
+                        )
+                        /
+                        duration
+                    );
+
+
+                const eased =
+                    1
+                    -
+                    Math.pow(
+                        1 - progress,
+                        3
+                    );
+
+
+                const value =
+                    Math.round(
+                        start
+                        +
+                        (
+                            end
+                            -
+                            start
+                        )
+                        *
+                        eased
+                    );
+
+
+                element.textContent =
+                    money(
+                        value
+                    );
+
+
+                if (
+                    progress < 1
+                ) {
+
+                    requestAnimationFrame(
+                        frame
+                    );
+                }
+            }
+
+
+            requestAnimationFrame(
+                frame
+            );
+        },
+        delay
+    );
+}
+
+
+function runPoolsRevealPostRenderAnimation() {
+
+    if (
+        state?.event?.status !==
+        "betting_locked"
+    ) {
+        return;
+    }
+
+
+    const key =
+        poolsRevealKey();
+
+
+    if (
+        poolsRevealPlayedKey ===
+        key
+    ) {
+        return;
+    }
+
+
+    /*
+       Mark it as played immediately. Polling is separately held during
+       the reveal so the DOM cannot be replaced halfway through.
+    */
+    poolsRevealPlayedKey =
+        key;
+
+
+    const cards =
+        [
+            ...document.querySelectorAll(
+                ".pool-reveal-card"
+            )
+        ];
+
+
+    if (!cards.length) {
+        return;
+    }
+
+
+    const cardStagger =
+        120;
+
+
+    const fillDuration =
+        1120;
+
+
+    poolsRevealAnimationUntil =
+        performance.now()
+        +
+        fillDuration
+        +
+        cardStagger
+        *
+        cards.length
+        +
+        360;
+
+
+    cards.forEach(
+        (
+            card,
+            cardIndex
+        ) => {
+
+            const cardDelay =
+                cardIndex
+                *
+                cardStagger;
+
+
+            card.animate(
+                [
+                    {
+                        opacity:
+                            .64,
+                        transform:
+                            "translateY(5px)"
+                    },
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "translateY(0)"
+                    }
+                ],
+                {
+                    duration:
+                        430,
+                    delay:
+                        cardDelay,
+                    easing:
+                        "cubic-bezier(.18,.78,.24,1)",
+                    fill:
+                        "both"
+                }
+            );
+
+
+            const fills =
+                [
+                    ...card.querySelectorAll(
+                        "[data-pool-reveal-fill]"
+                    )
+                ];
+
+
+            fills.forEach(
+                (
+                    fill,
+                    fighterIndex
+                ) => {
+
+                    const ratio =
+                        Number(
+                            getComputedStyle(
+                                fill.closest(
+                                    ".pool-reveal-fighter"
+                                )
+                            )
+                            .getPropertyValue(
+                                "--pool-ratio"
+                            )
+                        )
+                        ||
+                        0;
+
+
+                    fill.animate(
+                        [
+                            {
+                                transform:
+                                    "scaleY(0)"
+                            },
+                            {
+                                transform:
+                                    `scaleY(${ratio})`
+                            }
+                        ],
+                        {
+                            duration:
+                                fillDuration,
+                            delay:
+                                cardDelay
+                                +
+                                fighterIndex
+                                *
+                                55,
+                            easing:
+                                "cubic-bezier(.16,.82,.22,1)",
+                            fill:
+                                "forwards"
+                        }
+                    );
+                }
+            );
+
+
+            const counters =
+                [
+                    ...card.querySelectorAll(
+                        "[data-pool-count]"
+                    )
+                ];
+
+
+            counters.forEach(
+                (
+                    counter,
+                    fighterIndex
+                ) => {
+
+                    animatePoolRevealNumber(
+                        counter,
+                        Number(
+                            counter.dataset
+                                .startValue
+                            ?? 1000
+                        ),
+                        Number(
+                            counter.dataset
+                                .finalValue
+                            ?? 1000
+                        ),
+                        fillDuration,
+                        cardDelay
+                        +
+                        fighterIndex
+                        *
+                        55
+                    );
+                }
+            );
+        }
+    );
 }
 
 
