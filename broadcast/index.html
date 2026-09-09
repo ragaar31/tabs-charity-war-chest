@@ -7226,6 +7226,349 @@ input {
     }
 }
 
+
+/* =========================================================
+   BATTLE SHOW — OBS CHROMA-KEY GAMEPLAY WINDOW
+   ========================================================= */
+
+.battle-show-scene,
+.fight-winner-sequence {
+    --battle-key: #00FF00;
+    height: 100%;
+    min-height: 0;
+}
+
+.battle-show-scene {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 10px;
+}
+
+.battle-show-heading {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 16px;
+    align-items: center;
+}
+
+.battle-show-heading
+.scene-kicker {
+    margin: 0;
+}
+
+.battle-show-matchup {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        42px
+        minmax(0,1fr);
+    gap: 10px;
+    align-items: center;
+}
+
+.battle-show-matchup span {
+    min-width: 0;
+    font-size: 1.00rem;
+    font-weight: 930;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.battle-show-matchup .one {
+    color:
+        color-mix(
+            in srgb,
+            var(--p1) 82%,
+            white 18%
+        );
+    text-align: right;
+}
+
+.battle-show-matchup .two {
+    color:
+        color-mix(
+            in srgb,
+            var(--p2) 82%,
+            white 18%
+        );
+}
+
+.battle-show-matchup strong {
+    color: #7f8ca4;
+    font-size: .66rem;
+    font-weight: 1000;
+    text-align: center;
+}
+
+.battle-show-live {
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.035);
+    color: #dce5f5;
+    font-size: .57rem;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.battle-key-frame {
+    position: relative;
+    min-height: 0;
+    padding: 8px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: #0c111a;
+    overflow: hidden;
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,.22);
+}
+
+.battle-key-accent {
+    position: absolute;
+    top: 0;
+    width: 31%;
+    height: 3px;
+    z-index: 2;
+}
+
+.battle-key-accent.one {
+    left: 0;
+    background:
+        linear-gradient(
+            90deg,
+            var(--p1),
+            transparent
+        );
+}
+
+.battle-key-accent.two {
+    right: 0;
+    background:
+        linear-gradient(
+            270deg,
+            var(--p2),
+            transparent
+        );
+}
+
+.battle-chroma-window {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    border-radius: 12px;
+    background: #00FF00;
+}
+
+
+/* =========================================================
+   FIGHT WINNER SEQUENCE
+   ========================================================= */
+
+.fight-winner-sequence {
+    position: relative;
+    overflow: hidden;
+}
+
+.fight-winner-battle-layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 10px;
+}
+
+.fight-victory-overlay,
+.fight-waiting-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+}
+
+.fight-victory-card {
+    min-width:
+        min(
+            640px,
+            78vw
+        );
+    padding:
+        54px
+        70px;
+    border-radius: 26px;
+    text-align: center;
+    background:
+        radial-gradient(
+            circle at top,
+            color-mix(
+                in srgb,
+                var(--player) 34%,
+                transparent
+            ),
+            transparent 58%
+        ),
+        rgba(14,19,28,.97);
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--player) 76%,
+            white 12%
+        );
+    box-shadow:
+        0 0 0 1px
+        color-mix(
+            in srgb,
+            var(--player) 20%,
+            transparent
+        ),
+        0 24px 100px
+        rgba(0,0,0,.70),
+        0 0 70px
+        color-mix(
+            in srgb,
+            var(--player) 24%,
+            transparent
+        );
+}
+
+.fight-victory-label {
+    color: #cbd6e8;
+    font-size: .82rem;
+    font-weight: 950;
+    letter-spacing: .19em;
+    text-transform: uppercase;
+}
+
+.fight-victory-name {
+    margin-top: 12px;
+    color: #fff;
+    font-size:
+        clamp(
+            4rem,
+            8vw,
+            8rem
+        );
+    font-weight: 1000;
+    line-height: .88;
+    text-shadow:
+        0 0 30px
+        color-mix(
+            in srgb,
+            var(--player) 22%,
+            transparent
+        );
+}
+
+.fight-waiting-overlay {
+    opacity: 0;
+}
+
+.fight-settlement-scene {
+    --player: #7c8aa6;
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+}
+
+.fight-settlement-card {
+    width:
+        min(
+            900px,
+            82%
+        );
+    padding:
+        42px
+        54px;
+    border-radius: 24px;
+    text-align: center;
+    background:
+        radial-gradient(
+            circle at top,
+            color-mix(
+                in srgb,
+                var(--player) 24%,
+                transparent
+            ),
+            transparent 58%
+        ),
+        rgba(20,25,36,.94);
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--player) 64%,
+            white 10%
+        );
+    box-shadow:
+        0 18px 60px
+        rgba(0,0,0,.34);
+}
+
+.fight-settlement-label {
+    color: #b7c4dc;
+    font-size: .75rem;
+    font-weight: 950;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.fight-settlement-name {
+    margin-top: 10px;
+    font-size:
+        clamp(
+            3.4rem,
+            6vw,
+            6rem
+        );
+    font-weight: 1000;
+    line-height: .92;
+}
+
+.fight-settlement-status {
+    margin-top: 19px;
+    color: #bac7dd;
+    font-size: 1.02rem;
+    line-height: 1.35;
+}
+
+
+/* Make the battle key area generous at normal 1080p */
+@media (max-width: 1500px) {
+
+    .battle-show-heading {
+        gap: 12px;
+    }
+
+    .battle-show-matchup span {
+        font-size: .90rem;
+    }
+
+    .fight-victory-card {
+        padding:
+            46px
+            58px;
+    }
+
+    .fight-settlement-card {
+        padding:
+            36px
+            46px;
+    }
+}
+
 </style>
 </head>
 
@@ -7405,6 +7748,10 @@ let poolsRevealAnimationUntil = 0;
 
 let fightRevealPlayedKey = null;
 let fightRevealAnimationUntil = 0;
+
+let fightBattleShowActiveKey = null;
+let fightWinnerSequencePlayedKey = null;
+let fightWinnerAnimationUntil = 0;
 
 
 function escapeHtml(value) {
@@ -8739,6 +9086,26 @@ async function refreshState(
         }
 
 
+        if (
+            oldState?.event?.status === "fight"
+            &&
+            data?.event?.status === "fight"
+            &&
+            data?.matches?.find(
+                match =>
+                    Number(match.match_number) ===
+                    Number(data.event.current_match_number)
+                    &&
+                    match.winner_player_id
+            )
+            &&
+            performance.now() <
+                fightWinnerAnimationUntil
+        ) {
+            return;
+        }
+
+
         newlyJoinedPlayerIds = [];
         newlyJoinedAudienceKeys = [];
 
@@ -9119,6 +9486,7 @@ async function refreshState(
         runBettingPostRenderAnimations();
         runPoolsRevealPostRenderAnimation();
         runFightRevealPostRenderAnimation();
+        runFightWinnerPostRenderAnimation();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -10231,6 +10599,22 @@ function renderScene() {
         if (match?.winner_player_id) {
             return renderFightResult();
         }
+
+
+        if (
+            match
+            &&
+            fightBattleShowActiveKey ===
+                fightRevealKey(
+                    match
+                )
+        ) {
+
+            return renderBattleShow(
+                match
+            );
+        }
+
 
         return renderArmyReveal(
             match,
@@ -19452,8 +19836,210 @@ function runFightRevealPostRenderAnimation() {
         },
         3450
     );
+
+
+    /*
+       Once the full Army + Audience reveal has had time to land,
+       automatically hand the Broadcast over to the keyed Battle Window.
+    */
+    window.setTimeout(
+        () => {
+
+            const latestMatch =
+                currentMatch();
+
+
+            if (
+                state?.event?.status !==
+                    "fight"
+                ||
+                !latestMatch
+                ||
+                latestMatch.winner_player_id
+                ||
+                fightRevealKey(
+                    latestMatch
+                )
+                !==
+                key
+            ) {
+                return;
+            }
+
+
+            fightBattleShowActiveKey =
+                key;
+
+
+            renderBroadcast();
+
+
+            const battleShow =
+                document.querySelector(
+                    ".battle-show-scene"
+                );
+
+
+            battleShow?.animate(
+                [
+                    {
+                        opacity:
+                            0,
+                        transform:
+                            "scale(.992)"
+                    },
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "scale(1)"
+                    }
+                ],
+                {
+                    duration:
+                        480,
+                    easing:
+                        "cubic-bezier(.18,.78,.24,1)"
+                }
+            );
+        },
+        3650
+    );
 }
 
+
+
+function renderBattleShow(
+    match
+) {
+
+    const p1 =
+        playerById(
+            match?.player1_id
+        );
+
+
+    const p2 =
+        playerById(
+            match?.player2_id
+        );
+
+
+    return `
+        <div
+            class="battle-show-scene"
+            style="
+                --p1:${playerColor(match?.player1_id)};
+                --p2:${playerColor(match?.player2_id)};
+            "
+        >
+
+            <div class="battle-show-heading">
+
+                <div class="scene-kicker">
+                    Round ${match?.round_number}
+                    •
+                    Fight ${match?.match_number}
+                </div>
+
+                <div class="battle-show-matchup">
+
+                    <span class="one">
+                        ${escapeHtml(
+                            p1?.display_name
+                            ?? "Player"
+                        )}
+                    </span>
+
+                    <strong>
+                        VS
+                    </strong>
+
+                    <span class="two">
+                        ${escapeHtml(
+                            p2?.display_name
+                            ?? "Player"
+                        )}
+                    </span>
+
+                </div>
+
+                <div class="battle-show-live">
+                    Battle Live
+                </div>
+
+            </div>
+
+            <div class="battle-key-frame">
+
+                <div class="battle-key-accent one"></div>
+                <div class="battle-key-accent two"></div>
+
+                <div
+                    class="battle-chroma-window"
+                    aria-label="OBS chroma-key gameplay window"
+                ></div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function fightWinnerKey(
+    match
+) {
+
+    return [
+        match?.id
+        ?? "match",
+
+        match?.winner_player_id
+        ?? "winner"
+    ].join(":");
+}
+
+
+function renderFightSettlementWaiting(
+    match,
+    winner
+) {
+
+    return `
+        <div
+            class="fight-settlement-scene"
+            style="
+                --player:
+                    ${playerColor(
+                        winner?.id
+                    )};
+            "
+        >
+
+            <div class="fight-settlement-card">
+
+                <div class="fight-settlement-label">
+                    Fight ${match?.match_number} Winner
+                </div>
+
+                <div class="fight-settlement-name">
+                    ${escapeHtml(
+                        winner?.display_name
+                        ?? "Winner"
+                    )}
+                </div>
+
+                <div class="fight-settlement-status">
+                    Waiting for the Host to settle wagers
+                    and award the battle purse.
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
 
 
 function renderFightResult() {
@@ -19461,48 +20047,385 @@ function renderFightResult() {
     const match =
         currentMatch();
 
+
     const winner =
         playerById(
             match?.winner_player_id
         );
 
 
+    const key =
+        fightWinnerKey(
+            match
+        );
+
+
+    /*
+       After the one-shot victory animation has already played, normal
+       polling should reconstruct only the clean settlement-waiting scene.
+    */
+    if (
+        fightWinnerSequencePlayedKey ===
+        key
+    ) {
+
+        return renderFightSettlementWaiting(
+            match,
+            winner
+        );
+    }
+
+
     return `
-        <div class="champion-scene">
+        <div
+            class="fight-winner-sequence"
+            data-fight-winner-sequence="${escapeHtml(key)}"
+            style="
+                --player:
+                    ${playerColor(
+                        winner?.id
+                    )};
+                --p1:
+                    ${playerColor(
+                        match?.player1_id
+                    )};
+                --p2:
+                    ${playerColor(
+                        match?.player2_id
+                    )};
+            "
+        >
 
-            <div
-                class="champion-card"
-                style="
-                    --player:
-                    ${playerColor(winner?.id)};
-                "
-            >
+            <div class="fight-winner-battle-layer">
 
-                <div class="champ-label">
-                    Fight ${match?.match_number} Winner
+                <div class="battle-show-heading">
+
+                    <div class="scene-kicker">
+                        Round ${match?.round_number}
+                        •
+                        Fight ${match?.match_number}
+                    </div>
+
+                    <div class="battle-show-matchup">
+
+                        <span class="one">
+                            ${escapeHtml(
+                                playerName(
+                                    match?.player1_id
+                                )
+                            )}
+                        </span>
+
+                        <strong>
+                            VS
+                        </strong>
+
+                        <span class="two">
+                            ${escapeHtml(
+                                playerName(
+                                    match?.player2_id
+                                )
+                            )}
+                        </span>
+
+                    </div>
+
+                    <div class="battle-show-live">
+                        Final Result
+                    </div>
+
                 </div>
 
-                <div class="champ-name">
-                    ${escapeHtml(winner?.display_name ?? "Winner")}
+                <div class="battle-key-frame">
+
+                    <div class="battle-key-accent one"></div>
+                    <div class="battle-key-accent two"></div>
+
+                    <div class="battle-chroma-window"></div>
+
                 </div>
 
-                <div class="scene-subtitle">
-                    Waiting for the Host to settle wagers and award the battle purse.
+            </div>
+
+
+            <div class="fight-victory-overlay">
+
+                <div class="fight-victory-card">
+
+                    <div class="fight-victory-label">
+                        Victory
+                    </div>
+
+                    <div class="fight-victory-name">
+                        ${escapeHtml(
+                            winner?.display_name
+                            ?? "Winner"
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="fight-waiting-overlay">
+
+                <div class="fight-settlement-card">
+
+                    <div class="fight-settlement-label">
+                        Fight ${match?.match_number} Winner
+                    </div>
+
+                    <div class="fight-settlement-name">
+                        ${escapeHtml(
+                            winner?.display_name
+                            ?? "Winner"
+                        )}
+                    </div>
+
+                    <div class="fight-settlement-status">
+                        Waiting for the Host to settle wagers
+                        and award the battle purse.
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
-
-        <div class="scene-lower-two">
-            ${renderAudiencePoolPanel(match, false)}
-            ${renderAudienceLeaderboardMini(
-                "Audience Leaders",
-                "The crowd leaderboard updates when the Host settles this fight.",
-                6
-            )}
-        </div>
     `;
+}
+
+
+function runFightWinnerPostRenderAnimation() {
+
+    if (
+        state?.event?.status !==
+        "fight"
+    ) {
+        return;
+    }
+
+
+    const match =
+        currentMatch();
+
+
+    if (
+        !match?.winner_player_id
+    ) {
+        return;
+    }
+
+
+    const key =
+        fightWinnerKey(
+            match
+        );
+
+
+    if (
+        fightWinnerSequencePlayedKey ===
+        key
+    ) {
+        return;
+    }
+
+
+    const scene =
+        document.querySelector(
+            `[data-fight-winner-sequence="${CSS.escape(key)}"]`
+        );
+
+
+    if (!scene) {
+        return;
+    }
+
+
+    fightWinnerSequencePlayedKey =
+        key;
+
+
+    fightWinnerAnimationUntil =
+        performance.now()
+        +
+        3850;
+
+
+    const victory =
+        scene.querySelector(
+            ".fight-victory-card"
+        );
+
+
+    const victoryOverlay =
+        scene.querySelector(
+            ".fight-victory-overlay"
+        );
+
+
+    const battleLayer =
+        scene.querySelector(
+            ".fight-winner-battle-layer"
+        );
+
+
+    const waiting =
+        scene.querySelector(
+            ".fight-waiting-overlay"
+        );
+
+
+    /*
+       Victory card:
+       small -> big -> hold -> grow slightly / fade away.
+    */
+    victory?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(.38)"
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1.04)",
+                offset:
+                    .24
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1)",
+                offset:
+                    .62
+            },
+
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(1.28)",
+                offset:
+                    1
+            }
+        ],
+        {
+            duration:
+                2550,
+            easing:
+                "cubic-bezier(.16,.82,.22,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    victoryOverlay?.animate(
+        [
+            {
+                opacity:
+                    1
+            },
+            {
+                opacity:
+                    1,
+                offset:
+                    .72
+            },
+            {
+                opacity:
+                    0
+            }
+        ],
+        {
+            duration:
+                2650,
+            easing:
+                "ease",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    /*
+       Keep gameplay visible under the Victory card, then fade the keyed
+       Battle Window away immediately before the waiting card appears.
+    */
+    battleLayer?.animate(
+        [
+            {
+                opacity:
+                    1,
+                filter:
+                    "brightness(1)"
+            },
+            {
+                opacity:
+                    1,
+                filter:
+                    "brightness(.82)",
+                offset:
+                    .68
+            },
+            {
+                opacity:
+                    0,
+                filter:
+                    "brightness(.55)"
+            }
+        ],
+        {
+            duration:
+                2900,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    waiting?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "translateY(12px) scale(.985)"
+            },
+            {
+                opacity:
+                    0,
+                transform:
+                    "translateY(12px) scale(.985)",
+                offset:
+                    .72
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "translateY(0) scale(1)"
+            }
+        ],
+        {
+            duration:
+                3450,
+            easing:
+                "cubic-bezier(.18,.78,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
 }
 
 
@@ -19751,74 +20674,13 @@ function renderChampion() {
 
 function maybeShowWinner() {
 
-    if (
-        state.event.status !== "fight"
-    ) {
-        return;
-    }
+    /*
+       Legacy winner-banner overlay disabled.
 
-
-    const match =
-        currentMatch();
-
-
-    if (!match?.winner_player_id) {
-        return;
-    }
-
-
-    const key =
-        `${match.id}:${match.winner_player_id}`;
-
-
-    if (key === lastWinnerKey) {
-        return;
-    }
-
-
-    lastWinnerKey = key;
-
-
-    const banner =
-        document.getElementById(
-            "winner-banner"
-        );
-
-
-    banner.innerHTML = `
-        <div
-            class="winner-banner-inner"
-            style="
-                --player:
-                ${playerColor(match.winner_player_id)};
-            "
-        >
-            <small>VICTORY</small>
-            <strong>
-                ${escapeHtml(
-                    playerName(
-                        match.winner_player_id
-                    )
-                )}
-            </strong>
-        </div>
-    `;
-
-
-    banner.classList.remove("hidden");
-
-
-    clearTimeout(
-        winnerTimer
-    );
-
-
-    winnerTimer =
-        setTimeout(
-            () =>
-                banner.classList.add("hidden"),
-            2600
-        );
+       The regular Fight scene now owns its complete winner animation:
+       Battle Window -> Victory -> Settlement Waiting.
+    */
+    return;
 }
 
 
