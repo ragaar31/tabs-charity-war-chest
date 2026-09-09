@@ -7947,6 +7947,21 @@ input {
     line-height: .94;
 }
 
+
+/* =========================================================
+   SETTLEMENT / FIGHT STATE-MACHINE SAFETY
+   ========================================================= */
+
+.payout-overlay.active,
+.payout-overlay.prearmed {
+    z-index: 2147483000 !important;
+}
+
+.payout-overlay.prearmed {
+    opacity: 1 !important;
+    transition: none !important;
+}
+
 </style>
 </head>
 
@@ -8091,6 +8106,10 @@ let pollBusy = false;
 
 let firstState = true;
 let lastSettlementId = null;
+
+let settlementAwaitingMatchId = null;
+let settlementAwaitingMatchNumber = null;
+let settlementSequenceMatchId = null;
 let payoutTimer = null;
 
 let lastWinnerKey = null;
@@ -8867,25 +8886,47 @@ function standings() {
 }
 
 
-function currentMatch() {
+function matchForSnapshot(
+    snapshot
+) {
 
     const event =
-        state?.event;
+        snapshot?.event;
+
 
     if (!event) {
         return null;
     }
 
+
     return (
-        state.matches?.find(
+        snapshot.matches?.find(
             match =>
-                match.round_number ===
+                Number(
+                    match.round_number
+                )
+                ===
+                Number(
                     event.current_round
+                )
                 &&
-                match.match_number ===
+                Number(
+                    match.match_number
+                )
+                ===
+                Number(
                     event.current_match_number
+                )
         )
         ?? null
+    );
+}
+
+
+function currentMatch() {
+
+    return matchForSnapshot(
+        state
     );
 }
 
@@ -9396,6 +9437,18 @@ async function refreshState(
 
 
         /*
+           Settlement is a priority transition. Detect it before any
+           scene-animation lock can return from this poll.
+        */
+        const settlementTransition =
+            settlementTransitionInfo(
+                oldState,
+                data,
+                initial || firstState
+            );
+
+
+        /*
            Do the same for the Shop skill-unlock sequence.
 
            The old behavior rebuilt the entire Shop scene every ~900ms,
@@ -9468,6 +9521,8 @@ async function refreshState(
 
 
         if (
+            !settlementTransition.pending
+            &&
             oldState?.event?.status === "betting_locked"
             &&
             data?.event?.status === "betting_locked"
@@ -9480,6 +9535,8 @@ async function refreshState(
 
 
         if (
+            !settlementTransition.pending
+            &&
             oldState?.event?.status === "fight"
             &&
             data?.event?.status === "fight"
@@ -9500,6 +9557,8 @@ async function refreshState(
 
 
         if (
+            !settlementTransition.pending
+            &&
             oldState?.event?.status === "fight"
             &&
             data?.event?.status === "fight"
@@ -9873,18 +9932,6 @@ async function refreshState(
             : [];
 
 
-        /*
-           If this LIVE poll contains a NEW completed settlement, cover the
-           old Fight scene BEFORE state changes and BEFORE renderBroadcast().
-
-           On the initial page load / refresh this is deliberately skipped:
-           the existing latest_settlement is historical and must not replay.
-        */
-        prearmSettlementCurtain(
-            data,
-            initial || firstState
-        );
-
 
         previousState =
             oldState;
@@ -9907,6 +9954,18 @@ async function refreshState(
                 state.latest_settlement
                 ?.match_id
                 ?? null;
+
+
+            settlementAwaitingMatchId =
+                null;
+
+
+            settlementAwaitingMatchNumber =
+                null;
+
+
+            settlementSequenceMatchId =
+                null;
 
 
             const payoutOverlay =
@@ -20077,10 +20136,15 @@ function runFightRevealPostRenderAnimation() {
        headers -> Frontline -> Mid-range -> Backline -> totals
        -> Audience pool reveal.
     */
+    /*
+       Keep this DOM stable well beyond the final Audience reveal frame.
+       This avoids a normal poll rebuilding the scene while the cascade
+       is still painting on a slower browser.
+    */
     fightRevealAnimationUntil =
         performance.now()
         +
-        3650;
+        4400;
 
 
     const fighters =
@@ -20292,8 +20356,9 @@ function runFightRevealPostRenderAnimation() {
                         )
                 );
         },
-        3450
-    );}
+        3700
+    );
+}
 
 
 
@@ -21813,11 +21878,16 @@ function playSettlementSpotlightSequence(
                 () => {
 
                     overlay.classList.remove(
-                        "active"
+                        "active",
+                        "prearmed"
                     );
 
                     overlay.innerHTML =
                         "";
+
+
+                    settlementSequenceMatchId =
+                        null;
                 },
                 770
             );
@@ -21829,48 +21899,9 @@ function playSettlementSpotlightSequence(
 }
 
 
-function shouldPrearmSettlement(
-    incomingState,
-    initial = false
+function showSettlementCurtain(
+    matchNumber = null
 ) {
-
-    const matchId =
-        incomingState
-            ?.latest_settlement
-            ?.match_id;
-
-
-    if (
-        initial
-        ||
-        !matchId
-    ) {
-        return false;
-    }
-
-
-    return (
-        matchId
-        !==
-        lastSettlementId
-    );
-}
-
-
-function prearmSettlementCurtain(
-    incomingState,
-    initial = false
-) {
-
-    if (
-        !shouldPrearmSettlement(
-            incomingState,
-            initial
-        )
-    ) {
-        return;
-    }
-
 
     const overlay =
         document.getElementById(
@@ -21883,27 +21914,24 @@ function prearmSettlementCurtain(
     }
 
 
-    /*
-       This class is deliberately instant/no-transition.
-       It covers the OLD fight screen before the Broadcast renders the
-       newly-advanced phase underneath it, eliminating the one-frame flash.
-    */
     overlay.classList.add(
         "active",
         "prearmed"
     );
 
 
-    const settlement =
-        incomingState.latest_settlement;
-
-
     overlay.innerHTML = `
         <div class="settlement-prearm-curtain">
 
-            <div class="settlement-prearm-kicker">
-                Fight ${settlement.match_number}
-            </div>
+            ${
+                matchNumber != null
+                ? `
+                    <div class="settlement-prearm-kicker">
+                        Fight ${matchNumber}
+                    </div>
+                  `
+                : ""
+            }
 
             <div class="settlement-prearm-title">
                 Settling Bets
@@ -21911,6 +21939,124 @@ function prearmSettlementCurtain(
 
         </div>
     `;
+}
+
+
+function settlementTransitionInfo(
+    oldSnapshot,
+    incomingState,
+    initial = false
+) {
+
+    if (
+        initial
+        ||
+        !oldSnapshot
+    ) {
+
+        return {
+            pending:
+                false,
+
+            newSettlement:
+                false,
+
+            leftCompletedFight:
+                false
+        };
+    }
+
+
+    const oldMatch =
+        matchForSnapshot(
+            oldSnapshot
+        );
+
+
+    const incomingSettlement =
+        incomingState
+            ?.latest_settlement
+            ?? null;
+
+
+    const newSettlement =
+        Boolean(
+            incomingSettlement?.match_id
+        )
+        &&
+        incomingSettlement.match_id
+        !==
+        lastSettlementId
+        &&
+        incomingSettlement.match_id
+        !==
+        settlementSequenceMatchId;
+
+
+    const leftCompletedFight =
+        oldSnapshot?.event?.status ===
+            "fight"
+        &&
+        Boolean(
+            oldMatch?.winner_player_id
+        )
+        &&
+        incomingState?.event?.status !==
+            "fight";
+
+
+    if (
+        leftCompletedFight
+        &&
+        !settlementAwaitingMatchId
+    ) {
+
+        settlementAwaitingMatchId =
+            oldMatch.id;
+
+
+        settlementAwaitingMatchNumber =
+            oldMatch.match_number;
+
+
+        showSettlementCurtain(
+            oldMatch.match_number
+        );
+    }
+
+
+    if (newSettlement) {
+
+        if (
+            !settlementAwaitingMatchId
+        ) {
+
+            settlementAwaitingMatchId =
+                incomingSettlement.match_id;
+
+
+            settlementAwaitingMatchNumber =
+                incomingSettlement.match_number;
+        }
+
+
+        showSettlementCurtain(
+            incomingSettlement.match_number
+        );
+    }
+
+
+    return {
+        pending:
+            Boolean(
+                settlementAwaitingMatchId
+            )
+            ||
+            newSettlement,
+
+        newSettlement,
+        leftCompletedFight
+    };
 }
 
 
@@ -21937,13 +22083,69 @@ function maybeShowPayout() {
     if (
         settlement.match_id ===
         lastSettlementId
+        ||
+        settlement.match_id ===
+        settlementSequenceMatchId
     ) {
         return;
     }
 
 
-    lastSettlementId =
-        settlement.match_id;
+    /*
+       If a curtain was raised while waiting for this completed fight,
+       only accept that match or a newer settlement.
+    */
+    if (
+        settlementAwaitingMatchId
+        &&
+        settlement.match_id !==
+        settlementAwaitingMatchId
+    ) {
+
+        const incomingOrder =
+            Number(
+                settlement.round_number
+                ?? 0
+            )
+            *
+            100
+            +
+            Number(
+                settlement.match_number
+                ?? 0
+            );
+
+
+        const awaitingRound =
+            Number(
+                matchForSnapshot(
+                    previousState
+                )?.round_number
+                ??
+                settlement.round_number
+                ??
+                0
+            );
+
+
+        const awaitingOrder =
+            awaitingRound
+            *
+            100
+            +
+            Number(
+                settlementAwaitingMatchNumber
+                ?? 0
+            );
+
+
+        if (
+            incomingOrder <
+            awaitingOrder
+        ) {
+            return;
+        }
+    }
 
 
     const overlay =
@@ -21964,7 +22166,7 @@ function maybeShowPayout() {
             <div class="settlement-spotlight-heading">
 
                 <div class="settlement-spotlight-kicker">
-                    Round ${state.event.current_round}
+                    Round ${settlement.round_number ?? state.event.current_round}
                     •
                     Fight ${settlement.match_number}
                 </div>
@@ -22008,6 +22210,22 @@ function maybeShowPayout() {
     clearTimeout(
         payoutTimer
     );
+
+
+    settlementSequenceMatchId =
+        settlement.match_id;
+
+
+    lastSettlementId =
+        settlement.match_id;
+
+
+    settlementAwaitingMatchId =
+        null;
+
+
+    settlementAwaitingMatchNumber =
+        null;
 
 
     playSettlementSpotlightSequence(
