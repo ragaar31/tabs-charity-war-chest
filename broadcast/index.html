@@ -7902,6 +7902,51 @@ input {
     }
 }
 
+
+/* =========================================================
+   SETTLEMENT — NO-FLASH PREARM CURTAIN
+   ========================================================= */
+
+.payout-overlay.prearmed {
+    opacity: 1 !important;
+    transition: none !important;
+}
+
+.settlement-prearm-curtain {
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    background:
+        radial-gradient(
+            circle at 50% 44%,
+            rgba(38,50,78,.32),
+            transparent 34%
+        ),
+        #080c13;
+}
+
+.settlement-prearm-kicker {
+    color: #93a2bc;
+    font-size: .76rem;
+    font-weight: 950;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.settlement-prearm-title {
+    margin-top: 9px;
+    color: #fff;
+    font-size:
+        clamp(
+            3.5rem,
+            6vw,
+            6rem
+        );
+    font-weight: 1000;
+    line-height: .94;
+}
+
 </style>
 </head>
 
@@ -9826,6 +9871,17 @@ async function refreshState(
                 data
               )
             : [];
+
+
+        /*
+           If this poll contains a NEW completed settlement, cover the old
+           Fight scene BEFORE state changes and BEFORE renderBroadcast().
+           This prevents Shop / Pools Locked / any next phase from flashing
+           underneath for one frame.
+        */
+        prearmSettlementCurtain(
+            data
+        );
 
 
         previousState =
@@ -21456,11 +21512,15 @@ function playSettlementSpotlightSequence(
 
 
     const firstDelay =
-        420;
+        620;
 
 
+    /*
+       Give each player enough time to read:
+       entry -> War Chest movement -> result hold -> exit.
+    */
     const stepDuration =
-        920;
+        1450;
 
 
     rows.forEach(
@@ -21533,7 +21593,7 @@ function playSettlementSpotlightSequence(
                             ],
                             {
                                 duration:
-                                    300,
+                                    420,
                                 easing:
                                     "cubic-bezier(.18,.78,.24,1)",
                                 fill:
@@ -21546,7 +21606,7 @@ function playSettlementSpotlightSequence(
                         chest,
                         row.beforeWarChest,
                         row.finalWarChest,
-                        520
+                        900
                     );
 
 
@@ -21583,7 +21643,7 @@ function playSettlementSpotlightSequence(
                             ],
                             {
                                 duration:
-                                    640,
+                                    900,
                                 easing:
                                     "cubic-bezier(.18,.72,.24,1)"
                             }
@@ -21612,7 +21672,7 @@ function playSettlementSpotlightSequence(
                                 ],
                                 {
                                     duration:
-                                        230,
+                                        300,
                                     easing:
                                         "cubic-bezier(.22,.62,.28,1)",
                                     fill:
@@ -21620,7 +21680,7 @@ function playSettlementSpotlightSequence(
                                 }
                             );
                         },
-                        650
+                        1080
                     );
                 },
                 delay
@@ -21706,7 +21766,7 @@ function playSettlementSpotlightSequence(
                 ],
                 {
                     duration:
-                        620,
+                        760,
                     easing:
                         "ease",
                     fill:
@@ -21725,13 +21785,97 @@ function playSettlementSpotlightSequence(
                     overlay.innerHTML =
                         "";
                 },
-                630
+                770
             );
         },
         sequenceEnd
         +
-        900
+        1500
     );
+}
+
+
+function shouldPrearmSettlement(
+    incomingState,
+    initial = false
+) {
+
+    const matchId =
+        incomingState
+            ?.latest_settlement
+            ?.match_id;
+
+
+    if (
+        initial
+        ||
+        !matchId
+    ) {
+        return false;
+    }
+
+
+    return (
+        matchId
+        !==
+        lastSettlementId
+    );
+}
+
+
+function prearmSettlementCurtain(
+    incomingState
+) {
+
+    if (
+        !shouldPrearmSettlement(
+            incomingState,
+            false
+        )
+    ) {
+        return;
+    }
+
+
+    const overlay =
+        document.getElementById(
+            "payout-overlay"
+        );
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    /*
+       This class is deliberately instant/no-transition.
+       It covers the OLD fight screen before the Broadcast renders the
+       newly-advanced phase underneath it, eliminating the one-frame flash.
+    */
+    overlay.classList.add(
+        "active",
+        "prearmed"
+    );
+
+
+    const settlement =
+        incomingState.latest_settlement;
+
+
+    overlay.innerHTML = `
+        <div class="settlement-prearm-curtain">
+
+            <div class="settlement-prearm-kicker">
+                Fight ${settlement.match_number}
+            </div>
+
+            <div class="settlement-prearm-title">
+                Settling Bets
+            </div>
+
+        </div>
+    `;
 }
 
 
@@ -21799,6 +21943,21 @@ function maybeShowPayout() {
 
     overlay.classList.add(
         "active"
+    );
+
+
+    /*
+       The curtain was raised before the underlying phase rendered.
+       Now that the actual Settlement scene exists, normal overlay
+       transitions can resume while remaining fully opaque.
+    */
+    window.requestAnimationFrame(
+        () => {
+
+            overlay.classList.remove(
+                "prearmed"
+            );
+        }
     );
 
 
