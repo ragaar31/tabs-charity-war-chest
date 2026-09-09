@@ -6719,6 +6719,369 @@ input {
     }
 }
 
+
+/* =========================================================
+   CURRENT FIGHT — ARMY CASCADE + AUDIENCE POOL REVEAL
+   ========================================================= */
+
+.fight-reveal-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        116px;
+    gap: 10px;
+}
+
+.fight-reveal-kicker {
+    margin-bottom: 0;
+}
+
+.fight-reveal-stage {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        90px
+        minmax(0,1fr);
+    gap: 14px;
+    align-items: stretch;
+}
+
+.fight-reveal-stage .fighter-panel {
+    min-height: 0;
+    padding: 18px 20px 16px;
+    border-radius: 18px;
+}
+
+.fight-reveal-stage
+.fighter-panel
+.fighter-name {
+    font-size:
+        clamp(
+            1.85rem,
+            2.7vw,
+            3.25rem
+        );
+}
+
+.fight-reveal-stage
+.fighter-panel
+.fighter-money {
+    margin-top: 7px;
+    font-size: .84rem;
+}
+
+.fight-reveal-stage
+.army-zones {
+    margin-top: 13px;
+    gap: 8px;
+}
+
+.fight-reveal-stage
+.army-zone {
+    padding: 10px;
+}
+
+.fight-reveal-stage
+.army-zone h4 {
+    margin-bottom: 7px;
+    font-size: .58rem;
+}
+
+.fight-reveal-stage
+.army-unit {
+    padding: 3px 0;
+    font-size: .70rem;
+}
+
+.fight-reveal-stage
+.army-total {
+    padding-top: 10px;
+    font-size: 1.02rem;
+}
+
+.fight-reveal-vs {
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,.36);
+    font-size: 1.85rem;
+    font-weight: 1000;
+}
+
+.fight-reveal-scene.reveal-pending
+.fight-reveal-fighter
+[data-fight-reveal-header],
+
+.fight-reveal-scene.reveal-pending
+.fight-reveal-fighter
+[data-fight-reveal-zone],
+
+.fight-reveal-scene.reveal-pending
+.fight-reveal-fighter
+[data-fight-reveal-unit],
+
+.fight-reveal-scene.reveal-pending
+.fight-reveal-fighter
+[data-fight-reveal-total] {
+    opacity: 0;
+}
+
+.fight-reveal-scene.reveal-pending
+.fight-reveal-vs {
+    opacity: 0;
+}
+
+.fight-audience-reveal {
+    --p1: #8aa0ff;
+    --p2: #8aa0ff;
+    min-width: 0;
+    min-height: 0;
+    padding: 9px 13px 11px;
+    display: grid;
+    grid-template-rows:
+        auto
+        auto
+        24px;
+    gap: 6px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(20,25,36,.91);
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.14);
+}
+
+.fight-audience-reveal.reveal-pending {
+    opacity: 0;
+}
+
+.fight-audience-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.fight-audience-title {
+    color: #f4f7ff;
+    font-size: .68rem;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.fight-audience-count {
+    color: var(--muted);
+    font-size: .56rem;
+    font-weight: 760;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.fight-audience-sides {
+    display: grid;
+    grid-template-columns:
+        1fr
+        1fr;
+    gap: 24px;
+}
+
+.fight-audience-side {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        auto
+        46px;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.fight-audience-side.two {
+    grid-template-columns:
+        46px
+        auto
+        minmax(0,1fr);
+}
+
+.fight-audience-side.two
+.fight-audience-name {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+}
+
+.fight-audience-side.two
+.fight-audience-money {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.fight-audience-side.two
+.fight-audience-share {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: left;
+}
+
+.fight-audience-name {
+    min-width: 0;
+    font-size: .72rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fight-audience-side.one
+.fight-audience-name {
+    color:
+        color-mix(
+            in srgb,
+            var(--p1) 78%,
+            white 22%
+        );
+}
+
+.fight-audience-side.two
+.fight-audience-name {
+    color:
+        color-mix(
+            in srgb,
+            var(--p2) 78%,
+            white 22%
+        );
+}
+
+.fight-audience-money {
+    font-size: .72rem;
+    font-weight: 950;
+    font-variant-numeric: tabular-nums;
+}
+
+.fight-audience-share {
+    color: #dce5f7;
+    font-size: .62rem;
+    font-weight: 900;
+}
+
+.fight-audience-bar {
+    position: relative;
+    min-width: 0;
+    height: 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(0,0,0,.22);
+    overflow: hidden;
+}
+
+.fight-audience-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.fight-audience-fill.one {
+    left: 0;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--p1) 92%,
+                white 8%
+            ),
+            var(--p1)
+        );
+    box-shadow:
+        inset -1px 0 0
+        rgba(255,255,255,.16);
+}
+
+.fight-audience-fill.two {
+    right: 0;
+    background:
+        linear-gradient(
+            270deg,
+            color-mix(
+                in srgb,
+                var(--p2) 92%,
+                white 8%
+            ),
+            var(--p2)
+        );
+    box-shadow:
+        inset 1px 0 0
+        rgba(255,255,255,.16);
+}
+
+.fight-audience-center-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+    border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.17);
+    background: #111722;
+    color: #d4def0;
+    font-size: .52rem;
+    font-weight: 1000;
+    box-shadow:
+        0 0 0 4px
+        rgba(17,23,34,.80);
+}
+
+@media (max-width: 1500px) {
+
+    .fight-reveal-scene {
+        grid-template-rows:
+            auto
+            minmax(0,1fr)
+            108px;
+    }
+
+    .fight-reveal-stage {
+        grid-template-columns:
+            minmax(0,1fr)
+            72px
+            minmax(0,1fr);
+        gap: 10px;
+    }
+
+    .fight-reveal-stage
+    .fighter-panel {
+        padding:
+            15px 17px 13px;
+    }
+
+    .fight-reveal-stage
+    .army-zone {
+        padding: 8px;
+    }
+
+    .fight-reveal-stage
+    .army-unit {
+        font-size: .65rem;
+    }
+
+    .fight-audience-reveal {
+        padding:
+            8px 11px 9px;
+    }
+}
+
 </style>
 </head>
 
@@ -6895,6 +7258,9 @@ let bettingSeenActionSignatures = new Map();
 
 let poolsRevealPlayedKey = null;
 let poolsRevealAnimationUntil = 0;
+
+let fightRevealPlayedKey = null;
+let fightRevealAnimationUntil = 0;
 
 
 function escapeHtml(value) {
@@ -8209,6 +8575,26 @@ async function refreshState(
         }
 
 
+        if (
+            oldState?.event?.status === "fight"
+            &&
+            data?.event?.status === "fight"
+            &&
+            !data?.matches?.find(
+                match =>
+                    Number(match.match_number) ===
+                    Number(data.event.current_match_number)
+                    &&
+                    match.winner_player_id
+            )
+            &&
+            performance.now() <
+                fightRevealAnimationUntil
+        ) {
+            return;
+        }
+
+
         newlyJoinedPlayerIds = [];
         newlyJoinedAudienceKeys = [];
 
@@ -8588,6 +8974,7 @@ async function refreshState(
         runArmyBuildPostRenderAnimations();
         runBettingPostRenderAnimations();
         runPoolsRevealPostRenderAnimation();
+        runFightRevealPostRenderAnimation();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -17833,6 +18220,205 @@ function runPoolsRevealPostRenderAnimation() {
 }
 
 
+function fightRevealKey(
+    match
+) {
+
+    return [
+        state?.event?.id
+        ?? roomCode
+        ?? "event",
+
+        match?.round_number
+        ?? 0,
+
+        match?.match_number
+        ?? 0
+    ].join(":");
+}
+
+
+function renderFightAudienceReveal(
+    match,
+    animate
+) {
+
+    const pool =
+        audienceRegularPoolForMatch(
+            match.id
+        );
+
+
+    const p1Pool =
+        Number(
+            pool?.player1_pool
+            ?? 1000
+        );
+
+
+    const p2Pool =
+        Number(
+            pool?.player2_pool
+            ?? 1000
+        );
+
+
+    const total =
+        Math.max(
+            1,
+            p1Pool
+            +
+            p2Pool
+        );
+
+
+    const p1Share =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                (
+                    p1Pool
+                    /
+                    total
+                )
+                *
+                100
+            )
+        );
+
+
+    const p2Share =
+        100
+        -
+        p1Share;
+
+
+    return `
+        <section
+            class="
+                fight-audience-reveal
+                ${animate ? "reveal-pending" : ""}
+            "
+            style="
+                --p1:${playerColor(match.player1_id)};
+                --p2:${playerColor(match.player2_id)};
+                --p1-share:${p1Share}%;
+                --p2-share:${p2Share}%;
+            "
+        >
+
+            <div class="fight-audience-head">
+
+                <div class="fight-audience-title">
+                    Audience Pool
+                </div>
+
+                <div class="fight-audience-count">
+                    ${audienceCount()} gamblers
+                </div>
+
+            </div>
+
+            <div class="fight-audience-sides">
+
+                <div class="fight-audience-side one">
+
+                    <div class="fight-audience-name">
+                        ${escapeHtml(
+                            playerName(
+                                match.player1_id
+                            )
+                        )}
+                    </div>
+
+                    <div
+                        class="fight-audience-money"
+                        data-fight-audience-count
+                        data-start-value="1000"
+                        data-final-value="${p1Pool}"
+                    >
+                        ${
+                            money(
+                                animate
+                                ? 1000
+                                : p1Pool
+                            )
+                        }
+                    </div>
+
+                    <div class="fight-audience-share">
+                        ${Math.round(p1Share)}%
+                    </div>
+
+                </div>
+
+                <div class="fight-audience-side two">
+
+                    <div class="fight-audience-name">
+                        ${escapeHtml(
+                            playerName(
+                                match.player2_id
+                            )
+                        )}
+                    </div>
+
+                    <div
+                        class="fight-audience-money"
+                        data-fight-audience-count
+                        data-start-value="1000"
+                        data-final-value="${p2Pool}"
+                    >
+                        ${
+                            money(
+                                animate
+                                ? 1000
+                                : p2Pool
+                            )
+                        }
+                    </div>
+
+                    <div class="fight-audience-share">
+                        ${Math.round(p2Share)}%
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="fight-audience-bar">
+
+                <div
+                    class="fight-audience-fill one"
+                    data-fight-audience-fill
+                    data-final-share="${p1Share}"
+                    style="
+                        width:
+                            ${animate ? 0 : p1Share}%;
+                    "
+                ></div>
+
+                <div
+                    class="fight-audience-fill two"
+                    data-fight-audience-fill
+                    data-final-share="${p2Share}"
+                    style="
+                        width:
+                            ${animate ? 0 : p2Share}%;
+                    "
+                ></div>
+
+                <div class="fight-audience-center-mark">
+                    VS
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
 function renderArmyReveal(
     match,
     armies,
@@ -17856,6 +18442,7 @@ function renderArmyReveal(
                 match.player1_id
         );
 
+
     const a2 =
         armies.find(
             army =>
@@ -17864,42 +18451,104 @@ function renderArmyReveal(
         );
 
 
-    return `
-        <div class="scene-kicker">
-            ${
-                isFinalWar
-                ? `Final War • Stage ${match.stage_number}`
-                : `Round ${match.round_number} • Fight ${match.match_number}`
-            }
-        </div>
+    /*
+       Preserve the existing Final War presentation for now.
+       This iteration is specifically the regular-season Fight scene.
+    */
+    if (isFinalWar) {
 
-        <div class="hero-split">
-
-            ${renderFighterArmy(
-                match.player1_id,
-                a1,
-                isFinalWar
-            )}
-
-            <div class="vs">
-                VS
+        return `
+            <div class="scene-kicker">
+                Final War • Stage ${match.stage_number}
             </div>
 
-            ${renderFighterArmy(
-                match.player2_id,
-                a2,
-                isFinalWar
+            <div class="hero-split">
+
+                ${renderFighterArmy(
+                    match.player1_id,
+                    a1,
+                    true
+                )}
+
+                <div class="vs">
+                    VS
+                </div>
+
+                ${renderFighterArmy(
+                    match.player2_id,
+                    a2,
+                    true
+                )}
+
+            </div>
+
+            <div class="scene-lower-two">
+                ${renderAudiencePoolPanel(match, true)}
+                ${renderAudienceLeaderboardMini(
+                    "Audience Leaders",
+                    "Separate spectator bankrolls reacting to this matchup.",
+                    6
+                )}
+            </div>
+        `;
+    }
+
+
+    const key =
+        fightRevealKey(
+            match
+        );
+
+
+    const animate =
+        fightRevealPlayedKey !==
+        key;
+
+
+    return `
+        <div
+            class="
+                fight-reveal-scene
+                ${animate ? "reveal-pending" : ""}
+            "
+            data-fight-reveal-key="${escapeHtml(key)}"
+        >
+
+            <div class="scene-kicker fight-reveal-kicker">
+                Round ${match.round_number}
+                •
+                Fight ${match.match_number}
+            </div>
+
+            <div class="fight-reveal-stage">
+
+                ${renderFighterArmy(
+                    match.player1_id,
+                    a1,
+                    false,
+                    "one",
+                    animate
+                )}
+
+                <div class="fight-reveal-vs">
+                    VS
+                </div>
+
+                ${renderFighterArmy(
+                    match.player2_id,
+                    a2,
+                    false,
+                    "two",
+                    animate
+                )}
+
+            </div>
+
+            ${renderFightAudienceReveal(
+                match,
+                animate
             )}
 
-        </div>
-
-        <div class="scene-lower-two">
-            ${renderAudiencePoolPanel(match, isFinalWar)}
-            ${renderAudienceLeaderboardMini(
-                "Audience Leaders",
-                "Separate spectator bankrolls reacting to this matchup.",
-                6
-            )}
         </div>
     `;
 }
@@ -17908,7 +18557,9 @@ function renderArmyReveal(
 function renderFighterArmy(
     playerId,
     army,
-    isFinalWar
+    isFinalWar,
+    side = "",
+    animate = false
 ) {
 
     const zones = [
@@ -17920,18 +18571,42 @@ function renderFighterArmy(
 
     return `
         <article
-            class="fighter-panel"
+            class="
+                fighter-panel
+                ${
+                    !isFinalWar
+                    ? "fight-reveal-fighter"
+                    : ""
+                }
+                ${side}
+                ${animate ? "cascade-pending" : ""}
+            "
+            data-fight-fighter="${playerId}"
             style="
                 --player:
                 ${playerColor(playerId)};
             "
         >
 
-            <div class="fighter-name">
+            <div
+                class="fighter-name"
+                ${
+                    !isFinalWar
+                    ? 'data-fight-reveal-header'
+                    : ""
+                }
+            >
                 ${escapeHtml(playerName(playerId))}
             </div>
 
-            <div class="fighter-money">
+            <div
+                class="fighter-money"
+                ${
+                    !isFinalWar
+                    ? 'data-fight-reveal-header'
+                    : ""
+                }
+            >
                 ${
                     isFinalWar
                     ? `Frozen budget ${money(army?.army_budget ?? 0)}`
@@ -17944,7 +18619,10 @@ function renderFighterArmy(
 
                 ${
                     zones.map(
-                        ([zone,label]) => {
+                        (
+                            [zone,label],
+                            zoneIndex
+                        ) => {
 
                             const lines =
                                 (army?.lines ?? [])
@@ -17955,7 +18633,17 @@ function renderFighterArmy(
 
 
                             return `
-                                <div class="army-zone">
+                                <div
+                                    class="army-zone"
+                                    ${
+                                        !isFinalWar
+                                        ? `
+                                            data-fight-reveal-zone
+                                            data-zone-index="${zoneIndex}"
+                                          `
+                                        : ""
+                                    }
+                                >
 
                                     <h4>
                                         ${label}
@@ -17964,8 +18652,21 @@ function renderFighterArmy(
                                     ${
                                         lines.length
                                         ? lines.map(
-                                            line => `
-                                                <div class="army-unit">
+                                            (
+                                                line,
+                                                unitIndex
+                                            ) => `
+                                                <div
+                                                    class="army-unit"
+                                                    ${
+                                                        !isFinalWar
+                                                        ? `
+                                                            data-fight-reveal-unit
+                                                            data-unit-index="${unitIndex}"
+                                                          `
+                                                        : ""
+                                                    }
+                                                >
 
                                                     <span>
                                                         ${escapeHtml(line.unit_name)}
@@ -17979,7 +18680,17 @@ function renderFighterArmy(
                                             `
                                         ).join("")
                                         : `
-                                            <div class="army-unit">
+                                            <div
+                                                class="army-unit"
+                                                ${
+                                                    !isFinalWar
+                                                    ? `
+                                                        data-fight-reveal-unit
+                                                        data-unit-index="0"
+                                                      `
+                                                    : ""
+                                                }
+                                            >
                                                 <span>—</span>
                                             </div>
                                           `
@@ -17994,7 +18705,14 @@ function renderFighterArmy(
             </div>
 
 
-            <div class="army-total">
+            <div
+                class="army-total"
+                ${
+                    !isFinalWar
+                    ? 'data-fight-reveal-total'
+                    : ""
+                }
+            >
                 ${
                     army
                     ? `${Number(army.total_cost).toLocaleString()} points`
@@ -18012,6 +18730,586 @@ function renderFighterArmy(
         </article>
     `;
 }
+
+function animateFightAudienceNumber(
+    element,
+    fromValue,
+    toValue,
+    duration,
+    delay
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    window.setTimeout(
+        () => {
+
+            const start =
+                Number(
+                    fromValue
+                    ?? 1000
+                );
+
+
+            const end =
+                Number(
+                    toValue
+                    ?? start
+                );
+
+
+            const began =
+                performance.now();
+
+
+            function frame(
+                now
+            ) {
+
+                const progress =
+                    Math.min(
+                        1,
+                        (
+                            now
+                            -
+                            began
+                        )
+                        /
+                        duration
+                    );
+
+
+                const eased =
+                    1
+                    -
+                    Math.pow(
+                        1 - progress,
+                        3
+                    );
+
+
+                const value =
+                    Math.round(
+                        start
+                        +
+                        (
+                            end
+                            -
+                            start
+                        )
+                        *
+                        eased
+                    );
+
+
+                element.textContent =
+                    money(
+                        value
+                    );
+
+
+                if (
+                    progress < 1
+                ) {
+
+                    requestAnimationFrame(
+                        frame
+                    );
+                }
+            }
+
+
+            requestAnimationFrame(
+                frame
+            );
+        },
+        delay
+    );
+}
+
+
+function animateFightFighterCascade(
+    fighter,
+    sideIndex
+) {
+
+    if (!fighter) {
+        return;
+    }
+
+
+    const sideDelay =
+        sideIndex * 110;
+
+
+    const headers =
+        [
+            ...fighter.querySelectorAll(
+                "[data-fight-reveal-header]"
+            )
+        ];
+
+
+    headers.forEach(
+        (
+            element,
+            index
+        ) => {
+
+            element.animate(
+                [
+                    {
+                        opacity:
+                            0,
+                        transform:
+                            sideIndex === 0
+                            ? "translateX(-16px)"
+                            : "translateX(16px)"
+                    },
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "translateX(0)"
+                    }
+                ],
+                {
+                    duration:
+                        460,
+                    delay:
+                        sideDelay
+                        +
+                        index * 70,
+                    easing:
+                        "cubic-bezier(.18,.78,.24,1)",
+                    fill:
+                        "forwards"
+                }
+            );
+        }
+    );
+
+
+    const zones =
+        [
+            ...fighter.querySelectorAll(
+                "[data-fight-reveal-zone]"
+            )
+        ];
+
+
+    zones.forEach(
+        (
+            zone,
+            zoneIndex
+        ) => {
+
+            const zoneDelay =
+                360
+                +
+                sideDelay
+                +
+                zoneIndex * 300;
+
+
+            zone.animate(
+                [
+                    {
+                        opacity:
+                            0,
+                        transform:
+                            "translateY(12px) scale(.985)",
+                        filter:
+                            "brightness(.72)"
+                    },
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "translateY(0) scale(1)",
+                        filter:
+                            "brightness(1)"
+                    }
+                ],
+                {
+                    duration:
+                        500,
+                    delay:
+                        zoneDelay,
+                    easing:
+                        "cubic-bezier(.16,.82,.22,1)",
+                    fill:
+                        "forwards"
+                }
+            );
+
+
+            const units =
+                [
+                    ...zone.querySelectorAll(
+                        "[data-fight-reveal-unit]"
+                    )
+                ];
+
+
+            units.forEach(
+                (
+                    unit,
+                    unitIndex
+                ) => {
+
+                    unit.animate(
+                        [
+                            {
+                                opacity:
+                                    0,
+                                transform:
+                                    "translateY(7px)"
+                            },
+                            {
+                                opacity:
+                                    1,
+                                transform:
+                                    "translateY(0)"
+                            }
+                        ],
+                        {
+                            duration:
+                                300,
+                            delay:
+                                zoneDelay
+                                +
+                                165
+                                +
+                                unitIndex * 48,
+                            easing:
+                                "cubic-bezier(.18,.78,.24,1)",
+                            fill:
+                                "forwards"
+                        }
+                    );
+                }
+            );
+        }
+    );
+
+
+    const total =
+        fighter.querySelector(
+            "[data-fight-reveal-total]"
+        );
+
+
+    total?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "translateY(8px)"
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "translateY(0)"
+            }
+        ],
+        {
+            duration:
+                420,
+            delay:
+                1300
+                +
+                sideDelay,
+            easing:
+                "cubic-bezier(.18,.78,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+}
+
+
+function runFightRevealPostRenderAnimation() {
+
+    if (
+        state?.event?.status !==
+        "fight"
+    ) {
+        return;
+    }
+
+
+    const match =
+        currentMatch();
+
+
+    if (
+        !match
+        ||
+        match.winner_player_id
+    ) {
+        return;
+    }
+
+
+    const key =
+        fightRevealKey(
+            match
+        );
+
+
+    if (
+        fightRevealPlayedKey ===
+        key
+    ) {
+        return;
+    }
+
+
+    const scene =
+        document.querySelector(
+            `[data-fight-reveal-key="${CSS.escape(key)}"]`
+        );
+
+
+    if (!scene) {
+        return;
+    }
+
+
+    fightRevealPlayedKey =
+        key;
+
+
+    /*
+       Hold polling long enough for:
+       headers -> Frontline -> Mid-range -> Backline -> totals
+       -> Audience pool reveal.
+    */
+    fightRevealAnimationUntil =
+        performance.now()
+        +
+        2750;
+
+
+    const fighters =
+        [
+            ...scene.querySelectorAll(
+                ".fight-reveal-fighter"
+            )
+        ];
+
+
+    fighters.forEach(
+        (
+            fighter,
+            index
+        ) =>
+            animateFightFighterCascade(
+                fighter,
+                index
+            )
+    );
+
+
+    const vs =
+        scene.querySelector(
+            ".fight-reveal-vs"
+        );
+
+
+    vs?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(.62)"
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1.08)",
+                offset:
+                    .68
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1)"
+            }
+        ],
+        {
+            duration:
+                650,
+            delay:
+                220,
+            easing:
+                "cubic-bezier(.18,.78,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    const audience =
+        scene.querySelector(
+            ".fight-audience-reveal"
+        );
+
+
+    if (audience) {
+
+        audience.animate(
+            [
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translateY(10px)"
+                },
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateY(0)"
+                }
+            ],
+            {
+                duration:
+                    430,
+                delay:
+                    1540,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+        const fills =
+            [
+                ...audience.querySelectorAll(
+                    "[data-fight-audience-fill]"
+                )
+            ];
+
+
+        fills.forEach(
+            fill => {
+
+                const share =
+                    Number(
+                        fill.dataset
+                            .finalShare
+                        ?? 0
+                    );
+
+
+                fill.animate(
+                    [
+                        {
+                            width:
+                                "0%"
+                        },
+                        {
+                            width:
+                                `${share}%`
+                        }
+                    ],
+                    {
+                        duration:
+                            950,
+                        delay:
+                            1700,
+                        easing:
+                            "cubic-bezier(.16,.82,.22,1)",
+                        fill:
+                            "forwards"
+                    }
+                );
+            }
+        );
+
+
+        const counters =
+            [
+                ...audience.querySelectorAll(
+                    "[data-fight-audience-count]"
+                )
+            ];
+
+
+        counters.forEach(
+            counter => {
+
+                animateFightAudienceNumber(
+                    counter,
+                    Number(
+                        counter.dataset
+                            .startValue
+                        ?? 1000
+                    ),
+                    Number(
+                        counter.dataset
+                            .finalValue
+                        ?? 1000
+                    ),
+                    950,
+                    1700
+                );
+            }
+        );
+    }
+
+
+    /*
+       Once animations are underway, remove the CSS-only hidden fallback.
+       The Web Animations own the visible cascade from here.
+    */
+    window.setTimeout(
+        () => {
+
+            scene.classList.remove(
+                "reveal-pending"
+            );
+
+
+            scene
+                .querySelectorAll(
+                    ".cascade-pending"
+                )
+                .forEach(
+                    element =>
+                        element.classList.remove(
+                            "cascade-pending"
+                        )
+                );
+
+
+            scene
+                .querySelectorAll(
+                    ".fight-audience-reveal.reveal-pending"
+                )
+                .forEach(
+                    element =>
+                        element.classList.remove(
+                            "reveal-pending"
+                        )
+                );
+        },
+        2650
+    );
+}
+
 
 
 function renderFightResult() {
