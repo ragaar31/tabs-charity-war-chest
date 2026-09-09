@@ -9874,13 +9874,15 @@ async function refreshState(
 
 
         /*
-           If this poll contains a NEW completed settlement, cover the old
-           Fight scene BEFORE state changes and BEFORE renderBroadcast().
-           This prevents Shop / Pools Locked / any next phase from flashing
-           underneath for one frame.
+           If this LIVE poll contains a NEW completed settlement, cover the
+           old Fight scene BEFORE state changes and BEFORE renderBroadcast().
+
+           On the initial page load / refresh this is deliberately skipped:
+           the existing latest_settlement is historical and must not replay.
         */
         prearmSettlementCurtain(
-            data
+            data,
+            initial || firstState
         );
 
 
@@ -9893,10 +9895,42 @@ async function refreshState(
 
         if (initial || firstState) {
 
+            /*
+               Refresh recovery:
+               Whatever latest_settlement exists when the Broadcast first
+               connects is historical context, not a newly-arriving payout.
+
+               Also clear any overlay state so a browser refresh can never
+               remain stuck on a stale "Settling Bets" curtain.
+            */
             lastSettlementId =
                 state.latest_settlement
                 ?.match_id
                 ?? null;
+
+
+            const payoutOverlay =
+                document.getElementById(
+                    "payout-overlay"
+                );
+
+
+            if (payoutOverlay) {
+
+                payoutOverlay.classList.remove(
+                    "active",
+                    "prearmed"
+                );
+
+                payoutOverlay.innerHTML =
+                    "";
+            }
+
+
+            clearTimeout(
+                payoutTimer
+            );
+
 
             firstState = false;
         }
@@ -21824,13 +21858,14 @@ function shouldPrearmSettlement(
 
 
 function prearmSettlementCurtain(
-    incomingState
+    incomingState,
+    initial = false
 ) {
 
     if (
         !shouldPrearmSettlement(
             incomingState,
-            false
+            initial
         )
     ) {
         return;
@@ -21880,6 +21915,15 @@ function prearmSettlementCurtain(
 
 
 function maybeShowPayout() {
+
+    /*
+       A settlement is only "new" after the Broadcast has completed its
+       initial state synchronization. This makes refresh/reconnect safe.
+    */
+    if (firstState) {
+        return;
+    }
+
 
     const settlement =
         state.latest_settlement;
