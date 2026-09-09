@@ -7082,6 +7082,150 @@ input {
     }
 }
 
+
+/* =========================================================
+   CURRENT FIGHT — READABILITY PASS
+   ========================================================= */
+
+.fight-reveal-kicker {
+    font-size: .78rem;
+}
+
+.fight-reveal-stage
+.fighter-panel
+.fighter-name {
+    font-size:
+        clamp(
+            2.15rem,
+            3.15vw,
+            3.65rem
+        );
+    line-height: .98;
+}
+
+.fight-reveal-stage
+.fighter-panel
+.fighter-money {
+    margin-top: 9px;
+    font-size: 1.00rem;
+    font-weight: 760;
+}
+
+.fight-reveal-stage
+.army-zones {
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.fight-reveal-stage
+.army-zone {
+    padding: 12px 12px 11px;
+}
+
+.fight-reveal-stage
+.army-zone h4 {
+    margin-bottom: 9px;
+    font-size: .70rem;
+    letter-spacing: .065em;
+}
+
+.fight-reveal-stage
+.army-unit {
+    padding: 4px 0;
+    font-size: .82rem;
+    line-height: 1.16;
+}
+
+.fight-reveal-stage
+.army-unit strong {
+    font-size: .82rem;
+}
+
+.fight-reveal-stage
+.army-total {
+    padding-top: 12px;
+    font-size: 1.18rem;
+}
+
+.fight-reveal-vs {
+    font-size: 2.10rem;
+}
+
+.fight-audience-title {
+    font-size: .77rem;
+}
+
+.fight-audience-count {
+    font-size: .64rem;
+}
+
+.fight-audience-name {
+    font-size: .84rem;
+}
+
+.fight-audience-money {
+    font-size: .83rem;
+}
+
+.fight-audience-share {
+    font-size: .72rem;
+}
+
+.fight-audience-bar {
+    height: 27px;
+}
+
+.fight-audience-center-mark {
+    width: 37px;
+    height: 37px;
+    font-size: .57rem;
+}
+
+@media (max-width: 1500px) {
+
+    .fight-reveal-stage
+    .fighter-panel
+    .fighter-name {
+        font-size:
+            clamp(
+                1.95rem,
+                3vw,
+                3.15rem
+            );
+    }
+
+    .fight-reveal-stage
+    .fighter-panel
+    .fighter-money {
+        font-size: .90rem;
+    }
+
+    .fight-reveal-stage
+    .army-zone h4 {
+        font-size: .64rem;
+    }
+
+    .fight-reveal-stage
+    .army-unit {
+        font-size: .74rem;
+    }
+
+    .fight-reveal-stage
+    .army-unit strong {
+        font-size: .74rem;
+    }
+
+    .fight-reveal-stage
+    .army-total {
+        font-size: 1.08rem;
+    }
+
+    .fight-audience-name,
+    .fight-audience-money {
+        font-size: .76rem;
+    }
+}
+
 </style>
 </head>
 
@@ -19094,7 +19238,7 @@ function runFightRevealPostRenderAnimation() {
     fightRevealAnimationUntil =
         performance.now()
         +
-        2750;
+        3650;
 
 
     const fighters =
@@ -19227,11 +19371,11 @@ function runFightRevealPostRenderAnimation() {
                     ],
                     {
                         duration:
-                            950,
+                            1600,
                         delay:
                             1700,
                         easing:
-                            "cubic-bezier(.16,.82,.22,1)",
+                            "cubic-bezier(.18,.68,.22,1)",
                         fill:
                             "forwards"
                     }
@@ -19263,7 +19407,7 @@ function runFightRevealPostRenderAnimation() {
                             .finalValue
                         ?? 1000
                     ),
-                    950,
+                    1600,
                     1700
                 );
             }
@@ -19306,7 +19450,7 @@ function runFightRevealPostRenderAnimation() {
                         )
                 );
         },
-        2650
+        3450
     );
 }
 
