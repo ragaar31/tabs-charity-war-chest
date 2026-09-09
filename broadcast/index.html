@@ -5771,6 +5771,654 @@ input {
     animation: none !important;
 }
 
+
+/* =========================================================
+   BETTING OPEN — LIVE SPORTSBOOK
+   ========================================================= */
+
+.betting-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 12px;
+}
+
+.betting-header {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        430px;
+    gap: 18px;
+    align-items: stretch;
+}
+
+.betting-heading {
+    align-self: center;
+}
+
+.betting-heading .scene-kicker {
+    margin-bottom: 7px;
+}
+
+.betting-heading .scene-title {
+    margin-bottom: 8px;
+}
+
+.betting-heading .scene-subtitle {
+    margin-top: 0;
+}
+
+.betting-qr {
+    min-height: 102px;
+    padding: 10px 11px 10px 15px;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        90px;
+    gap: 13px;
+    align-items: center;
+    border-radius: 17px;
+    border: 1px solid rgba(255,255,255,.11);
+    background: rgba(20,25,36,.90);
+    box-shadow: 0 12px 28px rgba(0,0,0,.18);
+}
+
+.betting-qr-kicker {
+    color: var(--muted);
+    font-size: .61rem;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+.betting-qr-title {
+    margin-top: 3px;
+    font-size: .96rem;
+    font-weight: 950;
+}
+
+.betting-qr-room {
+    margin-top: 8px;
+    font-size: .70rem;
+    font-weight: 820;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.betting-qr-room strong {
+    color: #f2c94c;
+}
+
+.betting-qr-url {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: .56rem;
+    font-weight: 720;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.betting-qr-image-wrap {
+    width: 90px;
+    height: 90px;
+    padding: 5px;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.betting-qr-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.betting-main {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(300px,.31fr)
+        minmax(0,.69fr);
+    gap: 14px;
+}
+
+.betting-player-panel,
+.betting-match-panel {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 7px;
+}
+
+.betting-panel-title {
+    min-width: 0;
+    color: #f4f7ff;
+    font-size: .72rem;
+    font-weight: 950;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.betting-panel-title span {
+    margin-left: 8px;
+    color: var(--muted);
+    font-size: .58rem;
+    font-weight: 720;
+    letter-spacing: .04em;
+}
+
+.betting-player-list {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 6px;
+}
+
+.betting-player-bar {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        42px
+        minmax(0,1fr)
+        94px
+        58px;
+    gap: 8px;
+    align-items: center;
+    padding: 0 10px 0 0;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(20,25,36,.92);
+    overflow: hidden;
+    box-shadow: 0 7px 16px rgba(0,0,0,.14);
+}
+
+.betting-player-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--player);
+}
+
+.betting-player-rank {
+    padding-left: 11px;
+    font-size: .75rem;
+    font-weight: 1000;
+}
+
+.betting-player-main {
+    min-width: 0;
+}
+
+.betting-player-name {
+    min-width: 0;
+    font-size: .77rem;
+    font-weight: 920;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.betting-player-badges {
+    min-height: 12px;
+    margin-top: 2px;
+    display: flex;
+    gap: 3px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+.betting-player-badges span {
+    padding: 1px 4px;
+    border-radius: 999px;
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--player) 38%,
+            rgba(255,255,255,.08)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 10%,
+            rgba(255,255,255,.025)
+        );
+    color: #dce7ff;
+    font-size: .43rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.betting-player-money {
+    font-size: .82rem;
+    font-weight: 960;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.betting-player-status {
+    justify-self: end;
+    padding: 4px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.09);
+    color: #a9b8d5;
+    font-size: .48rem;
+    font-weight: 920;
+    letter-spacing: .06em;
+}
+
+.betting-player-status.ready {
+    color: #fff;
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 48%,
+            rgba(255,255,255,.10)
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 12%,
+            transparent
+        );
+}
+
+.betting-match-list {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+    gap: 7px;
+}
+
+.betting-match-card {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        68px
+        minmax(0,1fr)
+        250px;
+    gap: 12px;
+    align-items: center;
+    padding: 9px 11px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(20,25,36,.91);
+    overflow: hidden;
+}
+
+.betting-match-card::before,
+.betting-match-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+}
+
+.betting-match-card::before {
+    left: 0;
+    background: var(--p1);
+}
+
+.betting-match-card::after {
+    right: 0;
+    background: var(--p2);
+}
+
+.betting-match-number {
+    color: #aebbd4;
+    font-size: .62rem;
+    font-weight: 950;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.betting-matchup {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        32px
+        minmax(0,1fr);
+    gap: 8px;
+    align-items: center;
+}
+
+.betting-fighter {
+    min-width: 0;
+    font-size: .88rem;
+    font-weight: 930;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.betting-fighter.one {
+    text-align: right;
+}
+
+.betting-fighter.two {
+    text-align: left;
+}
+
+.betting-vs {
+    display: grid;
+    place-items: center;
+    color: #75839d;
+    font-size: .60rem;
+    font-weight: 1000;
+}
+
+.betting-sealed-pools {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        1fr
+        1fr;
+    gap: 6px;
+}
+
+.betting-sealed-pool {
+    min-width: 0;
+    min-height: 38px;
+    padding: 5px 7px;
+    display: grid;
+    grid-template-columns:
+        11px
+        minmax(0,1fr);
+    grid-template-rows:
+        auto
+        auto;
+    column-gap: 5px;
+    align-items: center;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+}
+
+.betting-pool-dot {
+    grid-row: 1 / 3;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(255,255,255,.055);
+}
+
+.betting-sealed-pool strong {
+    min-width: 0;
+    color: #eff4ff;
+    font-size: .49rem;
+    font-weight: 920;
+    letter-spacing: .045em;
+    white-space: nowrap;
+}
+
+.betting-sealed-pool small {
+    color: #77859f;
+    font-size: .43rem;
+    font-weight: 820;
+    letter-spacing: .07em;
+}
+
+.betting-sealed-pool.audience-pool .betting-pool-dot {
+    border-color: rgba(242,201,76,.40);
+}
+
+.betting-audience-strip {
+    min-width: 0;
+    min-height: 66px;
+    padding: 7px 9px;
+    display: grid;
+    grid-template-columns:
+        125px
+        minmax(0,1fr)
+        auto;
+    gap: 8px;
+    align-items: stretch;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.09);
+    background: rgba(20,25,36,.90);
+}
+
+.betting-audience-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.betting-audience-label strong {
+    font-size: .69rem;
+}
+
+.betting-audience-label span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .52rem;
+    font-weight: 760;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.betting-audience-cards {
+    min-width: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 5px;
+}
+
+.betting-audience-card {
+    min-width: 0;
+    padding: 5px 6px;
+    display: grid;
+    grid-template-columns:
+        24px
+        minmax(0,1fr)
+        auto;
+    gap: 4px;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.03);
+}
+
+.betting-audience-rank {
+    color: #f2c94c;
+    font-size: .48rem;
+    font-weight: 950;
+}
+
+.betting-audience-name {
+    min-width: 0;
+    font-size: .55rem;
+    font-weight: 840;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.betting-audience-money {
+    font-size: .52rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.betting-audience-more {
+    align-self: center;
+    min-width: 30px;
+    color: var(--muted);
+    font-size: .54rem;
+    font-weight: 840;
+    text-align: center;
+}
+
+.betting-audience-empty {
+    grid-column: 1 / -1;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: .62rem;
+}
+
+.betting-flight-chip {
+    position: fixed;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    margin-top: -6.5px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    pointer-events: none;
+    z-index: 10020;
+    border: 2px solid
+        color-mix(
+            in srgb,
+            var(--chip-color) 82%,
+            white 18%
+        );
+    background:
+        color-mix(
+            in srgb,
+            var(--chip-color) 66%,
+            #101723
+        );
+    box-shadow:
+        0 0 12px
+        color-mix(
+            in srgb,
+            var(--chip-color) 62%,
+            transparent
+        );
+}
+
+.betting-flight-chip::after {
+    content: "$";
+    color: rgba(255,255,255,.92);
+    font-size: 6px;
+    font-weight: 1000;
+    line-height: 1;
+}
+
+.betting-flight-chip.reverse {
+    filter: saturate(.58);
+}
+
+.betting-flight-ticket,
+.betting-action-badge,
+.betting-link-label {
+    position: fixed;
+    z-index: 10030;
+    pointer-events: none;
+    padding: 5px 8px;
+    border-radius: 7px;
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--ticket-color, var(--badge-color)) 68%,
+            white 12%
+        );
+    background: rgba(10,14,22,.96);
+    color: #fff;
+    font-size: .58rem;
+    font-weight: 1000;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--ticket-color, var(--badge-color)) 28%,
+            transparent
+        );
+}
+
+.betting-flight-ticket {
+    --badge-color: var(--ticket-color);
+}
+
+.betting-action-badge,
+.betting-link-label {
+    --ticket-color: var(--badge-color);
+}
+
+.betting-link-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10010;
+}
+
+@media (max-width: 1500px) {
+
+    .betting-header {
+        grid-template-columns:
+            minmax(0,1fr)
+            395px;
+    }
+
+    .betting-qr {
+        grid-template-columns:
+            minmax(0,1fr)
+            82px;
+        min-height: 94px;
+    }
+
+    .betting-qr-image-wrap {
+        width: 82px;
+        height: 82px;
+    }
+
+    .betting-main {
+        grid-template-columns:
+            minmax(285px,.30fr)
+            minmax(0,.70fr);
+    }
+
+    .betting-match-card {
+        grid-template-columns:
+            62px
+            minmax(0,1fr)
+            226px;
+    }
+
+    .betting-player-bar {
+        grid-template-columns:
+            38px
+            minmax(0,1fr)
+            84px
+            52px;
+    }
+}
+
 </style>
 </head>
 
@@ -5940,6 +6588,10 @@ let shopUnlockAnimationUntil = 0;
 let armyBuildPendingAnimations = [];
 let armyBuildAnimationUntil = 0;
 let armyBuildLastAnimationSignatures = new Map();
+
+let bettingPendingAnimations = [];
+let bettingAnimationUntil = 0;
+let bettingSeenActionSignatures = new Map();
 
 
 function escapeHtml(value) {
@@ -7045,6 +7697,41 @@ async function refreshState(
         }
 
 
+        if (
+            data?.event?.status === "betting_open"
+        ) {
+
+            const {
+                data:
+                    bettingSceneState,
+                error:
+                    bettingSceneError
+            } =
+                await db.rpc(
+                    "get_broadcast_betting_scene",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (bettingSceneError) {
+
+                console.error(
+                    bettingSceneError
+                );
+
+            }
+
+            else if (bettingSceneState) {
+
+                data.betting_scene =
+                    bettingSceneState;
+            }
+        }
+
+
         /*
            The Audience-enhanced get_broadcast_state() replacement
            does not include draft_units. During Draft, load the legal
@@ -7190,6 +7877,18 @@ async function refreshState(
             &&
             performance.now() <
                 armyBuildAnimationUntil
+        ) {
+            return;
+        }
+
+
+        if (
+            oldState?.event?.status === "betting_open"
+            &&
+            data?.event?.status === "betting_open"
+            &&
+            performance.now() <
+                bettingAnimationUntil
         ) {
             return;
         }
@@ -7538,6 +8237,17 @@ async function refreshState(
             : [];
 
 
+        bettingPendingAnimations =
+            !initial
+            && data?.event?.status ===
+                "betting_open"
+            ? collectBettingAnimations(
+                oldState,
+                data
+              )
+            : [];
+
+
         previousState =
             oldState;
 
@@ -7561,6 +8271,7 @@ async function refreshState(
         runDraftPostRenderAnimations();
         runShopPostRenderAnimations();
         runArmyBuildPostRenderAnimations();
+        runBettingPostRenderAnimations();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -13774,86 +14485,2393 @@ function renderLeaderboard() {
 }
 
 
+function bettingScenePlayers(
+    snapshot = state
+) {
+
+    return (
+        snapshot?.betting_scene?.players
+        ?? []
+    );
+}
+
+
+function bettingSceneAudience(
+    snapshot = state
+) {
+
+    return (
+        snapshot?.betting_scene?.audience
+        ?? []
+    );
+}
+
+
+function bettingSceneActions(
+    snapshot = state
+) {
+
+    return (
+        snapshot?.betting_scene?.player_actions
+        ?? []
+    );
+}
+
+
+function bettingSceneAudienceActions(
+    snapshot = state
+) {
+
+    return (
+        snapshot?.betting_scene?.audience_actions
+        ?? []
+    );
+}
+
+
+function bettingActionKey(
+    action
+) {
+
+    return [
+        action.kind,
+        action.action_id
+    ].join(":");
+}
+
+
+function bettingActionSignature(
+    action
+) {
+
+    return JSON.stringify([
+        action.kind,
+        action.action_id,
+        action.player_id
+            ?? action.audience_id
+            ?? null,
+        action.match_id
+            ?? null,
+        action.amount
+            ?? 0,
+        action.modifier_code
+            ?? null,
+        action.leg_count
+            ?? null,
+        action.match_ids
+            ?? []
+    ]);
+}
+
+
+function bettingActionLabel(
+    action
+) {
+
+    if (
+        action.kind === "parlay"
+    ) {
+
+        return (
+            Number(action.leg_count) >= 3
+            ? "MOONSHOT"
+            : "PARLAY"
+        );
+    }
+
+
+    if (action.kind === "hedge") {
+        return "HEDGE";
+    }
+
+
+    if (action.kind === "prop") {
+        return "PROP";
+    }
+
+
+    if (
+        action.kind === "standard"
+        &&
+        action.modifier_code === "all_in"
+    ) {
+        return "ALL IN";
+    }
+
+
+    if (
+        action.kind === "standard"
+        &&
+        action.modifier_code === "insurance"
+    ) {
+        return "INSURED";
+    }
+
+
+    if (
+        action.kind === "standard"
+        &&
+        action.modifier_code === "no_sweat"
+    ) {
+        return "NO-SWEAT";
+    }
+
+
+    return "";
+}
+
+
+function bettingPlayerBadges(
+    playerId
+) {
+
+    const labels =
+        bettingSceneActions()
+        .filter(
+            action =>
+                action.player_id ===
+                playerId
+        )
+        .map(
+            bettingActionLabel
+        )
+        .filter(Boolean);
+
+
+    return [
+        ...new Set(
+            labels
+        )
+    ];
+}
+
+
+function bettingPlayerRankMap(
+    snapshot
+) {
+
+    return new Map(
+        bettingScenePlayers(
+            snapshot
+        )
+        .map(
+            (
+                player,
+                index
+            ) => [
+                player.id,
+                index
+            ]
+        )
+    );
+}
+
+
+function bettingAudienceRankMap(
+    snapshot
+) {
+
+    return new Map(
+        bettingSceneAudience(
+            snapshot
+        )
+        .map(
+            (
+                viewer,
+                index
+            ) => [
+                viewer.id,
+                index
+            ]
+        )
+    );
+}
+
+
+function compareBettingActions(
+    oldActions,
+    newActions,
+    actorType
+) {
+
+    const oldMap =
+        new Map(
+            oldActions.map(
+                action => [
+                    bettingActionKey(
+                        action
+                    ),
+                    action
+                ]
+            )
+        );
+
+
+    const nextMap =
+        new Map(
+            newActions.map(
+                action => [
+                    bettingActionKey(
+                        action
+                    ),
+                    action
+                ]
+            )
+        );
+
+
+    const animations = [];
+
+
+    for (
+        const action
+        of newActions
+    ) {
+
+        const key =
+            bettingActionKey(
+                action
+            );
+
+
+        const previous =
+            oldMap.get(
+                key
+            );
+
+
+        const previousAmount =
+            Number(
+                previous?.amount
+                ?? 0
+            );
+
+
+        const currentAmount =
+            Number(
+                action.amount
+                ?? 0
+            );
+
+
+        const delta =
+            currentAmount
+            -
+            previousAmount;
+
+
+        const signatureChanged =
+            !previous
+            ||
+            bettingActionSignature(
+                previous
+            )
+            !==
+            bettingActionSignature(
+                action
+            );
+
+
+        if (
+            delta !== 0
+            ||
+            signatureChanged
+        ) {
+
+            animations.push({
+                ...action,
+                actorType,
+                amountDelta:
+                    delta,
+                direction:
+                    delta < 0
+                    ? "refund"
+                    : "wager"
+            });
+        }
+    }
+
+
+    for (
+        const oldAction
+        of oldActions
+    ) {
+
+        const key =
+            bettingActionKey(
+                oldAction
+            );
+
+
+        if (
+            !nextMap.has(
+                key
+            )
+        ) {
+
+            animations.push({
+                ...oldAction,
+                actorType,
+                amountDelta:
+                    -Number(
+                        oldAction.amount
+                        ?? 0
+                    ),
+                direction:
+                    "refund"
+            });
+        }
+    }
+
+
+    return animations;
+}
+
+
+function collectBettingAnimations(
+    oldSnapshot,
+    newSnapshot
+) {
+
+    const samePhase =
+        oldSnapshot?.event?.status ===
+        "betting_open";
+
+
+    const playerOld =
+        samePhase
+        ? bettingSceneActions(
+            oldSnapshot
+          )
+        : [];
+
+
+    const audienceOld =
+        samePhase
+        ? bettingSceneAudienceActions(
+            oldSnapshot
+          )
+        : [];
+
+
+    const animations = [
+        ...compareBettingActions(
+            playerOld,
+            bettingSceneActions(
+                newSnapshot
+            ),
+            "player"
+        ),
+
+        ...compareBettingActions(
+            audienceOld,
+            bettingSceneAudienceActions(
+                newSnapshot
+            ),
+            "audience"
+        )
+    ];
+
+
+    return animations
+        .filter(
+            action => {
+
+                const key =
+                    [
+                        newSnapshot
+                            ?.event
+                            ?.current_round
+                            ?? 0,
+                        action.actorType,
+                        bettingActionSignature(
+                            action
+                        ),
+                        action.amountDelta
+                    ].join("|");
+
+
+                if (
+                    bettingSeenActionSignatures
+                        .get(
+                            bettingActionKey(
+                                action
+                            )
+                        )
+                    ===
+                    key
+                ) {
+
+                    return false;
+                }
+
+
+                bettingSeenActionSignatures
+                    .set(
+                        bettingActionKey(
+                            action
+                        ),
+                        key
+                    );
+
+
+                return true;
+            }
+        );
+}
+
+
+function renderBettingQrPanel() {
+
+    return `
+        <section class="betting-qr">
+
+            <div class="betting-qr-copy">
+
+                <div class="betting-qr-kicker">
+                    Audience Gamblers
+                </div>
+
+                <div class="betting-qr-title">
+                    Scan to place your bets
+                </div>
+
+                <div class="betting-qr-room">
+                    Room
+                    <strong>
+                        ${escapeHtml(
+                            roomCode
+                            || "------"
+                        )}
+                    </strong>
+                </div>
+
+                <div class="betting-qr-url">
+                    ragaar31.github.io/tabs-charity-war-chest/gamble
+                </div>
+
+            </div>
+
+            <div class="betting-qr-image-wrap">
+                <img
+                    class="betting-qr-image"
+                    src="./audience-qr.png"
+                    alt="Audience Gambler QR code"
+                >
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderBettingPlayerBar(
+    player,
+    rank
+) {
+
+    const isReady =
+        Number(
+            player.betting_ready_round
+            ?? 0
+        )
+        ===
+        Number(
+            state.event.current_round
+        );
+
+
+    const badges =
+        bettingPlayerBadges(
+            player.id
+        );
+
+
+    return `
+        <article
+            class="betting-player-bar"
+            data-betting-player-id="${player.id}"
+            data-money-value="${Number(player.war_chest ?? 0)}"
+            style="
+                --player:
+                    ${playerColor(player.id)};
+            "
+        >
+
+            <div class="betting-player-rank">
+                #${rank}
+            </div>
+
+            <div class="betting-player-main">
+
+                <div class="betting-player-name">
+                    ${escapeHtml(player.display_name)}
+                </div>
+
+                <div class="betting-player-badges">
+
+                    ${
+                        badges.map(
+                            label => `
+                                <span>
+                                    ${escapeHtml(label)}
+                                </span>
+                            `
+                        ).join("")
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="betting-player-money">
+                ${money(player.war_chest)}
+            </div>
+
+            <div
+                class="
+                    betting-player-status
+                    ${isReady ? "ready" : ""}
+                "
+            >
+                ${isReady ? "READY" : "BETTING"}
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderBettingMatchCard(
+    match
+) {
+
+    const p1 =
+        playerById(
+            match.player1_id
+        );
+
+
+    const p2 =
+        playerById(
+            match.player2_id
+        );
+
+
+    return `
+        <article
+            class="betting-match-card"
+            data-betting-match-id="${match.id}"
+            style="
+                --p1:${playerColor(match.player1_id)};
+                --p2:${playerColor(match.player2_id)};
+            "
+        >
+
+            <div class="betting-match-number">
+                Match ${match.match_number}
+            </div>
+
+            <div class="betting-matchup">
+
+                <div class="betting-fighter one">
+                    ${escapeHtml(
+                        p1?.display_name
+                        ?? "Player"
+                    )}
+                </div>
+
+                <div class="betting-vs">
+                    VS
+                </div>
+
+                <div class="betting-fighter two">
+                    ${escapeHtml(
+                        p2?.display_name
+                        ?? "Player"
+                    )}
+                </div>
+
+            </div>
+
+            <div class="betting-sealed-pools">
+
+                <div
+                    class="betting-sealed-pool player-pool"
+                    data-player-betting-target="${match.id}"
+                >
+                    <span class="betting-pool-dot"></span>
+                    <strong>PLAYER POOL</strong>
+                    <small>SEALED</small>
+                </div>
+
+                <div
+                    class="betting-sealed-pool audience-pool"
+                    data-audience-betting-target="${match.id}"
+                >
+                    <span class="betting-pool-dot"></span>
+                    <strong>AUDIENCE</strong>
+                    <small>SEALED</small>
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderBettingAudienceStrip(
+    limit = 8
+) {
+
+    const audience =
+        bettingSceneAudience()
+        .slice(
+            0,
+            limit
+        );
+
+
+    const total =
+        Number(
+            state
+                ?.betting_scene
+                ?.audience_count
+            ??
+            audienceCount()
+        );
+
+
+    return `
+        <section class="betting-audience-strip">
+
+            <div class="betting-audience-label">
+
+                <strong>
+                    Audience Sportsbook
+                </strong>
+
+                <span>
+                    ${total} gamblers
+                </span>
+
+            </div>
+
+            <div class="betting-audience-cards">
+
+                ${
+                    audience.length
+                    ? audience.map(
+                        (
+                            viewer,
+                            index
+                        ) => `
+                            <div
+                                class="betting-audience-card"
+                                data-betting-audience-id="${viewer.id}"
+                                data-money-value="${Number(viewer.war_chest ?? 0)}"
+                            >
+
+                                <div class="betting-audience-rank">
+                                    #${index + 1}
+                                </div>
+
+                                <div class="betting-audience-name">
+                                    ${escapeHtml(viewer.display_name)}
+                                </div>
+
+                                <div class="betting-audience-money">
+                                    ${money(viewer.war_chest)}
+                                </div>
+
+                            </div>
+                        `
+                      ).join("")
+                    : `
+                        <div class="betting-audience-empty">
+                            Waiting for Audience Gamblers…
+                        </div>
+                      `
+                }
+
+            </div>
+
+            ${
+                total > audience.length
+                ? `
+                    <div class="betting-audience-more">
+                        +${total - audience.length}
+                    </div>
+                  `
+                : ""
+            }
+
+        </section>
+    `;
+}
+
+
 function renderBettingOpen() {
 
+    const players =
+        bettingScenePlayers();
+
+
+    const matches =
+        (
+            state
+                ?.betting_scene
+                ?.matches
+            ??
+            state.matches
+                .filter(
+                    match =>
+                        match.round_number ===
+                        state.event.current_round
+                )
+        );
+
+
     const ready =
-        state.players.filter(
+        players.filter(
             player =>
-                player.betting_ready_round ===
-                state.event.current_round
+                Number(
+                    player.betting_ready_round
+                    ?? 0
+                )
+                ===
+                Number(
+                    state.event.current_round
+                )
         ).length;
 
 
     return `
-        <div class="scene-kicker">
-            Round ${state.event.current_round}
-        </div>
+        <div class="betting-scene">
 
-        <h1 class="scene-title">
-            Place Your Bets
-        </h1>
+            <div class="betting-header">
 
-        <div class="scene-subtitle">
-            ${ready} of ${state.players.length} gamblers are ready.
-            Wagers remain secret until the pools lock.
-        </div>
+                <div class="betting-heading">
 
-        <div class="cast-grid">
+                    <div class="scene-kicker">
+                        Round ${state.event.current_round}
+                    </div>
 
-            ${
-                state.players.map(
-                    player => {
+                    <h1 class="scene-title">
+                        Place Your Bets
+                    </h1>
 
-                        const isReady =
-                            player.betting_ready_round ===
-                            state.event.current_round;
+                    <div class="scene-subtitle">
+                        ${ready} of ${players.length} players ready.
+                        Picks and pool sides remain sealed.
+                    </div>
 
+                </div>
 
-                        return `
-                            <div
-                                class="
-                                    player-card
-                                    ${isReady ? "ready" : ""}
-                                "
-                                style="
-                                    --player:
-                                    ${playerColor(player.id)};
-                                "
-                            >
+                ${renderBettingQrPanel()}
 
-                                <div class="rank">
-                                    ${isReady ? "BETTING COMPLETE" : "BETTING"}
-                                </div>
+            </div>
 
-                                <div class="name">
-                                    ${escapeHtml(player.display_name)}
-                                </div>
+            <div class="betting-main">
 
-                                <div class="money">
-                                    ${money(player.war_chest)}
-                                </div>
+                <section class="betting-player-panel">
 
-                            </div>
-                        `;
-                    }
-                ).join("")
-            }
+                    <div class="betting-panel-title">
+                        Live War Chests
+                    </div>
 
-        </div>
+                    <div class="betting-player-list">
 
-        <div class="scene-lower-two">
-            ${renderAudiencePreviewPanel(
-                "Audience Betting Is Live",
-                "Spectators are now making their own independent bets on every fight.",
-                12
-            )}
+                        ${
+                            players.map(
+                                (
+                                    player,
+                                    index
+                                ) =>
+                                    renderBettingPlayerBar(
+                                        player,
+                                        index + 1
+                                    )
+                            ).join("")
+                        }
 
-            ${renderGambleQrPanel(
-                "Scan to Bet",
-                "The spectator sportsbook is open while the players finish their selections."
-            )}
+                    </div>
+
+                </section>
+
+                <section class="betting-match-panel">
+
+                    <div class="betting-panel-title">
+                        Round ${state.event.current_round} Matchups
+                        <span>
+                            Sealed betting pools
+                        </span>
+                    </div>
+
+                    <div class="betting-match-list">
+
+                        ${
+                            matches.map(
+                                renderBettingMatchCard
+                            ).join("")
+                        }
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            ${renderBettingAudienceStrip(8)}
+
         </div>
     `;
+}
+
+
+function bettingActorElement(
+    action
+) {
+
+    if (
+        action.actorType ===
+        "audience"
+    ) {
+
+        return document
+            .querySelector(
+                `[data-betting-audience-id="${action.audience_id}"]`
+            );
+    }
+
+
+    return document
+        .querySelector(
+            `[data-betting-player-id="${action.player_id}"]`
+        );
+}
+
+
+function bettingPoolTarget(
+    action,
+    matchId = null
+) {
+
+    const id =
+        matchId
+        ?? action.match_id
+        ?? action.match_ids?.[0]
+        ?? null;
+
+
+    if (!id) {
+        return null;
+    }
+
+
+    const attribute =
+        action.actorType ===
+        "audience"
+        ? "data-audience-betting-target"
+        : "data-player-betting-target";
+
+
+    return document
+        .querySelector(
+            `[${attribute}="${id}"]`
+        );
+}
+
+
+function bettingColorForAction(
+    action
+) {
+
+    if (
+        action.actorType ===
+        "audience"
+    ) {
+        return "#F2C94C";
+    }
+
+
+    return playerColor(
+        action.player_id
+    );
+}
+
+
+function pulseBettingActor(
+    element,
+    color
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    const pulse =
+        element.animate(
+            [
+                {
+                    boxShadow:
+                        "0 0 0 rgba(0,0,0,0)",
+                    transform:
+                        "scale(1)"
+                },
+                {
+                    boxShadow:
+                        `0 0 0 1px ${color}, 0 0 22px ${color}`,
+                    transform:
+                        "scale(1.012)",
+                    offset:
+                        .38
+                },
+                {
+                    boxShadow:
+                        "0 0 0 rgba(0,0,0,0)",
+                    transform:
+                        "scale(1)"
+                }
+            ],
+            {
+                duration:
+                    720,
+                easing:
+                    "cubic-bezier(.18,.76,.24,1)"
+            }
+        );
+
+
+    pulse.finished
+        .catch(
+            () => null
+        );
+}
+
+
+function pulseBettingPool(
+    target,
+    color
+) {
+
+    if (!target) {
+        return;
+    }
+
+
+    const pulse =
+        target.animate(
+            [
+                {
+                    boxShadow:
+                        "0 0 0 rgba(0,0,0,0)",
+                    transform:
+                        "scale(1)"
+                },
+                {
+                    boxShadow:
+                        `0 0 0 1px ${color}, 0 0 20px ${color}`,
+                    transform:
+                        "scale(1.035)",
+                    offset:
+                        .34
+                },
+                {
+                    boxShadow:
+                        "0 0 0 rgba(0,0,0,0)",
+                    transform:
+                        "scale(1)"
+                }
+            ],
+            {
+                duration:
+                    760,
+                easing:
+                    "cubic-bezier(.18,.76,.24,1)"
+            }
+        );
+
+
+    pulse.finished
+        .catch(
+            () => null
+        );
+}
+
+
+function launchBettingChip(
+    startX,
+    startY,
+    endX,
+    endY,
+    color,
+    delay = 0,
+    reverse = false,
+    offset = 0
+) {
+
+    window.setTimeout(
+        () => {
+
+            const chip =
+                document.createElement(
+                    "div"
+                );
+
+
+            chip.className =
+                `
+                    betting-flight-chip
+                    ${reverse ? "reverse" : ""}
+                `;
+
+
+            chip.style.setProperty(
+                "--chip-color",
+                color
+            );
+
+
+            chip.style.left =
+                `${startX}px`;
+
+            chip.style.top =
+                `${startY}px`;
+
+
+            document.body.appendChild(
+                chip
+            );
+
+
+            const dx =
+                endX - startX;
+
+
+            const dy =
+                endY - startY;
+
+
+            const arc =
+                -18
+                - offset * 2;
+
+
+            const animation =
+                chip.animate(
+                    [
+                        {
+                            transform:
+                                "translate(0,0) scale(.55) rotate(0deg)",
+                            opacity:
+                                0
+                        },
+
+                        {
+                            transform:
+                                `translate(${dx * .32}px, ${dy * .24 + arc}px) scale(1) rotate(120deg)`,
+                            opacity:
+                                reverse
+                                ? .62
+                                : 1,
+                            offset:
+                                .34
+                        },
+
+                        {
+                            transform:
+                                `translate(${dx * .72}px, ${dy * .70 - arc * .25}px) scale(.92) rotate(270deg)`,
+                            opacity:
+                                reverse
+                                ? .54
+                                : .96,
+                            offset:
+                                .73
+                        },
+
+                        {
+                            transform:
+                                `translate(${dx}px, ${dy}px) scale(.62) rotate(360deg)`,
+                            opacity:
+                                0
+                        }
+                    ],
+                    {
+                        duration:
+                            720,
+                        easing:
+                            "cubic-bezier(.20,.60,.24,1)",
+                        fill:
+                            "forwards"
+                    }
+                );
+
+
+            animation.finished
+                .catch(
+                    () => null
+                )
+                .then(
+                    () =>
+                        chip.remove()
+                );
+        },
+        delay
+    );
+}
+
+
+function launchBettingTicket(
+    source,
+    target,
+    color,
+    label
+) {
+
+    if (
+        !source
+        ||
+        !target
+    ) {
+        return;
+    }
+
+
+    const s =
+        source.getBoundingClientRect();
+
+
+    const t =
+        target.getBoundingClientRect();
+
+
+    const ticket =
+        document.createElement(
+            "div"
+        );
+
+
+    ticket.className =
+        "betting-flight-ticket";
+
+
+    ticket.style.setProperty(
+        "--ticket-color",
+        color
+    );
+
+
+    ticket.textContent =
+        label;
+
+
+    const sx =
+        s.left
+        +
+        s.width / 2;
+
+
+    const sy =
+        s.top
+        +
+        s.height / 2;
+
+
+    const tx =
+        t.left
+        +
+        t.width / 2;
+
+
+    const ty =
+        t.top
+        +
+        t.height / 2;
+
+
+    ticket.style.left =
+        `${sx}px`;
+
+    ticket.style.top =
+        `${sy}px`;
+
+
+    document.body.appendChild(
+        ticket
+    );
+
+
+    const animation =
+        ticket.animate(
+            [
+                {
+                    transform:
+                        "translate(-50%,-50%) scale(.72) rotate(-5deg)",
+                    opacity:
+                        0
+                },
+                {
+                    transform:
+                        "translate(-50%,-50%) scale(1.05) rotate(2deg)",
+                    opacity:
+                        1,
+                    offset:
+                        .18
+                },
+                {
+                    transform:
+                        `translate(calc(-50% + ${tx - sx}px), calc(-50% + ${ty - sy}px)) scale(.88) rotate(6deg)`,
+                    opacity:
+                        .95,
+                    offset:
+                        .82
+                },
+                {
+                    transform:
+                        `translate(calc(-50% + ${tx - sx}px), calc(-50% + ${ty - sy}px)) scale(.64) rotate(6deg)`,
+                    opacity:
+                        0
+                }
+            ],
+            {
+                duration:
+                    920,
+                easing:
+                    "cubic-bezier(.18,.72,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    animation.finished
+        .catch(
+            () => null
+        )
+        .then(
+            () =>
+                ticket.remove()
+        );
+}
+
+
+function flashBettingBadge(
+    source,
+    color,
+    label
+) {
+
+    if (
+        !source
+        ||
+        !label
+    ) {
+        return;
+    }
+
+
+    const rect =
+        source.getBoundingClientRect();
+
+
+    const badge =
+        document.createElement(
+            "div"
+        );
+
+
+    badge.className =
+        "betting-action-badge";
+
+
+    badge.style.setProperty(
+        "--badge-color",
+        color
+    );
+
+
+    badge.textContent =
+        label;
+
+
+    badge.style.left =
+        `${rect.right - 12}px`;
+
+    badge.style.top =
+        `${rect.top + rect.height / 2}px`;
+
+
+    document.body.appendChild(
+        badge
+    );
+
+
+    const animation =
+        badge.animate(
+            [
+                {
+                    transform:
+                        "translate(-100%,-50%) scale(.72)",
+                    opacity:
+                        0
+                },
+                {
+                    transform:
+                        "translate(-100%,-70%) scale(1.04)",
+                    opacity:
+                        1,
+                    offset:
+                        .24
+                },
+                {
+                    transform:
+                        "translate(-100%,-88%) scale(1)",
+                    opacity:
+                        1,
+                    offset:
+                        .72
+                },
+                {
+                    transform:
+                        "translate(-100%,-108%) scale(.92)",
+                    opacity:
+                        0
+                }
+            ],
+            {
+                duration:
+                    1350,
+                easing:
+                    "cubic-bezier(.18,.74,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    animation.finished
+        .catch(
+            () => null
+        )
+        .then(
+            () =>
+                badge.remove()
+        );
+}
+
+
+function flashBettingConnector(
+    matchIds,
+    color,
+    label
+) {
+
+    const targets =
+        (
+            matchIds
+            ?? []
+        )
+        .map(
+            id =>
+                document.querySelector(
+                    `[data-player-betting-target="${id}"]`
+                )
+        )
+        .filter(Boolean);
+
+
+    if (
+        targets.length < 2
+    ) {
+        return;
+    }
+
+
+    const overlay =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "svg"
+        );
+
+
+    overlay.classList.add(
+        "betting-link-overlay"
+    );
+
+
+    overlay.setAttribute(
+        "viewBox",
+        `0 0 ${window.innerWidth} ${window.innerHeight}`
+    );
+
+
+    const points =
+        targets.map(
+            target => {
+
+                const rect =
+                    target.getBoundingClientRect();
+
+
+                return [
+                    rect.left
+                    +
+                    rect.width / 2,
+
+                    rect.top
+                    +
+                    rect.height / 2
+                ];
+            }
+        );
+
+
+    const path =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path"
+        );
+
+
+    const d =
+        points.map(
+            (
+                point,
+                index
+            ) =>
+                `${index === 0 ? "M" : "L"} ${point[0]} ${point[1]}`
+        ).join(" ");
+
+
+    path.setAttribute(
+        "d",
+        d
+    );
+
+
+    path.setAttribute(
+        "fill",
+        "none"
+    );
+
+
+    path.setAttribute(
+        "stroke",
+        color
+    );
+
+
+    path.setAttribute(
+        "stroke-width",
+        "4"
+    );
+
+
+    path.setAttribute(
+        "stroke-linecap",
+        "round"
+    );
+
+
+    path.setAttribute(
+        "stroke-linejoin",
+        "round"
+    );
+
+
+    overlay.appendChild(
+        path
+    );
+
+
+    document.body.appendChild(
+        overlay
+    );
+
+
+    const length =
+        path.getTotalLength();
+
+
+    path.style.strokeDasharray =
+        `${length}`;
+
+    path.style.strokeDashoffset =
+        `${length}`;
+
+    path.style.filter =
+        `drop-shadow(0 0 7px ${color})`;
+
+
+    path.animate(
+        [
+            {
+                strokeDashoffset:
+                    `${length}`,
+                opacity:
+                    0
+            },
+            {
+                strokeDashoffset:
+                    "0",
+                opacity:
+                    1,
+                offset:
+                    .42
+            },
+            {
+                strokeDashoffset:
+                    "0",
+                opacity:
+                    1,
+                offset:
+                    .76
+            },
+            {
+                strokeDashoffset:
+                    "0",
+                opacity:
+                    0
+            }
+        ],
+        {
+            duration:
+                1450,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    const averageX =
+        points.reduce(
+            (
+                sum,
+                point
+            ) =>
+                sum + point[0],
+            0
+        )
+        /
+        points.length;
+
+
+    const averageY =
+        points.reduce(
+            (
+                sum,
+                point
+            ) =>
+                sum + point[1],
+            0
+        )
+        /
+        points.length;
+
+
+    const tag =
+        document.createElement(
+            "div"
+        );
+
+
+    tag.className =
+        "betting-link-label";
+
+
+    tag.style.setProperty(
+        "--badge-color",
+        color
+    );
+
+
+    tag.textContent =
+        label;
+
+
+    tag.style.left =
+        `${averageX}px`;
+
+    tag.style.top =
+        `${averageY}px`;
+
+
+    document.body.appendChild(
+        tag
+    );
+
+
+    tag.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "translate(-50%,-50%) scale(.72)"
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "translate(-50%,-50%) scale(1.05)",
+                offset:
+                    .34
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "translate(-50%,-50%) scale(1)",
+                offset:
+                    .72
+            },
+            {
+                opacity:
+                    0,
+                transform:
+                    "translate(-50%,-50%) scale(.92)"
+            }
+        ],
+        {
+            duration:
+                1450,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    window.setTimeout(
+        () => {
+
+            overlay.remove();
+            tag.remove();
+        },
+        1500
+    );
+}
+
+
+function animateBettingMoneyValue(
+    element,
+    fromValue,
+    toValue,
+    duration = 650
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    const start =
+        Number(
+            fromValue
+            ?? 0
+        );
+
+
+    const end =
+        Number(
+            toValue
+            ?? 0
+        );
+
+
+    if (start === end) {
+        return;
+    }
+
+
+    const started =
+        performance.now();
+
+
+    function tick(
+        now
+    ) {
+
+        const progress =
+            Math.min(
+                1,
+                (
+                    now - started
+                )
+                /
+                duration
+            );
+
+
+        const eased =
+            1
+            -
+            Math.pow(
+                1 - progress,
+                3
+            );
+
+
+        const value =
+            Math.round(
+                start
+                +
+                (
+                    end - start
+                )
+                *
+                eased
+            );
+
+
+        element.textContent =
+            money(
+                value
+            );
+
+
+        if (
+            progress < 1
+        ) {
+
+            requestAnimationFrame(
+                tick
+            );
+        }
+    }
+
+
+    requestAnimationFrame(
+        tick
+    );
+}
+
+
+function animateBettingRankMovement(
+    selector,
+    idAttribute,
+    oldRankMap
+) {
+
+    document
+        .querySelectorAll(
+            selector
+        )
+        .forEach(
+            (
+                row,
+                newIndex
+            ) => {
+
+                const id =
+                    row.getAttribute(
+                        idAttribute
+                    );
+
+
+                const oldIndex =
+                    oldRankMap.get(
+                        id
+                    );
+
+
+                if (
+                    oldIndex == null
+                    ||
+                    oldIndex ===
+                    newIndex
+                ) {
+                    return;
+                }
+
+
+                const rect =
+                    row.getBoundingClientRect();
+
+
+                const gap =
+                    6;
+
+
+                const offset =
+                    (
+                        oldIndex
+                        -
+                        newIndex
+                    )
+                    *
+                    (
+                        rect.height
+                        +
+                        gap
+                    );
+
+
+                row.animate(
+                    [
+                        {
+                            transform:
+                                `translateY(${offset}px)`
+                        },
+                        {
+                            transform:
+                                "translateY(0)"
+                        }
+                    ],
+                    {
+                        duration:
+                            720,
+                        easing:
+                            "cubic-bezier(.18,.82,.24,1)"
+                    }
+                );
+            }
+        );
+}
+
+
+function runBettingMoneyAndRankAnimations() {
+
+    const oldPlayerMap =
+        new Map(
+            bettingScenePlayers(
+                previousState
+            )
+            .map(
+                player => [
+                    player.id,
+                    player
+                ]
+            )
+        );
+
+
+    const oldAudienceMap =
+        new Map(
+            bettingSceneAudience(
+                previousState
+            )
+            .map(
+                viewer => [
+                    viewer.id,
+                    viewer
+                ]
+            )
+        );
+
+
+    animateBettingRankMovement(
+        ".betting-player-bar",
+        "data-betting-player-id",
+        bettingPlayerRankMap(
+            previousState
+        )
+    );
+
+
+    animateBettingRankMovement(
+        ".betting-audience-card",
+        "data-betting-audience-id",
+        bettingAudienceRankMap(
+            previousState
+        )
+    );
+
+
+    document
+        .querySelectorAll(
+            ".betting-player-bar"
+        )
+        .forEach(
+            row => {
+
+                const id =
+                    row.getAttribute(
+                        "data-betting-player-id"
+                    );
+
+
+                const current =
+                    bettingScenePlayers()
+                    .find(
+                        player =>
+                            player.id ===
+                            id
+                    );
+
+
+                const old =
+                    oldPlayerMap.get(
+                        id
+                    );
+
+
+                animateBettingMoneyValue(
+                    row.querySelector(
+                        ".betting-player-money"
+                    ),
+                    old?.war_chest
+                        ?? current?.war_chest
+                        ?? 0,
+                    current?.war_chest
+                        ?? 0
+                );
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".betting-audience-card"
+        )
+        .forEach(
+            row => {
+
+                const id =
+                    row.getAttribute(
+                        "data-betting-audience-id"
+                    );
+
+
+                const current =
+                    bettingSceneAudience()
+                    .find(
+                        viewer =>
+                            viewer.id ===
+                            id
+                    );
+
+
+                const old =
+                    oldAudienceMap.get(
+                        id
+                    );
+
+
+                animateBettingMoneyValue(
+                    row.querySelector(
+                        ".betting-audience-money"
+                    ),
+                    old?.war_chest
+                        ?? current?.war_chest
+                        ?? 0,
+                    current?.war_chest
+                        ?? 0
+                );
+            }
+        );
+}
+
+
+function playBettingActionAnimation(
+    action
+) {
+
+    const source =
+        bettingActorElement(
+            action
+        );
+
+
+    if (!source) {
+        return;
+    }
+
+
+    const color =
+        bettingColorForAction(
+            action
+        );
+
+
+    const label =
+        bettingActionLabel(
+            action
+        );
+
+
+    const reverse =
+        action.direction ===
+        "refund";
+
+
+    const sourceRect =
+        source.getBoundingClientRect();
+
+
+    const primaryTarget =
+        bettingPoolTarget(
+            action
+        );
+
+
+    if (
+        action.kind ===
+        "parlay"
+        &&
+        !reverse
+    ) {
+
+        pulseBettingActor(
+            source,
+            color
+        );
+
+
+        flashBettingConnector(
+            action.match_ids,
+            color,
+            label
+        );
+
+
+        (
+            action.match_ids
+            ?? []
+        ).forEach(
+            (
+                matchId,
+                index
+            ) => {
+
+                const target =
+                    bettingPoolTarget(
+                        action,
+                        matchId
+                    );
+
+
+                if (!target) {
+                    return;
+                }
+
+
+                const targetRect =
+                    target.getBoundingClientRect();
+
+
+                launchBettingChip(
+                    sourceRect.left
+                    +
+                    sourceRect.width / 2,
+
+                    sourceRect.top
+                    +
+                    sourceRect.height / 2,
+
+                    targetRect.left
+                    +
+                    targetRect.width / 2,
+
+                    targetRect.top
+                    +
+                    targetRect.height / 2,
+
+                    color,
+
+                    index * 105,
+
+                    false,
+
+                    index
+                );
+
+
+                window.setTimeout(
+                    () =>
+                        pulseBettingPool(
+                            target,
+                            color
+                        ),
+                    610
+                    +
+                    index * 105
+                );
+            }
+        );
+
+
+        flashBettingBadge(
+            source,
+            color,
+            label
+        );
+
+
+        return;
+    }
+
+
+    if (!primaryTarget) {
+        return;
+    }
+
+
+    const targetRect =
+        primaryTarget
+            .getBoundingClientRect();
+
+
+    const fromX =
+        reverse
+        ? targetRect.left
+            +
+            targetRect.width / 2
+        : sourceRect.left
+            +
+            sourceRect.width / 2;
+
+
+    const fromY =
+        reverse
+        ? targetRect.top
+            +
+            targetRect.height / 2
+        : sourceRect.top
+            +
+            sourceRect.height / 2;
+
+
+    const toX =
+        reverse
+        ? sourceRect.left
+            +
+            sourceRect.width / 2
+        : targetRect.left
+            +
+            targetRect.width / 2;
+
+
+    const toY =
+        reverse
+        ? sourceRect.top
+            +
+            sourceRect.height / 2
+        : targetRect.top
+            +
+            targetRect.height / 2;
+
+
+    if (reverse) {
+
+        pulseBettingPool(
+            primaryTarget,
+            color
+        );
+
+    }
+
+    else {
+
+        pulseBettingActor(
+            source,
+            color
+        );
+    }
+
+
+    const amount =
+        Math.abs(
+            Number(
+                action.amountDelta
+                || action.amount
+                || 0
+            )
+        );
+
+
+    let chipCount =
+        Math.min(
+            12,
+            Math.max(
+                1,
+                Math.round(
+                    amount
+                    /
+                    250
+                )
+            )
+        );
+
+
+    if (
+        action.kind ===
+        "standard"
+        &&
+        action.modifier_code ===
+        "all_in"
+    ) {
+
+        chipCount =
+            Math.max(
+                chipCount,
+                10
+            );
+    }
+
+
+    if (
+        action.kind ===
+        "hedge"
+    ) {
+
+        chipCount =
+            Math.max(
+                4,
+                chipCount
+            );
+    }
+
+
+    for (
+        let index = 0;
+        index < chipCount;
+        index++
+    ) {
+
+        const hedgeOffset =
+            action.kind ===
+            "hedge"
+            ? (
+                index % 2 === 0
+                ? -1
+                : 1
+              )
+            : 0;
+
+
+        launchBettingChip(
+            fromX,
+            fromY,
+            toX,
+            toY,
+            color,
+            Math.min(
+                420,
+                index * 62
+            ),
+            reverse,
+            hedgeOffset
+        );
+    }
+
+
+    if (
+        action.kind ===
+        "prop"
+        &&
+        !reverse
+    ) {
+
+        launchBettingTicket(
+            source,
+            primaryTarget,
+            color,
+            "PROP"
+        );
+    }
+
+
+    if (
+        label
+        &&
+        !reverse
+    ) {
+
+        flashBettingBadge(
+            source,
+            color,
+            label
+        );
+    }
+
+
+    window.setTimeout(
+        () => {
+
+            if (reverse) {
+
+                pulseBettingActor(
+                    source,
+                    color
+                );
+
+            }
+
+            else {
+
+                pulseBettingPool(
+                    primaryTarget,
+                    color
+                );
+            }
+        },
+        640
+    );
+}
+
+
+function runBettingPostRenderAnimations() {
+
+    if (
+        state?.event?.status !==
+            "betting_open"
+    ) {
+        return;
+    }
+
+
+    runBettingMoneyAndRankAnimations();
+
+
+    if (
+        !bettingPendingAnimations
+            .length
+    ) {
+        return;
+    }
+
+
+    const queue =
+        bettingPendingAnimations
+        .slice();
+
+
+    bettingPendingAnimations =
+        [];
+
+
+    bettingAnimationUntil =
+        performance.now()
+        +
+        1650
+        +
+        queue.length
+        *
+        120;
+
+
+    queue.forEach(
+        (
+            action,
+            index
+        ) => {
+
+            window.setTimeout(
+                () =>
+                    playBettingActionAnimation(
+                        action
+                    ),
+                index * 120
+            );
+        }
+    );
 }
 
 
