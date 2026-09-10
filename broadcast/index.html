@@ -1038,7 +1038,15 @@ input {
             var(--player) 70%,
             white 12%
         );
-    animation: championPulse 2.6s ease-in-out infinite;
+    animation:
+        championPulse
+        3.8s
+        cubic-bezier(.45,0,.55,1)
+        infinite;
+    will-change:
+        box-shadow,
+        border-color,
+        background;
 }
 
 .champion-card .crown {
@@ -1061,14 +1069,65 @@ input {
 }
 
 @keyframes championPulse {
-    50% {
-        box-shadow:
-            0 0 70px
+
+    0%,
+    100% {
+        border-color:
             color-mix(
                 in srgb,
-                var(--player) 28%,
+                var(--player) 62%,
+                white 10%
+            );
+
+        box-shadow:
+            0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--player) 7%,
+                transparent
+            ),
+            0 0 22px
+            color-mix(
+                in srgb,
+                var(--player) 8%,
                 transparent
             );
+
+        filter:
+            brightness(1);
+    }
+
+
+    50% {
+        border-color:
+            color-mix(
+                in srgb,
+                var(--player) 78%,
+                white 16%
+            );
+
+        box-shadow:
+            0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--player) 18%,
+                transparent
+            ),
+            0 0 48px
+            color-mix(
+                in srgb,
+                var(--player) 18%,
+                transparent
+            ),
+            0 0 86px
+            color-mix(
+                in srgb,
+                var(--player) 16%,
+                transparent
+            );
+
+        filter:
+            brightness(1.035);
     }
 }
 
@@ -9643,7 +9702,7 @@ span.up-next {
 
 .champion-section-kicker {
     color: #8998b1;
-    font-size: .56rem;
+    font-size: .62rem;
     font-weight: 950;
     letter-spacing: .13em;
     text-transform: uppercase;
@@ -9652,40 +9711,41 @@ span.up-next {
 .champion-section-title {
     margin-top: 2px;
     color: #fff;
-    font-size: 1.02rem;
+    font-size: 1.15rem;
     font-weight: 1000;
 }
 
 .champion-section-note,
 .champion-audience-total {
-    color: #8998b1;
-    font-size: .52rem;
+    color: #98a5ba;
+    font-size: .59rem;
     font-weight: 800;
 }
 
 .champion-player-standing-grid {
     min-height: 0;
     display: grid;
-    grid-template-columns:
+    grid-template-rows:
         repeat(
-            2,
+            4,
             minmax(0,1fr)
         );
-    grid-auto-rows:
+    grid-auto-flow: column;
+    grid-auto-columns:
         minmax(0,1fr);
-    gap: 7px;
+    gap: 8px;
 }
 
 .champion-player-standing {
     --player: #7c8aa6;
     min-width: 0;
-    padding: 7px 9px;
+    padding: 9px 11px;
     display: grid;
     grid-template-columns:
-        33px
+        39px
         minmax(0,1fr)
         auto;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
     border-radius: 9px;
     border:
@@ -9720,7 +9780,7 @@ span.up-next {
 
 .champion-player-rank {
     color: var(--player);
-    font-size: .72rem;
+    font-size: .88rem;
     font-weight: 1000;
 }
 
@@ -9733,26 +9793,49 @@ span.up-next {
 .champion-player-standing-main strong {
     min-width: 0;
     color: #fff;
-    font-size: .64rem;
-    font-weight: 930;
+    font-size: .79rem;
+    font-weight: 950;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .champion-player-standing-main span {
-    color: #8290a8;
-    font-size: .46rem;
-    font-weight: 760;
+    color: #929fb5;
+    font-size: .56rem;
+    font-weight: 820;
     text-transform: uppercase;
     letter-spacing: .05em;
 }
 
 .champion-player-standing-money {
-    color: #dfe8f7;
-    font-size: .61rem;
-    font-weight: 930;
+    color: #f1f5fd;
+    font-size: .76rem;
+    font-weight: 960;
     font-variant-numeric: tabular-nums;
+}
+
+
+
+.champion-player-standing.is-champion {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--player) 48%,
+            rgba(242,201,76,.32)
+        );
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--player) 13%,
+                transparent
+            ),
+            rgba(242,201,76,.045)
+        );
+    box-shadow:
+        inset 0 0 18px rgba(242,201,76,.045);
 }
 
 
@@ -9836,13 +9919,13 @@ span.up-next {
 
 .champion-audience-row {
     min-width: 0;
-    padding: 7px 9px;
+    padding: 9px 11px;
     display: grid;
     grid-template-columns:
-        28px
+        34px
         minmax(0,1fr)
         auto;
-    gap: 7px;
+    gap: 9px;
     align-items: center;
     border-radius: 9px;
     border: 1px solid rgba(255,255,255,.07);
@@ -9852,15 +9935,15 @@ span.up-next {
 .champion-audience-row
 .rank {
     color: #f2c94c;
-    font-size: .59rem;
+    font-size: .76rem;
     font-weight: 1000;
 }
 
 .champion-audience-row strong {
     min-width: 0;
     color: #fff;
-    font-size: .59rem;
-    font-weight: 900;
+    font-size: .73rem;
+    font-weight: 940;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -9868,9 +9951,9 @@ span.up-next {
 
 .champion-audience-row
 .money {
-    color: #e2e9f6;
-    font-size: .56rem;
-    font-weight: 900;
+    color: #f0f4fc;
+    font-size: .70rem;
+    font-weight: 950;
     font-variant-numeric: tabular-nums;
 }
 
@@ -9903,7 +9986,21 @@ span.up-next {
 
     .champion-player-standing,
     .champion-audience-row {
-        padding: 6px 7px;
+        padding: 7px 8px;
+    }
+
+    .champion-player-standing-main strong {
+        font-size: .72rem;
+    }
+
+    .champion-player-standing-money,
+    .champion-audience-row
+    .money {
+        font-size: .66rem;
+    }
+
+    .champion-audience-row strong {
+        font-size: .67rem;
     }
 }
 
@@ -27475,13 +27572,13 @@ function renderFinalPlayerStandings() {
             ?.final_war_champion_id;
 
 
+    /*
+       Show the complete final order here, including the Champion.
+       The large Champion card remains the hero treatment above, while this
+       board serves as the clean 1-through-8 final standings reference.
+    */
     const rows =
-        finalPlayerPlacements()
-        .filter(
-            row =>
-                row.playerId !==
-                championId
-        );
+        finalPlayerPlacements();
 
 
     return `
@@ -27526,6 +27623,12 @@ function renderFinalPlayerStandings() {
                                         ${
                                             row.rank <= 4
                                             ? "final-four"
+                                            : ""
+                                        }
+
+                                        ${
+                                            row.rank === 1
+                                            ? "is-champion"
                                             : ""
                                         }
                                     "
