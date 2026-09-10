@@ -1923,6 +1923,9 @@ let armyDraft = {
 let armyProgressSyncTimer = null;
 let lastArmyProgressSignature = null;
 
+let finalWarProgressSyncTimer = null;
+let lastFinalWarProgressSignature = null;
+
 let selectedTier = "S";
 
 let eventChannel = null;
@@ -10126,6 +10129,10 @@ function clearFinalWarDraft() {
     finalWarDraft = {
         quantities: {}
     };
+
+
+    lastFinalWarProgressSignature =
+        null;
 }
 
 
@@ -10159,6 +10166,7 @@ function setFinalWarQty(
 
     saveFinalWarDraft();
     renderFinalWar();
+    scheduleFinalWarBuildProgressSync();
 }
 
 
@@ -10452,6 +10460,184 @@ function finalWarTotal() {
                 * line.quantity,
             0
         );
+}
+
+
+function finalWarTotalUnits() {
+
+    return finalWarLines()
+        .reduce(
+            (
+                total,
+                line
+            ) =>
+                total
+                +
+                Number(
+                    line.quantity
+                    ?? 0
+                ),
+            0
+        );
+}
+
+
+function finalWarProgressSignature() {
+
+    const match =
+        currentFinalWarMatch();
+
+
+    return [
+        match?.id
+        ?? "no-match",
+
+        finalWarTotalUnits(),
+
+        finalWarTotal(),
+
+        myFinalWarEntry()
+            ?.frozen_budget
+        ?? 0
+    ].join(":");
+}
+
+
+function scheduleFinalWarBuildProgressSync() {
+
+    const match =
+        currentFinalWarMatch();
+
+
+    const amParticipant =
+        match
+        &&
+        [
+            match.player1_id,
+            match.player2_id
+        ].includes(
+            currentPlayerId
+        );
+
+
+    if (
+        eventData?.status !==
+            "final_war_build"
+        ||
+        !currentEventId
+        ||
+        !currentPlayerId
+        ||
+        !amParticipant
+        ||
+        currentFinalWarSubmission(
+            currentPlayerId
+        )
+    ) {
+        return;
+    }
+
+
+    if (
+        finalWarProgressSyncTimer
+    ) {
+
+        clearTimeout(
+            finalWarProgressSyncTimer
+        );
+    }
+
+
+    finalWarProgressSyncTimer =
+        setTimeout(
+            syncFinalWarBuildProgress,
+            90
+        );
+}
+
+
+async function syncFinalWarBuildProgress() {
+
+    finalWarProgressSyncTimer =
+        null;
+
+
+    const match =
+        currentFinalWarMatch();
+
+
+    const amParticipant =
+        match
+        &&
+        [
+            match.player1_id,
+            match.player2_id
+        ].includes(
+            currentPlayerId
+        );
+
+
+    if (
+        eventData?.status !==
+            "final_war_build"
+        ||
+        !currentEventId
+        ||
+        !currentPlayerId
+        ||
+        !amParticipant
+        ||
+        currentFinalWarSubmission(
+            currentPlayerId
+        )
+    ) {
+        return;
+    }
+
+
+    const signature =
+        finalWarProgressSignature();
+
+
+    if (
+        signature ===
+        lastFinalWarProgressSignature
+    ) {
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await db.rpc(
+            "upsert_my_final_war_build_progress",
+            {
+                p_event_id:
+                    currentEventId,
+
+                p_total_units:
+                    finalWarTotalUnits(),
+
+                p_total_cost:
+                    finalWarTotal()
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Could not sync hidden Final War build progress.",
+            error
+        );
+
+        return;
+    }
+
+
+    lastFinalWarProgressSignature =
+        signature;
 }
 
 
@@ -10829,6 +11015,14 @@ function renderFinalWar() {
 
             </div>
         `;
+
+
+        /*
+           If a locally-saved Final War draft already exists when this
+           screen loads/reloads, publish its hidden aggregate progress once.
+        */
+        scheduleFinalWarBuildProgressSync();
+
 
         return;
     }
