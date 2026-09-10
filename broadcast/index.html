@@ -9488,6 +9488,425 @@ span.up-next {
     }
 }
 
+
+/* =========================================================
+   FINAL WAR — REGULAR-SEASON STYLE VICTORY HANDOFF
+   ========================================================= */
+
+.final-war-advance-overlay.victory-phase {
+    display: grid;
+    place-items: stretch;
+    background: transparent;
+}
+
+.final-war-victory-layer {
+    z-index: 8;
+    display: grid;
+    place-items: center;
+}
+
+.final-war-victory-layer
+.fight-victory-card {
+    /*
+       Explicit fallback ensures the box remains fully styled even if a
+       future transition forgets to inherit a player color.
+    */
+    --player:
+        var(
+            --player,
+            #8B97AE
+        );
+}
+
+
+/* =========================================================
+   CHAMPION — FINAL RESULTS DASHBOARD
+   ========================================================= */
+
+.champion-final-scene {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1.16fr)
+        minmax(390px,.84fr);
+    gap: 18px;
+}
+
+.champion-player-column,
+.champion-audience-column {
+    min-height: 0;
+    display: grid;
+    gap: 14px;
+}
+
+.champion-player-column {
+    grid-template-rows:
+        minmax(0,1.05fr)
+        minmax(260px,.95fr);
+}
+
+.champion-audience-column {
+    grid-template-rows:
+        minmax(225px,.70fr)
+        minmax(0,1.30fr);
+}
+
+.champion-player-scene {
+    min-height: 0;
+}
+
+.champion-player-card {
+    width:
+        min(
+            920px,
+            95%
+        );
+    padding:
+        30px
+        42px
+        32px;
+}
+
+.champion-player-card
+.crown {
+    font-size: 3.05rem;
+}
+
+.champion-player-card
+.champ-label {
+    margin-top: 8px;
+    font-size: .72rem;
+}
+
+.champion-player-card
+.champ-name {
+    margin-top: 9px;
+    font-size:
+        clamp(
+            3.25rem,
+            5.6vw,
+            6rem
+        );
+}
+
+.champion-winning-war-chest {
+    margin-top: 17px;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+}
+
+.champion-winning-war-chest span {
+    margin-left: 6px;
+    color: #9eacc4;
+    font-size: .56rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.champion-player-card
+.scene-subtitle {
+    margin-top: 11px;
+}
+
+
+/* Player final standings */
+
+.champion-player-standings,
+.champion-audience-board,
+.champion-audience-winner {
+    min-height: 0;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(20,25,36,.92);
+}
+
+.champion-player-standings,
+.champion-audience-board {
+    padding: 14px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 10px;
+}
+
+.champion-section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.champion-section-kicker {
+    color: #8998b1;
+    font-size: .56rem;
+    font-weight: 950;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.champion-section-title {
+    margin-top: 2px;
+    color: #fff;
+    font-size: 1.02rem;
+    font-weight: 1000;
+}
+
+.champion-section-note,
+.champion-audience-total {
+    color: #8998b1;
+    font-size: .52rem;
+    font-weight: 800;
+}
+
+.champion-player-standing-grid {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+    grid-auto-rows:
+        minmax(0,1fr);
+    gap: 7px;
+}
+
+.champion-player-standing {
+    --player: #7c8aa6;
+    min-width: 0;
+    padding: 7px 9px;
+    display: grid;
+    grid-template-columns:
+        33px
+        minmax(0,1fr)
+        auto;
+    gap: 8px;
+    align-items: center;
+    border-radius: 9px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--player) 23%,
+            rgba(255,255,255,.06)
+        );
+    border-left:
+        4px solid
+        color-mix(
+            in srgb,
+            var(--player) 68%,
+            rgba(255,255,255,.10)
+        );
+    background: rgba(255,255,255,.025);
+}
+
+.champion-player-standing.final-four {
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(
+                in srgb,
+                var(--player) 9%,
+                transparent
+            ),
+            rgba(255,255,255,.025)
+        );
+}
+
+.champion-player-rank {
+    color: var(--player);
+    font-size: .72rem;
+    font-weight: 1000;
+}
+
+.champion-player-standing-main {
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+}
+
+.champion-player-standing-main strong {
+    min-width: 0;
+    color: #fff;
+    font-size: .64rem;
+    font-weight: 930;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.champion-player-standing-main span {
+    color: #8290a8;
+    font-size: .46rem;
+    font-weight: 760;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.champion-player-standing-money {
+    color: #dfe8f7;
+    font-size: .61rem;
+    font-weight: 930;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Centered Audience Champion */
+
+.champion-audience-winner {
+    padding:
+        24px
+        28px;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(242,201,76,.13),
+            transparent 62%
+        ),
+        rgba(20,25,36,.94);
+    border-color: rgba(242,201,76,.30);
+}
+
+.champion-audience-winner
+.champion-section-kicker {
+    color: #c6b875;
+    font-size: .67rem;
+}
+
+.champion-audience-winner
+.winner-name {
+    margin-top: 10px;
+    color: #fff;
+    font-size:
+        clamp(
+            2.0rem,
+            3.1vw,
+            3.35rem
+        );
+    font-weight: 1000;
+    line-height: .94;
+}
+
+.champion-audience-winner
+.winner-money {
+    margin-top: 10px;
+    color: #f2c94c;
+    font-size:
+        clamp(
+            1.35rem,
+            2vw,
+            2rem
+        );
+    font-weight: 1000;
+    font-variant-numeric: tabular-nums;
+}
+
+.champion-audience-winner
+.audience-panel-copy {
+    margin-top: 8px;
+    color: #96a4bb;
+    font-size: .61rem;
+}
+
+
+/* Top Ten Audience board */
+
+.champion-audience-top-ten {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            5,
+            minmax(0,1fr)
+        );
+    grid-auto-flow: column;
+    grid-auto-columns:
+        minmax(0,1fr);
+    gap: 7px;
+}
+
+.champion-audience-row {
+    min-width: 0;
+    padding: 7px 9px;
+    display: grid;
+    grid-template-columns:
+        28px
+        minmax(0,1fr)
+        auto;
+    gap: 7px;
+    align-items: center;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.07);
+    background: rgba(255,255,255,.028);
+}
+
+.champion-audience-row
+.rank {
+    color: #f2c94c;
+    font-size: .59rem;
+    font-weight: 1000;
+}
+
+.champion-audience-row strong {
+    min-width: 0;
+    color: #fff;
+    font-size: .59rem;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.champion-audience-row
+.money {
+    color: #e2e9f6;
+    font-size: .56rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+
+@media (max-width: 1500px) {
+
+    .champion-final-scene {
+        grid-template-columns:
+            minmax(0,1.12fr)
+            minmax(350px,.88fr);
+        gap: 13px;
+    }
+
+    .champion-player-column,
+    .champion-audience-column {
+        gap: 10px;
+    }
+
+    .champion-player-card {
+        padding:
+            24px
+            34px
+            26px;
+    }
+
+    .champion-player-card
+    .crown {
+        font-size: 2.65rem;
+    }
+
+    .champion-player-standing,
+    .champion-audience-row {
+        padding: 6px 7px;
+    }
+}
+
 </style>
 </head>
 
@@ -24436,33 +24855,70 @@ function launchFinalWarAdvanceFlyer(
             );
 
 
-            const dx =
+            /*
+               Move center-to-center and use ONE scale value.
+
+               The previous scaleX/scaleY morph distorted the text when the
+               destination (especially the Champion slot) had a different
+               aspect ratio from the bracket fighter card.
+            */
+            const fromCenterX =
+                from.left
+                +
+                from.width / 2;
+
+
+            const fromCenterY =
+                from.top
+                +
+                from.height / 2;
+
+
+            const toCenterX =
                 to.left
+                +
+                to.width / 2;
+
+
+            const toCenterY =
+                to.top
+                +
+                to.height / 2;
+
+
+            const dx =
+                toCenterX
                 -
-                from.left;
+                fromCenterX;
 
 
             const dy =
-                to.top
+                toCenterY
                 -
-                from.top;
+                fromCenterY;
 
 
-            const sx =
-                to.width
-                /
+            const uniformScale =
                 Math.max(
-                    1,
-                    from.width
-                );
+                    .72,
+                    Math.min(
+                        1.04,
+                        Math.min(
+                            to.width
+                            /
+                            Math.max(
+                                1,
+                                from.width
+                            ),
 
-
-            const sy =
-                to.height
-                /
-                Math.max(
-                    1,
-                    from.height
+                            to.height
+                            /
+                            Math.max(
+                                1,
+                                from.height
+                            )
+                        )
+                    )
                 );
 
 
@@ -24482,19 +24938,43 @@ function launchFinalWarAdvanceFlyer(
                             transform:
                                 `
                                     translate(
+                                        ${dx * .72}px,
+                                        ${dy * .72}px
+                                    )
+                                    scale(
+                                        ${
+                                            1
+                                            +
+                                            (
+                                                uniformScale - 1
+                                            )
+                                            *
+                                            .72
+                                        }
+                                    )
+                                `,
+                            offset:
+                                .72
+                        },
+
+                        {
+                            opacity:
+                                0,
+                            transform:
+                                `
+                                    translate(
                                         ${dx}px,
                                         ${dy}px
                                     )
                                     scale(
-                                        ${sx},
-                                        ${sy}
+                                        ${uniformScale}
                                     )
                                 `
                         }
                     ],
                     {
                         duration:
-                            760,
+                            820,
                         easing:
                             "cubic-bezier(.18,.78,.22,1)",
                         fill:
@@ -24577,6 +25057,14 @@ async function runFinalWarWinnerAdvanceTransition(
 
 
     overlay.style.setProperty(
+        "--player",
+        playerColor(
+            winnerId
+        )
+    );
+
+
+    overlay.style.setProperty(
         "--winner",
         playerColor(
             winnerId
@@ -24625,6 +25113,22 @@ async function runFinalWarWinnerAdvanceTransition(
     const victoryLayer =
         overlay.querySelector(
             ".final-war-victory-layer"
+        );
+
+
+    /*
+       The database advances immediately when a Final War winner is picked,
+       so this function intercepts that transition while the OLD Battle Show
+       DOM is still visible.
+
+       Fade that exact Battle Show just like the regular-season winner
+       sequence fades its fight-winner-battle-layer. As the #00FF00 element
+       disappears, the normal dark page background replaces it in OBS and
+       the TABS capture is no longer exposed through the chroma key.
+    */
+    const battleScene =
+        document.querySelector(
+            ".battle-show-scene"
         );
 
 
@@ -24703,8 +25207,49 @@ async function runFinalWarWinnerAdvanceTransition(
     );
 
 
+    /*
+       Match the regular-season winner timing:
+       gameplay stays fully visible during the Victory entrance/hold,
+       then fades down as the Victory card leaves.
+    */
+    battleScene?.animate(
+        [
+            {
+                opacity:
+                    1,
+                filter:
+                    "brightness(1)"
+            },
+
+            {
+                opacity:
+                    1,
+                filter:
+                    "brightness(.82)",
+                offset:
+                    .68
+            },
+
+            {
+                opacity:
+                    0,
+                filter:
+                    "brightness(.55)"
+            }
+        ],
+        {
+            duration:
+                2900,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
     await wait(
-        2700
+        2940
     );
 
 
@@ -26632,54 +27177,565 @@ function runFinalWarBuildPostRenderAnimations() {
 }
 
 
+function finalPlayerPlacements() {
+
+    const championId =
+        state?.event
+            ?.final_war_champion_id;
+
+
+    const qualifierCount =
+        Math.max(
+            0,
+            Number(
+                state?.event
+                    ?.final_war_qualifier_count
+                ??
+                (
+                    state?.final_war_entries
+                    ?? []
+                )
+                .filter(
+                    entry =>
+                        entry.qualified
+                )
+                .length
+                ??
+                0
+            )
+        );
+
+
+    const placements =
+        [];
+
+
+    const placed =
+        new Set();
+
+
+    if (championId) {
+
+        placements.push(
+            {
+                rank:
+                    1,
+
+                playerId:
+                    championId,
+
+                finish:
+                    "Champion"
+            }
+        );
+
+
+        placed.add(
+            championId
+        );
+    }
+
+
+    /*
+       In the gauntlet:
+         final-stage loser = #2
+         previous-stage loser = #3
+         opening-stage loser = #4
+
+       Generic formula also works for a Top-3 Final War.
+    */
+    const matches =
+        [
+            ...(
+                state?.final_war_matches
+                ?? []
+            )
+        ]
+        .filter(
+            match =>
+                match.winner_player_id
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    b.stage_number
+                )
+                -
+                Number(
+                    a.stage_number
+                )
+        );
+
+
+    for (
+        const match of
+        matches
+    ) {
+
+        const winnerId =
+            match.winner_player_id;
+
+
+        const loserId =
+            match.player1_id ===
+                winnerId
+            ? match.player2_id
+            : match.player1_id;
+
+
+        if (
+            !loserId
+            ||
+            placed.has(
+                loserId
+            )
+        ) {
+            continue;
+        }
+
+
+        const rank =
+            Math.max(
+                2,
+                qualifierCount
+                -
+                Number(
+                    match.stage_number
+                    ?? 0
+                )
+                +
+                1
+            );
+
+
+        placements.push(
+            {
+                rank,
+
+                playerId:
+                    loserId,
+
+                finish:
+                    rank === 2
+                    ? "Runner-Up"
+                    : "Final Four"
+            }
+        );
+
+
+        placed.add(
+            loserId
+        );
+    }
+
+
+    /*
+       Everyone outside the Final War keeps the order they earned at the end
+       of the regular season. Their War Chests did not change during Final
+       War, so the existing standings order is still authoritative for them.
+    */
+    const nonFinalists =
+        standings()
+        .filter(
+            player =>
+                !placed.has(
+                    player.id
+                )
+                &&
+                !(
+                    state?.final_war_entries
+                    ?? []
+                )
+                .some(
+                    entry =>
+                        entry.qualified
+                        &&
+                        entry.player_id ===
+                            player.id
+                )
+        );
+
+
+    let nextRank =
+        Math.max(
+            qualifierCount + 1,
+            placements.length + 1
+        );
+
+
+    for (
+        const player of
+        nonFinalists
+    ) {
+
+        placements.push(
+            {
+                rank:
+                    nextRank++,
+
+                playerId:
+                    player.id,
+
+                finish:
+                    "Regular Season"
+            }
+        );
+    }
+
+
+    /*
+       Safety fallback: if a Final War entrant is somehow absent from the
+       completed-match list, include them rather than dropping a player from
+       the final standings.
+    */
+    const qualifiedMissing =
+        (
+            state?.final_war_entries
+            ?? []
+        )
+        .filter(
+            entry =>
+                entry.qualified
+                &&
+                !placed.has(
+                    entry.player_id
+                )
+                &&
+                entry.player_id !==
+                    championId
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    a.seed
+                    ?? 99
+                )
+                -
+                Number(
+                    b.seed
+                    ?? 99
+                )
+        );
+
+
+    for (
+        const entry of
+        qualifiedMissing
+    ) {
+
+        if (
+            placements.some(
+                row =>
+                    row.playerId ===
+                    entry.player_id
+            )
+        ) {
+            continue;
+        }
+
+
+        placements.push(
+            {
+                rank:
+                    nextRank++,
+
+                playerId:
+                    entry.player_id,
+
+                finish:
+                    "Final War"
+            }
+        );
+    }
+
+
+    return placements
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                a.rank
+                -
+                b.rank
+        );
+}
+
+
+function renderFinalPlayerStandings() {
+
+    const championId =
+        state?.event
+            ?.final_war_champion_id;
+
+
+    const rows =
+        finalPlayerPlacements()
+        .filter(
+            row =>
+                row.playerId !==
+                championId
+        );
+
+
+    return `
+        <section class="champion-player-standings">
+
+            <div class="champion-section-head">
+
+                <div>
+
+                    <div class="champion-section-kicker">
+                        Final Results
+                    </div>
+
+                    <div class="champion-section-title">
+                        Player Standings
+                    </div>
+
+                </div>
+
+                <div class="champion-section-note">
+                    Final Four ranked by Final War finish
+                </div>
+
+            </div>
+
+            <div class="champion-player-standing-grid">
+
+                ${
+                    rows.map(
+                        row => {
+
+                            const player =
+                                playerById(
+                                    row.playerId
+                                );
+
+
+                            return `
+                                <div
+                                    class="
+                                        champion-player-standing
+                                        ${
+                                            row.rank <= 4
+                                            ? "final-four"
+                                            : ""
+                                        }
+                                    "
+                                    style="
+                                        --player:
+                                            ${playerColor(
+                                                row.playerId
+                                            )};
+                                    "
+                                >
+
+                                    <div class="champion-player-rank">
+                                        #${row.rank}
+                                    </div>
+
+                                    <div class="champion-player-standing-main">
+
+                                        <strong>
+                                            ${escapeHtml(
+                                                player?.display_name
+                                                ?? "Player"
+                                            )}
+                                        </strong>
+
+                                        <span>
+                                            ${escapeHtml(
+                                                row.finish
+                                            )}
+                                        </span>
+
+                                    </div>
+
+                                    <div class="champion-player-standing-money">
+                                        ${money(
+                                            player?.war_chest
+                                            ?? 0
+                                        )}
+                                    </div>
+
+                                </div>
+                            `;
+                        }
+                    ).join("")
+                }
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+function renderChampionAudienceTopTen() {
+
+    const leaders =
+        audienceLeaders(
+            10
+        );
+
+
+    return `
+        <section class="champion-audience-board">
+
+            <div class="champion-section-head">
+
+                <div>
+
+                    <div class="champion-section-kicker">
+                        Audience Final
+                    </div>
+
+                    <div class="champion-section-title">
+                        Top 10 Gamblers
+                    </div>
+
+                </div>
+
+                <div class="champion-audience-total">
+                    ${audienceCount()} total
+                </div>
+
+            </div>
+
+            ${
+                leaders.length
+                ? `
+                    <div class="champion-audience-top-ten">
+
+                        ${
+                            leaders.map(
+                                row => `
+                                    <div class="champion-audience-row">
+
+                                        <span class="rank">
+                                            #${row.rank}
+                                        </span>
+
+                                        <strong>
+                                            ${escapeHtml(
+                                                row.display_name
+                                            )}
+                                        </strong>
+
+                                        <span class="money">
+                                            ${money(
+                                                row.bankroll
+                                            )}
+                                        </span>
+
+                                    </div>
+                                `
+                            ).join("")
+                        }
+
+                    </div>
+                  `
+                : `
+                    <div class="audience-empty">
+                        No Audience Gamblers were recorded.
+                    </div>
+                  `
+            }
+
+        </section>
+    `;
+}
+
+
 function renderChampion() {
 
     const championId =
         state.event
         .final_war_champion_id;
 
+
+    const champion =
+        playerById(
+            championId
+        );
+
+
     const topAudience =
-        audienceLeaders(1)[0];
+        audienceLeaders(
+            1
+        )[0];
 
 
     return `
-        <div class="champion-grid">
+        <div class="champion-final-scene">
 
-            <div class="champion-scene">
+            <div class="champion-player-column">
 
-                <div
-                    class="champion-card"
-                    style="
-                        --player:
-                        ${playerColor(championId)};
-                    "
-                >
+                <div class="champion-scene champion-player-scene">
 
-                    <div class="crown">
-                        👑
-                    </div>
+                    <div
+                        class="champion-card champion-player-card"
+                        style="
+                            --player:
+                                ${playerColor(
+                                    championId
+                                )};
+                        "
+                    >
 
-                    <div class="champ-label">
-                        TABS War Chest Betting Special Champion
-                    </div>
+                        <div class="crown">
+                            👑
+                        </div>
 
-                    <div class="champ-name">
-                        ${escapeHtml(playerName(championId))}
-                    </div>
+                        <div class="champ-label">
+                            TABS War Chest Betting Special Champion
+                        </div>
 
-                    <div class="scene-subtitle">
-                        DreamHarrier • Benefiting Extra Life
+                        <div class="champ-name">
+                            ${escapeHtml(
+                                champion?.display_name
+                                ?? playerName(
+                                    championId
+                                )
+                            )}
+                        </div>
+
+                        <div class="champion-winning-war-chest">
+                            ${money(
+                                champion?.war_chest
+                                ?? 0
+                            )}
+                            <span>
+                                Final War Chest
+                            </span>
+                        </div>
+
+                        <div class="scene-subtitle">
+                            DreamHarrier • Benefiting Extra Life
+                        </div>
+
                     </div>
 
                 </div>
 
+
+                ${renderFinalPlayerStandings()}
+
             </div>
 
-            <div class="audience-stack">
 
-                <section class="audience-champion-card">
-                    <div class="trophy">🎰</div>
-                    <div class="audience-panel-title">
+            <div class="champion-audience-column">
+
+                <section class="audience-champion-card champion-audience-winner">
+
+                    <div class="champion-section-kicker">
                         Audience Gambling Champion
                     </div>
 
@@ -26687,13 +27743,19 @@ function renderChampion() {
                         topAudience
                         ? `
                             <div class="winner-name">
-                                ${escapeHtml(topAudience.display_name)}
+                                ${escapeHtml(
+                                    topAudience.display_name
+                                )}
                             </div>
+
                             <div class="winner-money">
-                                ${money(topAudience.bankroll)}
+                                ${money(
+                                    topAudience.bankroll
+                                )}
                             </div>
+
                             <div class="audience-panel-copy">
-                                Finished #1 on the spectator leaderboard.
+                                #1 spectator gambler of the show
                             </div>
                           `
                         : `
@@ -26702,13 +27764,12 @@ function renderChampion() {
                             </div>
                           `
                     }
+
                 </section>
 
-                ${renderAudienceLeaderboardMini(
-                    "Audience Final Top Board",
-                    "The crowd’s best gamblers of the show.",
-                    6
-                )}
+
+                ${renderChampionAudienceTopTen()}
+
             </div>
 
         </div>
