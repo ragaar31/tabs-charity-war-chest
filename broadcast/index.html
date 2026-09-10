@@ -7962,6 +7962,30 @@ input {
     transition: none !important;
 }
 
+
+/* =========================================================
+   HARD ANIMATION LIFECYCLE FIX
+   ========================================================= */
+
+/*
+   Settlement visibility is now controlled entirely by reusable CSS state.
+   No completed Web Animation is allowed to permanently own opacity.
+*/
+.payout-overlay.active {
+    opacity: 1 !important;
+}
+
+.payout-overlay.active.settlement-exiting {
+    opacity: 0 !important;
+    transition:
+        opacity 760ms ease !important;
+}
+
+.payout-overlay.prearmed {
+    opacity: 1 !important;
+    transition: none !important;
+}
+
 </style>
 </head>
 
@@ -9534,23 +9558,59 @@ async function refreshState(
         }
 
 
-        if (
+        /*
+           CURRENT FIGHT REVEAL FREEZE
+
+           Once a regular Fight Army Reveal is on screen, its armies and
+           locked Audience pool are static. Re-rendering that DOM every
+           ~900ms serves no visual purpose and can destroy Web Animations
+           midway through their cascade.
+
+           Keep the existing Fight Reveal DOM untouched for the SAME match
+           until one of the real state transitions happens:
+             - Host reveals the Battle Window
+             - Winner is recorded
+             - Event leaves Fight
+
+           This replaces the old fixed-duration animation lock.
+        */
+        const oldFightMatch =
+            matchForSnapshot(
+                oldState
+            );
+
+
+        const newFightMatch =
+            matchForSnapshot(
+                data
+            );
+
+
+        const sameUnadvancedFightReveal =
             !settlementTransition.pending
             &&
-            oldState?.event?.status === "fight"
+            oldState?.event?.status ===
+                "fight"
             &&
-            data?.event?.status === "fight"
+            data?.event?.status ===
+                "fight"
             &&
-            !data?.matches?.find(
-                match =>
-                    Number(match.match_number) ===
-                    Number(data.event.current_match_number)
-                    &&
-                    match.winner_player_id
-            )
+            oldFightMatch?.id
             &&
-            performance.now() <
-                fightRevealAnimationUntil
+            oldFightMatch.id ===
+                newFightMatch?.id
+            &&
+            !oldFightMatch.winner_player_id
+            &&
+            !newFightMatch?.winner_player_id
+            &&
+            !oldState?.battle_show?.revealed
+            &&
+            !data?.battle_show?.revealed;
+
+
+        if (
+            sameUnadvancedFightReveal
         ) {
             return;
         }
@@ -9976,10 +10036,17 @@ async function refreshState(
 
             if (payoutOverlay) {
 
+                clearSettlementOverlayAnimations(
+                    payoutOverlay
+                );
+
+
                 payoutOverlay.classList.remove(
                     "active",
-                    "prearmed"
+                    "prearmed",
+                    "settlement-exiting"
                 );
+
 
                 payoutOverlay.innerHTML =
                     "";
@@ -20356,7 +20423,7 @@ function runFightRevealPostRenderAnimation() {
                         )
                 );
         },
-        3700
+        3850
     );
 }
 
@@ -21852,25 +21919,23 @@ function playSettlementSpotlightSequence(
     window.setTimeout(
         () => {
 
-            overlay.animate(
-                [
-                    {
-                        opacity:
-                            1
-                    },
-                    {
-                        opacity:
-                            0
-                    }
-                ],
-                {
-                    duration:
-                        760,
-                    easing:
-                        "ease",
-                    fill:
-                        "forwards"
-                }
+            /*
+               Use a normal CSS state for the exit instead of a Web
+               Animation with fill:'forwards'. This guarantees the overlay
+               returns to a clean reusable opacity state for Fight 2, 3, 4...
+            */
+            clearSettlementOverlayAnimations(
+                overlay
+            );
+
+
+            overlay.classList.remove(
+                "prearmed"
+            );
+
+
+            overlay.classList.add(
+                "settlement-exiting"
             );
 
 
@@ -21879,8 +21944,9 @@ function playSettlementSpotlightSequence(
 
                     overlay.classList.remove(
                         "active",
-                        "prearmed"
+                        "settlement-exiting"
                     );
+
 
                     overlay.innerHTML =
                         "";
@@ -21888,14 +21954,53 @@ function playSettlementSpotlightSequence(
 
                     settlementSequenceMatchId =
                         null;
+
+
+                    /*
+                       Ensure there is no stale animation state left on the
+                       reusable overlay element.
+                    */
+                    clearSettlementOverlayAnimations(
+                        overlay
+                    );
                 },
-                770
+                790
             );
         },
         sequenceEnd
         +
         1500
     );
+}
+
+
+function clearSettlementOverlayAnimations(
+    overlay
+) {
+
+    if (!overlay) {
+        return;
+    }
+
+
+    /*
+       A previous Settlement fade used Web Animations with fill:'forwards'.
+       If that animation is left attached at opacity:0, it can override
+       every future .active overlay and make later settlements invisible.
+    */
+    overlay
+        .getAnimations()
+        .forEach(
+            animation => {
+
+                try {
+                    animation.cancel();
+                }
+                catch {
+                    // Safe if an animation already finished.
+                }
+            }
+        );
 }
 
 
@@ -21912,6 +22017,16 @@ function showSettlementCurtain(
     if (!overlay) {
         return;
     }
+
+
+    clearSettlementOverlayAnimations(
+        overlay
+    );
+
+
+    overlay.classList.remove(
+        "settlement-exiting"
+    );
 
 
     overlay.classList.add(
@@ -22158,6 +22273,20 @@ function maybeShowPayout() {
         settlementPlayerRows(
             settlement
         );
+
+
+    /*
+       Defensive reset in case this settlement arrived without the prearm
+       curtain path, or a prior overlay animation was interrupted.
+    */
+    clearSettlementOverlayAnimations(
+        overlay
+    );
+
+
+    overlay.classList.remove(
+        "settlement-exiting"
+    );
 
 
     overlay.innerHTML = `
