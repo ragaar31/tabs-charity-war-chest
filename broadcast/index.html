@@ -8197,6 +8197,367 @@ input {
     }
 }
 
+
+/* =========================================================
+   REGULAR SEASON COMPLETE — FINAL SKILL ALLOCATION
+   ========================================================= */
+
+.regular-complete-skill-scene {
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        minmax(0,1fr)
+        82px;
+    gap: 10px;
+}
+
+.regular-complete-main {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(300px, 27%)
+        minmax(0, 73%);
+    gap: 14px;
+}
+
+.final-allocation-player-rail,
+.final-allocation-tree-stage {
+    min-height: 0;
+}
+
+.final-allocation-player-rail {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 8px;
+}
+
+.final-allocation-rail-head {
+    min-width: 0;
+}
+
+.final-allocation-rail-title {
+    margin-top: 2px;
+    color: #fff;
+    font-size: 1.42rem;
+    font-weight: 1000;
+    line-height: 1;
+}
+
+.final-allocation-rail-copy {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: .64rem;
+    line-height: 1.25;
+}
+
+.final-allocation-player-list {
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        repeat(
+            8,
+            minmax(0,1fr)
+        );
+    gap: 5px;
+}
+
+.final-allocation-player-bar {
+    position: relative;
+    min-height: 0;
+    grid-template-columns:
+        42px
+        minmax(0,1fr)
+        92px;
+    padding-right: 10px;
+    overflow: visible;
+    transition:
+        box-shadow 220ms ease;
+}
+
+.final-allocation-player-bar
+.shop-player-name {
+    font-size: .72rem;
+}
+
+.final-allocation-player-meta {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8997b0;
+    font-size: .49rem;
+    font-weight: 780;
+}
+
+.final-allocation-sp {
+    color:
+        color-mix(
+            in srgb,
+            var(--player) 74%,
+            white 26%
+        );
+    font-weight: 940;
+}
+
+.final-allocation-player-bar
+.shop-money-value {
+    font-size: .79rem;
+}
+
+.final-allocation-tree-stage {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr);
+    gap: 8px;
+}
+
+.final-allocation-tree-header {
+    align-items: end;
+}
+
+.final-allocation-tree-header
+.shop-tree-title {
+    margin-top: 1px;
+}
+
+.final-allocation-skill-tree {
+    min-height: 0;
+    height: 100%;
+}
+
+.final-allocation-skill-tree
+.shop-skill-branch {
+    min-height: 0;
+}
+
+.final-allocation-skill-tree
+.shop-branch-path {
+    min-height: 0;
+}
+
+.final-allocation-skill-tree
+.shop-skill-node {
+    min-height: 0;
+}
+
+.final-allocation-audience {
+    min-width: 0;
+    min-height: 0;
+}
+
+.final-allocation-audience
+.draft-complete-audience-panel {
+    height: 100%;
+    min-height: 0;
+    padding: 6px 9px;
+    display: grid;
+    grid-template-columns:
+        112px
+        minmax(0,1fr)
+        auto;
+    gap: 7px;
+    align-items: center;
+}
+
+.final-allocation-audience
+.draft-complete-audience-head {
+    display: block;
+}
+
+.final-allocation-audience
+.audience-count-pill {
+    margin-top: 3px;
+    width: max-content;
+    padding: 2px 6px;
+    font-size: .48rem;
+}
+
+.final-allocation-audience
+.draft-complete-audience-row {
+    gap: 5px;
+}
+
+.final-allocation-audience
+.draft-complete-audience-card {
+    min-height: 51px;
+    padding: 5px 6px;
+}
+
+.final-allocation-audience
+.draft-complete-audience-rank {
+    font-size: .45rem;
+}
+
+.final-allocation-audience
+.draft-complete-audience-name {
+    font-size: .50rem;
+}
+
+.final-allocation-audience
+.draft-complete-audience-money {
+    font-size: .47rem;
+}
+
+.final-allocation-audience
+.draft-complete-audience-foot {
+    min-width: 44px;
+    margin: 0;
+    font-size: .43rem;
+    text-align: right;
+}
+
+
+/* =========================================================
+   FINAL WAR SEEDING — ELIMINATION TRANSITION
+   ========================================================= */
+
+.final-allocation-elimination-tag {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    z-index: 10;
+    padding: 4px 8px;
+    transform:
+        translateY(-50%)
+        rotate(-2deg);
+    border-radius: 7px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--player) 64%,
+            white 12%
+        );
+    background: #111722;
+    color: #fff;
+    font-size: .52rem;
+    font-weight: 1000;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--player) 22%,
+            transparent
+        );
+}
+
+.final-allocation-elimination-tag span {
+    color: var(--player);
+    margin-right: 4px;
+}
+
+.final-four-transition-card {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    z-index: 300;
+    min-width:
+        min(
+            640px,
+            68vw
+        );
+    padding:
+        34px
+        48px
+        40px;
+    transform:
+        translate(-50%,-50%);
+    border-radius: 24px;
+    border: 2px solid rgba(255,255,255,.26);
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(242,201,76,.16),
+            transparent 60%
+        ),
+        rgba(10,14,22,.98);
+    box-shadow:
+        0 24px 90px rgba(0,0,0,.68),
+        0 0 42px rgba(242,201,76,.12);
+    text-align: center;
+}
+
+.final-four-transition-card div {
+    color: #a7b4ca;
+    font-size: .76rem;
+    font-weight: 950;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+
+.final-four-transition-card strong {
+    display: block;
+    margin-top: 9px;
+    color: #fff;
+    font-size:
+        clamp(
+            3.8rem,
+            7vw,
+            7rem
+        );
+    font-weight: 1000;
+    line-height: .90;
+    text-transform: uppercase;
+}
+
+@media (max-width: 1500px) {
+
+    .regular-complete-skill-scene {
+        grid-template-rows:
+            minmax(0,1fr)
+            76px;
+    }
+
+    .regular-complete-main {
+        grid-template-columns:
+            minmax(275px, 26%)
+            minmax(0, 74%);
+        gap: 11px;
+    }
+
+    .final-allocation-player-list {
+        gap: 4px;
+    }
+
+    .final-allocation-player-bar {
+        grid-template-columns:
+            36px
+            minmax(0,1fr)
+            82px;
+    }
+
+    .final-allocation-player-bar
+    .shop-player-name {
+        font-size: .66rem;
+    }
+
+    .final-allocation-player-meta {
+        font-size: .44rem;
+    }
+
+    .final-allocation-skill-tree
+    .shop-skill-name {
+        font-size: .62rem;
+    }
+
+    .final-allocation-skill-tree
+    .shop-skill-copy {
+        font-size: .46rem;
+    }
+
+    .final-allocation-skill-tree
+    .shop-skill-cost {
+        font-size: .43rem;
+    }
+}
+
 </style>
 </head>
 
@@ -8384,6 +8745,8 @@ let fightRevealAnimationUntil = 0;
 let fightBattleShowActiveKey = null;
 let fightWinnerSequencePlayedKey = null;
 let fightWinnerAnimationUntil = 0;
+
+let finalSeedingTransitionRunning = false;
 
 
 function escapeHtml(value) {
@@ -9443,6 +9806,8 @@ async function refreshState(
         */
         if (
             data?.event?.status === "shop"
+            ||
+            data?.event?.status === "regular_complete"
         ) {
 
             const {
@@ -9698,9 +10063,14 @@ async function refreshState(
            it inside a suppressed render.
         */
         if (
-            oldState?.event?.status === "shop"
+            oldState?.event?.status ===
+                data?.event?.status
             &&
-            data?.event?.status === "shop"
+            (
+                data?.event?.status === "shop"
+                ||
+                data?.event?.status === "regular_complete"
+            )
             &&
             performance.now() <
                 shopUnlockAnimationUntil
@@ -10178,6 +10548,32 @@ async function refreshState(
 
                 await fadeOutCurrentDrafter();
             }
+        }
+
+
+        const enteringFinalWarFromRegularSeason =
+            !initial
+            &&
+            oldState?.event?.status ===
+                "regular_complete"
+            &&
+            (
+                data?.event?.status ===
+                    "final_war_build"
+                ||
+                data?.event?.status ===
+                    "final_war_ready"
+            );
+
+
+        if (
+            enteringFinalWarFromRegularSeason
+        ) {
+
+            await runFinalWarSeedingTransition(
+                oldState,
+                data
+            );
         }
 
 
@@ -11369,10 +11765,15 @@ function renderScene() {
 
     if (
         status === "draft_complete"
-        ||
-        status === "regular_complete"
     ) {
         return renderStandingsPrep();
+    }
+
+
+    if (
+        status === "regular_complete"
+    ) {
+        return renderRegularCompleteSkillScene();
     }
 
 
@@ -13083,11 +13484,27 @@ function shopSkillOwned(
 
 function shopHasPriorLiveSnapshot() {
 
-    return (
-        previousState?.event?.status ===
-        "shop"
+    const currentStatus =
+        state?.event?.status;
+
+
+    const priorStatus =
+        previousState?.event?.status;
+
+
+    return Boolean(
+        state?.shop
         &&
         previousState?.shop
+        &&
+        currentStatus ===
+            priorStatus
+        &&
+        (
+            currentStatus === "shop"
+            ||
+            currentStatus === "regular_complete"
+        )
     );
 }
 
@@ -14180,9 +14597,16 @@ function animateShopSkillUnlock(
 
 function runShopPostRenderAnimations() {
 
+    const currentStatus =
+        state?.event?.status;
+
+
     if (
-        state?.event?.status !==
-        "shop"
+        currentStatus !==
+            "shop"
+        &&
+        currentStatus !==
+            "regular_complete"
     ) {
         return;
     }
@@ -14190,7 +14614,7 @@ function runShopPostRenderAnimations() {
 
     if (
         previousState?.event?.status !==
-        "shop"
+        currentStatus
     ) {
         return;
     }
@@ -14503,6 +14927,195 @@ function runShopPostRenderAnimations() {
                 );
             }
         );
+}
+
+
+function renderFinalAllocationPlayerBar(
+    player,
+    index
+) {
+
+    const changed =
+        shopPlayerChanged(
+            player.id
+        );
+
+
+    return `
+        <div
+            class="
+                shop-player-bar
+                final-allocation-player-bar
+                ${
+                    changed
+                    ? "shop-player-purchase"
+                    : ""
+                }
+            "
+            data-shop-player-id="${player.id}"
+            data-final-allocation-player="${player.id}"
+            style="
+                --player:
+                    ${shopPlayerColor(player.id)};
+            "
+        >
+
+            <div class="shop-rank">
+                #${index + 1}
+            </div>
+
+            <div class="shop-player-main">
+
+                <div class="shop-player-name">
+                    ${escapeHtml(
+                        player.display_name
+                    )}
+                </div>
+
+                <div class="final-allocation-player-meta">
+
+                    <span>
+                        ${Number(player.wins ?? 0)}
+                        ${
+                            Number(player.wins ?? 0) === 1
+                            ? "win"
+                            : "wins"
+                        }
+                    </span>
+
+                    <span class="final-allocation-sp">
+                        ${Number(player.skill_points ?? 0)} SP
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div
+                class="shop-money-value"
+                data-shop-money-player="${player.id}"
+            >
+                ${money(player.war_chest)}
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderRegularCompleteSkillScene() {
+
+    const players =
+        shopStandings();
+
+
+    const branches = [
+        "high_roller",
+        "analyst",
+        "broker",
+        "speculator",
+        "quartermaster"
+    ];
+
+
+    return `
+        <div class="regular-complete-skill-scene">
+
+            <div class="regular-complete-main">
+
+                <aside class="final-allocation-player-rail">
+
+                    <div class="final-allocation-rail-head">
+
+                        <div class="scene-kicker">
+                            Regular Season Complete
+                        </div>
+
+                        <div class="final-allocation-rail-title">
+                            Final Standings
+                        </div>
+
+                        <div class="final-allocation-rail-copy">
+                            Final War seeds lock when the Host advances.
+                        </div>
+
+                    </div>
+
+                    <div class="shop-player-list final-allocation-player-list">
+
+                        ${
+                            players.map(
+                                (
+                                    player,
+                                    index
+                                ) =>
+                                    renderFinalAllocationPlayerBar(
+                                        player,
+                                        index
+                                    )
+                            ).join("")
+                        }
+
+                    </div>
+
+                </aside>
+
+
+                <main class="final-allocation-tree-stage">
+
+                    <div class="shop-tree-header final-allocation-tree-header">
+
+                        <div>
+
+                            <div class="scene-kicker">
+                                Final Skill Allocation
+                            </div>
+
+                            <h1 class="shop-tree-title">
+                                Skill Tree
+                            </h1>
+
+                        </div>
+
+                        <div class="shop-tree-legend">
+
+                            <strong>
+                                Spend Remaining SP
+                            </strong>
+
+                            <span>
+                                Mastery cashouts can still change Final War seeding
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="shop-skill-tree final-allocation-skill-tree">
+
+                        ${
+                            branches.map(
+                                branch =>
+                                    renderShopBranch(
+                                        branch
+                                    )
+                            ).join("")
+                        }
+
+                    </div>
+
+                </main>
+
+            </div>
+
+
+            <div class="final-allocation-audience">
+                ${renderDraftCompleteAudienceRow(8)}
+            </div>
+
+        </div>
+    `;
 }
 
 
@@ -21157,6 +21770,695 @@ function runFightWinnerPostRenderAnimation() {
                 "forwards"
         }
     );
+}
+
+
+function qualifiedFinalWarPlayerIds(
+    incomingState
+) {
+
+    const qualified =
+        (
+            incomingState
+                ?.final_war_entries
+            ?? []
+        )
+        .filter(
+            entry =>
+                entry.qualified
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                Number(a.seed ?? 99)
+                -
+                Number(b.seed ?? 99)
+        )
+        .map(
+            entry =>
+                entry.player_id
+        );
+
+
+    if (qualified.length) {
+        return qualified;
+    }
+
+
+    /*
+       Safe fallback if the Broadcast catches the status change a fraction
+       before final_war_entries is populated.
+    */
+    return sortShopPlayers(
+        shopPlayersForSnapshot(
+            state
+        )
+    )
+    .slice(
+        0,
+        4
+    )
+    .map(
+        player =>
+            player.id
+    );
+}
+
+
+function finalAllocationBarRects() {
+
+    return new Map(
+        [
+            ...document.querySelectorAll(
+                "[data-final-allocation-player]"
+            )
+        ]
+        .map(
+            element => [
+                element.dataset
+                    .finalAllocationPlayer,
+
+                element
+                    .getBoundingClientRect()
+            ]
+        )
+    );
+}
+
+
+function animateFinalAllocationReflow(
+    beforeRects
+) {
+
+    document
+        .querySelectorAll(
+            "[data-final-allocation-player]"
+        )
+        .forEach(
+            element => {
+
+                if (
+                    element.style.display ===
+                    "none"
+                ) {
+                    return;
+                }
+
+
+                const id =
+                    element.dataset
+                    .finalAllocationPlayer;
+
+
+                const before =
+                    beforeRects.get(
+                        id
+                    );
+
+
+                const after =
+                    element
+                    .getBoundingClientRect();
+
+
+                if (!before) {
+                    return;
+                }
+
+
+                const dy =
+                    before.top
+                    -
+                    after.top;
+
+
+                if (
+                    Math.abs(dy) < 1
+                ) {
+                    return;
+                }
+
+
+                element.animate(
+                    [
+                        {
+                            transform:
+                                `translateY(${dy}px)`
+                        },
+
+                        {
+                            transform:
+                                "translateY(0)"
+                        }
+                    ],
+                    {
+                        duration:
+                            430,
+                        easing:
+                            "cubic-bezier(.16,.84,.24,1)"
+                    }
+                );
+            }
+        );
+}
+
+
+async function eliminateFinalAllocationPlayer(
+    playerId,
+    rank
+) {
+
+    const wait =
+        milliseconds =>
+            new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        milliseconds
+                    )
+            );
+
+
+    const bar =
+        document.querySelector(
+            `[data-final-allocation-player="${playerId}"]`
+        );
+
+
+    if (!bar) {
+        return;
+    }
+
+
+    const beforeRects =
+        finalAllocationBarRects();
+
+
+    const color =
+        shopPlayerColor(
+            playerId
+        );
+
+
+    const dots =
+        [
+            ...document.querySelectorAll(
+                `.shop-owner-dot[data-shop-owner-id="${playerId}"]`
+            )
+        ];
+
+
+    const eliminationTag =
+        document.createElement(
+            "div"
+        );
+
+
+    eliminationTag.className =
+        "final-allocation-elimination-tag";
+
+
+    eliminationTag.style.setProperty(
+        "--player",
+        color
+    );
+
+
+    eliminationTag.innerHTML = `
+        <span>
+            #${rank}
+        </span>
+        Eliminated
+    `;
+
+
+    bar.appendChild(
+        eliminationTag
+    );
+
+
+    dots.forEach(
+        (
+            dot,
+            index
+        ) => {
+
+            dot.animate(
+                [
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "scale(1)",
+                        filter:
+                            "brightness(1)"
+                    },
+
+                    {
+                        opacity:
+                            .92,
+                        transform:
+                            "scale(1.65)",
+                        filter:
+                            "brightness(1.8)",
+                        offset:
+                            .28
+                    },
+
+                    {
+                        opacity:
+                            0,
+                        transform:
+                            "scale(.18)",
+                        filter:
+                            "brightness(.6)"
+                    }
+                ],
+                {
+                    duration:
+                        500,
+                    delay:
+                        index * 24,
+                    easing:
+                        "cubic-bezier(.18,.72,.24,1)",
+                    fill:
+                        "forwards"
+                }
+            );
+        }
+    );
+
+
+    const exit =
+        bar.animate(
+            [
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateY(0) rotate(0deg) scale(1)",
+                    filter:
+                        "brightness(1)"
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateY(4px) rotate(0deg) scale(1.015)",
+                    filter:
+                        "brightness(1.18)",
+                    offset:
+                        .22
+                },
+
+                {
+                    opacity:
+                        0,
+                    transform:
+                        `translateY(72px) rotate(${rank % 2 ? -3 : 3}deg) scale(.92)`,
+                    filter:
+                        "brightness(.6)"
+                }
+            ],
+            {
+                duration:
+                    600,
+                easing:
+                    "cubic-bezier(.22,.64,.28,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    await exit.finished
+        .catch(
+            () => null
+        );
+
+
+    bar.style.display =
+        "none";
+
+
+    dots.forEach(
+        dot => {
+
+            dot.style.display =
+                "none";
+        }
+    );
+
+
+    animateFinalAllocationReflow(
+        beforeRects
+    );
+
+
+    await wait(
+        220
+    );
+}
+
+
+async function runFinalWarSeedingTransition(
+    oldSnapshot,
+    incomingState
+) {
+
+    if (
+        finalSeedingTransitionRunning
+    ) {
+        return;
+    }
+
+
+    const scene =
+        document.querySelector(
+            ".regular-complete-skill-scene"
+        );
+
+
+    if (!scene) {
+        return;
+    }
+
+
+    finalSeedingTransitionRunning =
+        true;
+
+
+    const wait =
+        milliseconds =>
+            new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        milliseconds
+                    )
+            );
+
+
+    /*
+       Ensure no half-finished skill-unlock Web Animation competes with
+       the elimination sequence.
+    */
+    scene
+        .getAnimations(
+            {
+                subtree:
+                    true
+            }
+        )
+        .forEach(
+            animation => {
+
+                try {
+                    animation.finish();
+                }
+                catch {
+                    try {
+                        animation.cancel();
+                    }
+                    catch {}
+                }
+            }
+        );
+
+
+    const qualified =
+        new Set(
+            qualifiedFinalWarPlayerIds(
+                incomingState
+            )
+        );
+
+
+    const rankedPlayers =
+        sortShopPlayers(
+            shopPlayersForSnapshot(
+                oldSnapshot
+            )
+        );
+
+
+    const eliminated =
+        rankedPlayers
+        .map(
+            (
+                player,
+                index
+            ) => ({
+                player,
+                rank:
+                    index + 1
+            })
+        )
+        .filter(
+            row =>
+                !qualified.has(
+                    row.player.id
+                )
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                b.rank
+                -
+                a.rank
+        );
+
+
+    /*
+       Give the complete standings a brief beat after the Host presses Seed.
+    */
+    scene.animate(
+        [
+            {
+                filter:
+                    "brightness(1)"
+            },
+            {
+                filter:
+                    "brightness(.92)"
+            },
+            {
+                filter:
+                    "brightness(1)"
+            }
+        ],
+        {
+            duration:
+                420,
+            easing:
+                "ease"
+        }
+    );
+
+
+    await wait(
+        520
+    );
+
+
+    for (
+        const row of
+        eliminated
+    ) {
+
+        await eliminateFinalAllocationPlayer(
+            row.player.id,
+            row.rank
+        );
+
+
+        await wait(
+            260
+        );
+    }
+
+
+    const survivorBars =
+        [
+            ...document.querySelectorAll(
+                "[data-final-allocation-player]"
+            )
+        ]
+        .filter(
+            bar =>
+                bar.style.display !==
+                "none"
+        );
+
+
+    survivorBars.forEach(
+        (
+            bar,
+            index
+        ) => {
+
+            bar.animate(
+                [
+                    {
+                        boxShadow:
+                            "0 0 0 rgba(0,0,0,0)",
+                        transform:
+                            "scale(1)"
+                    },
+
+                    {
+                        boxShadow:
+                            `
+                                0 0 0 1px var(--player),
+                                0 0 24px color-mix(
+                                    in srgb,
+                                    var(--player) 24%,
+                                    transparent
+                                )
+                            `,
+                        transform:
+                            "scale(1.015)",
+                        offset:
+                            .48
+                    },
+
+                    {
+                        boxShadow:
+                            "0 0 0 rgba(0,0,0,0)",
+                        transform:
+                            "scale(1)"
+                    }
+                ],
+                {
+                    duration:
+                        720,
+                    delay:
+                        index * 80,
+                    easing:
+                        "cubic-bezier(.18,.74,.24,1)"
+                }
+            );
+        }
+    );
+
+
+    const finalFour =
+        document.createElement(
+            "div"
+        );
+
+
+    finalFour.className =
+        "final-four-transition-card";
+
+
+    finalFour.innerHTML = `
+        <div>
+            Final War
+        </div>
+
+        <strong>
+            Final Four
+        </strong>
+    `;
+
+
+    scene.appendChild(
+        finalFour
+    );
+
+
+    const finalFourAnimation =
+        finalFour.animate(
+            [
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translate(-50%,-50%) scale(.65)"
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translate(-50%,-50%) scale(1.07)",
+                    offset:
+                        .34
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translate(-50%,-50%) scale(1)",
+                    offset:
+                        .76
+                },
+
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translate(-50%,-50%) scale(1.04)"
+                }
+            ],
+            {
+                duration:
+                    1600,
+                easing:
+                    "cubic-bezier(.16,.80,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    await finalFourAnimation.finished
+        .catch(
+            () => null
+        );
+
+
+    finalFour.remove();
+
+
+    const fade =
+        scene.animate(
+            [
+                {
+                    opacity:
+                        1
+                },
+                {
+                    opacity:
+                        0
+                }
+            ],
+            {
+                duration:
+                    360,
+                easing:
+                    "ease",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    await fade.finished
+        .catch(
+            () => null
+        );
+
+
+    finalSeedingTransitionRunning =
+        false;
 }
 
 
