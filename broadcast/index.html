@@ -14017,6 +14017,155 @@ function runStandardSceneTransition(
 }
 
 
+function runSequentialSceneTransition(
+    oldScene,
+    nextHtml
+) {
+
+    const serial =
+        ++sceneTransitionSerial;
+
+
+    cleanupSceneTransitionArtifacts();
+
+
+    const nextScene =
+        installNextSceneElement(
+            oldScene,
+            nextHtml
+        );
+
+
+    /*
+       Unlike the normal crossfade, this handoff never exposes the incoming
+       scene underneath the outgoing one. The old scene fades fully to the
+       stage background first; only then does the new scene fade in.
+    */
+    nextScene.style.visibility =
+        "hidden";
+
+
+    oldScene.style.zIndex =
+        "3";
+
+
+    nextScene.style.zIndex =
+        "2";
+
+
+    const outgoing =
+        oldScene.animate(
+            [
+                {
+                    opacity: 1,
+                    transform:
+                        "translateX(0) scale(1)",
+                    filter:
+                        "brightness(1)"
+                },
+
+                {
+                    opacity: 0,
+                    transform:
+                        "translateX(-14px) scale(.996)",
+                    filter:
+                        "brightness(.72)"
+                }
+            ],
+            {
+                duration: 320,
+                easing:
+                    "cubic-bezier(.22,.64,.26,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    outgoing.finished
+        .catch(
+            () => null
+        )
+        .then(
+            () => {
+
+                if (
+                    serial !==
+                    sceneTransitionSerial
+                ) {
+                    return;
+                }
+
+
+                oldScene.remove();
+
+
+                nextScene.style.visibility =
+                    "visible";
+
+
+                const incoming =
+                    nextScene.animate(
+                        [
+                            {
+                                opacity: 0,
+                                transform:
+                                    "translateX(14px) scale(.996)",
+                                filter:
+                                    "brightness(.82)"
+                            },
+
+                            {
+                                opacity: 1,
+                                transform:
+                                    "translateX(0) scale(1)",
+                                filter:
+                                    "brightness(1)"
+                            }
+                        ],
+                        {
+                            duration: 390,
+                            easing:
+                                "cubic-bezier(.18,.78,.24,1)",
+                            fill:
+                                "both"
+                        }
+                    );
+
+
+                incoming.finished
+                    .catch(
+                        () => null
+                    )
+                    .then(
+                        () => {
+
+                            if (
+                                serial !==
+                                sceneTransitionSerial
+                            ) {
+                                return;
+                            }
+
+
+                            try {
+                                incoming.cancel();
+                            }
+                            catch {}
+
+
+                            nextScene.style.zIndex =
+                                "";
+                        }
+                    );
+            }
+        );
+
+
+    return nextScene;
+}
+
+
 function runBattleShowShutterTransition(
     oldScene,
     nextHtml
@@ -14038,6 +14187,16 @@ function runBattleShowShutterTransition(
             oldScene,
             nextHtml
         );
+
+
+    /*
+       The incoming Battle Show is mounted now so its layout is ready, but it
+       must remain completely invisible until BOTH shutter panels have fully
+       closed. This prevents even a single frame of #00FF00 from appearing
+       around / beneath the moving curtains.
+    */
+    nextScene.style.visibility =
+        "hidden";
 
 
     /*
@@ -14197,8 +14356,14 @@ function runBattleShowShutterTransition(
 
                 /*
                    Scene swap happens only after the stage is 100% covered.
+                   The green Battle Show becomes visible only while it is
+                   physically hidden behind the closed shutter.
                 */
                 oldScene.remove();
+
+
+                nextScene.style.visibility =
+                    "visible";
 
 
                 await new Promise(
@@ -14316,6 +14481,26 @@ function replaceSceneWithPresentationTransition(
     previousKey,
     nextKey
 ) {
+
+    /*
+       The final Draft screen is visually dense and partially translucent.
+       A true crossfade lets Draft Complete show through it, which reads like
+       two scenes stacked together. Fade fully away first for this handoff.
+    */
+    if (
+        previousKey ===
+            "draft"
+        &&
+        nextKey ===
+            "draft-complete"
+    ) {
+
+        return runSequentialSceneTransition(
+            scene,
+            nextHtml
+        );
+    }
+
 
     /*
        Army Reveal -> Battle Show gets the chroma-safe mechanical shutter.
@@ -24464,6 +24649,221 @@ function renderFightResult() {
 }
 
 
+async function runBattleExitShutterSwap(
+    onCovered,
+    zIndex = 5000
+) {
+
+    const activeScene =
+        document.getElementById(
+            "scene"
+        );
+
+
+    const stage =
+        activeScene?.parentElement;
+
+
+    if (!stage) {
+
+        onCovered?.();
+        return;
+    }
+
+
+    const shutter =
+        document.createElement(
+            "div"
+        );
+
+
+    shutter.className =
+        "battle-scene-shutter";
+
+
+    shutter.style.zIndex =
+        String(zIndex);
+
+
+    shutter.innerHTML = `
+        <div class="battle-scene-shutter-panel left"></div>
+        <div class="battle-scene-shutter-panel right"></div>
+        <div class="battle-scene-shutter-seam"></div>
+    `;
+
+
+    stage.appendChild(
+        shutter
+    );
+
+
+    const left =
+        shutter.querySelector(
+            ".battle-scene-shutter-panel.left"
+        );
+
+
+    const right =
+        shutter.querySelector(
+            ".battle-scene-shutter-panel.right"
+        );
+
+
+    const seam =
+        shutter.querySelector(
+            ".battle-scene-shutter-seam"
+        );
+
+
+    /* Start physically offstage. */
+    left.style.transform =
+        "translateX(-101%)";
+
+
+    right.style.transform =
+        "translateX(101%)";
+
+
+    const leftClose =
+        left.animate(
+            [
+                { transform: "translateX(-101%)" },
+                { transform: "translateX(0)" }
+            ],
+            {
+                duration: 300,
+                easing:
+                    "cubic-bezier(.34,.01,.22,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    const rightClose =
+        right.animate(
+            [
+                { transform: "translateX(101%)" },
+                { transform: "translateX(0)" }
+            ],
+            {
+                duration: 300,
+                easing:
+                    "cubic-bezier(.34,.01,.22,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    seam?.animate(
+        [
+            {
+                opacity: 0,
+                transform:
+                    "translateX(-50%) scaleY(.2)"
+            },
+            {
+                opacity: 0,
+                transform:
+                    "translateX(-50%) scaleY(.2)",
+                offset: .72
+            },
+            {
+                opacity: 1,
+                transform:
+                    "translateX(-50%) scaleY(1)"
+            }
+        ],
+        {
+            duration: 300,
+            easing: "ease",
+            fill: "forwards"
+        }
+    );
+
+
+    await Promise.allSettled(
+        [
+            leftClose.finished,
+            rightClose.finished
+        ]
+    );
+
+
+    /*
+       This callback is the ONLY point where the keyed green may disappear.
+       At this instant the opaque panels completely cover the stage.
+    */
+    onCovered?.();
+
+
+    await new Promise(
+        resolve =>
+            window.setTimeout(
+                resolve,
+                90
+            )
+    );
+
+
+    const leftOpen =
+        left.animate(
+            [
+                { transform: "translateX(0)" },
+                { transform: "translateX(-101%)" }
+            ],
+            {
+                duration: 470,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    const rightOpen =
+        right.animate(
+            [
+                { transform: "translateX(0)" },
+                { transform: "translateX(101%)" }
+            ],
+            {
+                duration: 470,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    seam?.animate(
+        [
+            { opacity: 1 },
+            { opacity: 0 }
+        ],
+        {
+            duration: 180,
+            easing: "ease",
+            fill: "forwards"
+        }
+    );
+
+
+    await Promise.allSettled(
+        [
+            leftOpen.finished,
+            rightOpen.finished
+        ]
+    );
+
+
+    shutter.remove();
+}
+
+
 function runFightWinnerPostRenderAnimation() {
 
     if (
@@ -24517,7 +24917,7 @@ function runFightWinnerPostRenderAnimation() {
     fightWinnerAnimationUntil =
         performance.now()
         +
-        3850;
+        3900;
 
 
     const victory =
@@ -24624,74 +25024,38 @@ function runFightWinnerPostRenderAnimation() {
 
 
     /*
-       Keep gameplay visible under the Victory card, then fade the keyed
-       Battle Window away immediately before the waiting card appears.
+       Chroma-safe winner handoff:
+           green stays at 100% opacity
+           -> shutters close over the keyed Battle Window
+           -> ONLY while fully covered, remove green and reveal Waiting
+           -> shutters open onto the normal dark Broadcast scene
+
+       Never fade #00FF00: OBS always sees either clean keyed green or an
+       opaque mechanical cover.
     */
-    battleLayer?.animate(
-        [
-            {
-                opacity:
-                    1,
-                filter:
-                    "brightness(1)"
-            },
-            {
-                opacity:
-                    1,
-                filter:
-                    "brightness(.82)",
-                offset:
-                    .68
-            },
-            {
-                opacity:
-                    0,
-                filter:
-                    "brightness(.55)"
-            }
-        ],
-        {
-            duration:
-                2900,
-            easing:
-                "cubic-bezier(.18,.72,.24,1)",
-            fill:
-                "forwards"
-        }
-    );
+    window.setTimeout(
+        () => {
+
+            runBattleExitShutterSwap(
+                () => {
+
+                    if (battleLayer) {
+                        battleLayer.style.visibility =
+                            "hidden";
+                    }
 
 
-    waiting?.animate(
-        [
-            {
-                opacity:
-                    0,
-                transform:
-                    "translateY(12px) scale(.985)"
-            },
-            {
-                opacity:
-                    0,
-                transform:
-                    "translateY(12px) scale(.985)",
-                offset:
-                    .72
-            },
-            {
-                opacity:
-                    1,
-                transform:
-                    "translateY(0) scale(1)"
-            }
-        ],
-        {
-            duration:
-                3450,
-            easing:
-                "cubic-bezier(.18,.78,.24,1)",
-            fill:
-                "forwards"
-        }
+                    if (waiting) {
+                        waiting.style.opacity =
+                            "1";
+
+                        waiting.style.transform =
+                            "translateY(0) scale(1)";
+                    }
+                }
+            );
+        },
+        2300
     );
 }
 
@@ -26364,12 +26728,8 @@ async function runFinalWarWinnerAdvanceTransition(
     /*
        The database advances immediately when a Final War winner is picked,
        so this function intercepts that transition while the OLD Battle Show
-       DOM is still visible.
-
-       Fade that exact Battle Show just like the regular-season winner
-       sequence fades its fight-winner-battle-layer. As the #00FF00 element
-       disappears, the normal dark page background replaces it in OBS and
-       the TABS capture is no longer exposed through the chroma key.
+       DOM is still visible. The keyed Battle Show must NEVER fade. It will
+       remain at 100% opacity until an opaque shutter fully covers it.
     */
     const battleScene =
         document.querySelector(
@@ -26453,66 +26813,43 @@ async function runFinalWarWinnerAdvanceTransition(
 
 
     /*
-       Match the regular-season winner timing:
-       gameplay stays fully visible during the Victory entrance/hold,
-       then fades down as the Victory card leaves.
+       Let the Victory card play over the live keyed Battle Window, then
+       close the same mechanical shutters used to enter Battle Show. The
+       green disappears only at full closure, and the shutters reopen onto
+       the fully rendered Final War bracket.
     */
-    battleScene?.animate(
-        [
-            {
-                opacity:
-                    1,
-                filter:
-                    "brightness(1)"
-            },
-
-            {
-                opacity:
-                    1,
-                filter:
-                    "brightness(.82)",
-                offset:
-                    .68
-            },
-
-            {
-                opacity:
-                    0,
-                filter:
-                    "brightness(.55)"
-            }
-        ],
-        {
-            duration:
-                2900,
-            easing:
-                "cubic-bezier(.18,.72,.24,1)",
-            fill:
-                "forwards"
-        }
-    );
-
-
     await wait(
-        2940
+        2300
     );
 
 
-    overlay.classList.remove(
-        "victory-phase"
+    await runBattleExitShutterSwap(
+        () => {
+
+            if (battleScene) {
+                battleScene.style.visibility =
+                    "hidden";
+            }
+
+
+            overlay.classList.remove(
+                "victory-phase"
+            );
+
+
+            overlay.classList.add(
+                "bracket-phase"
+            );
+
+
+            overlay.innerHTML =
+                renderFinalWarAdvanceBracket(
+                    incomingState,
+                    completedMatch
+                );
+        },
+        2147483000
     );
-
-
-    overlay.classList.add(
-        "bracket-phase"
-    );
-
-
-    overlay.innerHTML =
-        renderFinalWarAdvanceBracket(
-            incomingState,
-            completedMatch
-        );
 
 
     const bracket =
@@ -26521,35 +26858,16 @@ async function runFinalWarWinnerAdvanceTransition(
         );
 
 
-    bracket?.animate(
-        [
-            {
-                opacity:
-                    0,
-                transform:
-                    "translateY(12px) scale(.992)"
-            },
-
-            {
-                opacity:
-                    1,
-                transform:
-                    "translateY(0) scale(1)"
-            }
-        ],
-        {
-            duration:
-                520,
-            easing:
-                "cubic-bezier(.18,.78,.24,1)",
-            fill:
-                "forwards"
-        }
-    );
+    /* The curtain reveal is the bracket entrance; no opacity crossfade. */
+    bracket?.getAnimations()
+        .forEach(
+            animation =>
+                animation.cancel()
+        );
 
 
     await wait(
-        560
+        120
     );
 
 
