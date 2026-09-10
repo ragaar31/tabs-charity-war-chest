@@ -9102,6 +9102,392 @@ input {
     }
 }
 
+
+/* =========================================================
+   FINAL WAR FIGHT — SAME REVEAL / BATTLE LANGUAGE
+   ========================================================= */
+
+.final-war-advance-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 86px;
+    bottom: 60px;
+    z-index: 2147482500;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.final-war-advance-overlay.victory-phase {
+    background: transparent;
+}
+
+.final-war-victory-layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+}
+
+.final-war-advance-overlay.bracket-phase {
+    padding: 26px 30px;
+    background:
+        radial-gradient(
+            circle at 50% 22%,
+            rgba(39,51,79,.24),
+            transparent 32%
+        ),
+        #080c13;
+}
+
+.final-war-advance-bracket {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 16px;
+}
+
+.final-war-advance-heading {
+    text-align: center;
+}
+
+.final-war-advance-heading
+.scene-kicker {
+    margin-bottom: 7px;
+}
+
+.final-war-advance-heading h1 {
+    margin: 0;
+    color: #fff;
+    font-size:
+        clamp(
+            2.7rem,
+            4.7vw,
+            5rem
+        );
+    font-weight: 1000;
+    line-height: .94;
+}
+
+.final-war-advance-heading p {
+    margin: 8px 0 0;
+    color: #9eacc4;
+    font-size: .88rem;
+}
+
+.final-war-advance-flow {
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+    gap: 18px;
+    align-items: center;
+}
+
+.final-war-advance-flow.stages-2 {
+    width: 72%;
+    justify-self: center;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+}
+
+.final-war-advance-stage {
+    --p1: #6f7d95;
+    --p2: #6f7d95;
+    position: relative;
+    min-width: 0;
+    min-height: 255px;
+    padding: 17px;
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0,1fr)
+        auto;
+    gap: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.10);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(25,31,43,.98),
+            rgba(16,21,30,.98)
+        );
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.20);
+}
+
+.final-war-advance-stage:not(:last-child)::after {
+    content: "›";
+    position: absolute;
+    right: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #56647c;
+    font-size: 2.5rem;
+    font-weight: 300;
+}
+
+.final-war-advance-stage.next-stage {
+    border-color:
+        color-mix(
+            in srgb,
+            var(--p1) 42%,
+            var(--p2) 42%
+        );
+}
+
+.final-war-advance-stage-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 9px;
+    align-items: baseline;
+}
+
+.final-war-advance-stage-head span {
+    color: #8795ad;
+    font-size: .61rem;
+    font-weight: 950;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.final-war-advance-stage-head strong {
+    color: #eaf0fb;
+    font-size: .76rem;
+    font-weight: 950;
+}
+
+.final-war-advance-fighters {
+    min-height: 0;
+    display: grid;
+    align-content: center;
+    gap: 10px;
+}
+
+.final-war-advance-fighter {
+    --fighter: #6f7d95;
+    position: relative;
+    min-width: 0;
+    padding: 13px 14px;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        auto;
+    gap: 9px;
+    align-items: center;
+    border-radius: 11px;
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--fighter) 31%,
+            rgba(255,255,255,.06)
+        );
+    border-left:
+        4px solid
+        var(--fighter);
+    background:
+        color-mix(
+            in srgb,
+            var(--fighter) 8%,
+            rgba(255,255,255,.028)
+        );
+}
+
+.final-war-advance-fighter strong {
+    min-width: 0;
+    color: #fff;
+    font-size: .96rem;
+    font-weight: 950;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.final-war-advance-fighter span {
+    color: #aebbd0;
+    font-size: .65rem;
+    font-weight: 850;
+}
+
+.final-war-advance-fighter
+span.placeholder {
+    color: #6f7d95;
+    font-size: .58rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.final-war-advance-fighter.winner-source {
+    box-shadow:
+        0 0 18px
+        color-mix(
+            in srgb,
+            var(--fighter) 13%,
+            transparent
+        );
+}
+
+.final-war-advance-fighter.winner-target {
+    opacity: .28;
+}
+
+.final-war-advance-vs {
+    color: #69768d;
+    font-size: .55rem;
+    font-weight: 1000;
+    letter-spacing: .10em;
+    text-align: center;
+}
+
+.final-war-advance-stage-foot {
+    min-height: 25px;
+    display: grid;
+    place-items: center;
+}
+
+.final-war-advance-stage-foot span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: #77859c;
+    border: 1px solid rgba(255,255,255,.06);
+    font-size: .54rem;
+    font-weight: 900;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.final-war-advance-stage-foot
+span.resolved {
+    color: #d9e3f4;
+}
+
+.final-war-advance-stage-foot
+span.up-next {
+    color: #fff;
+    border-color:
+        color-mix(
+            in srgb,
+            var(--p1) 36%,
+            var(--p2) 36%
+        );
+}
+
+.final-war-advance-flyer {
+    --player: #7c8aa6;
+    padding: 13px 14px;
+    display: grid;
+    grid-template-columns:
+        minmax(0,1fr)
+        auto;
+    gap: 9px;
+    align-items: center;
+    border-radius: 11px;
+    border: 2px solid var(--player);
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 15%,
+            #111722
+        );
+    box-shadow:
+        0 0 32px
+        color-mix(
+            in srgb,
+            var(--player) 32%,
+            transparent
+        ),
+        0 18px 50px rgba(0,0,0,.40);
+}
+
+.final-war-advance-flyer strong {
+    min-width: 0;
+    color: #fff;
+    font-size: .96rem;
+    font-weight: 950;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.final-war-advance-flyer span {
+    color: #d2dcef;
+    font-size: .65rem;
+    font-weight: 850;
+}
+
+.final-war-advance-champion-target {
+    --player: #f2c94c;
+    justify-self: center;
+    min-width: 330px;
+    padding: 12px 18px;
+    display: grid;
+    justify-items: center;
+    border-radius: 13px;
+    border:
+        2px solid
+        var(--player);
+    background:
+        color-mix(
+            in srgb,
+            var(--player) 11%,
+            #121824
+        );
+    box-shadow:
+        0 0 28px
+        color-mix(
+            in srgb,
+            var(--player) 22%,
+            transparent
+        );
+}
+
+.final-war-advance-champion-target span {
+    color: #9dabc1;
+    font-size: .57rem;
+    font-weight: 950;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.final-war-advance-champion-target strong {
+    margin-top: 3px;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 1000;
+}
+
+@media (max-width: 1500px) {
+
+    .final-war-advance-overlay.bracket-phase {
+        padding: 20px 24px;
+    }
+
+    .final-war-advance-stage {
+        min-height: 220px;
+        padding: 14px;
+    }
+
+    .final-war-advance-fighter {
+        padding: 10px 11px;
+    }
+
+    .final-war-advance-fighter strong,
+    .final-war-advance-flyer strong {
+        font-size: .84rem;
+    }
+}
+
 </style>
 </head>
 
@@ -9300,6 +9686,9 @@ let finalWarBracketIntroUntil = 0;
 let finalWarBuildPendingAnimations = [];
 let finalWarBuildAnimationUntil = 0;
 let finalWarBuildLastAnimationSignatures = new Map();
+
+let finalWarAdvanceTransitionRunning = false;
+let finalWarAdvanceDismissPending = false;
 
 
 function escapeHtml(value) {
@@ -10084,18 +10473,8 @@ function currentMatch() {
 
 function currentFinalMatch() {
 
-    const stage =
-        state?.event
-        ?.final_war_current_stage;
-
-    return (
-        state?.final_war_matches
-        ?.find(
-            match =>
-                match.stage_number ===
-                stage
-        )
-        ?? null
+    return finalMatchForSnapshot(
+        state
     );
 }
 
@@ -10500,6 +10879,41 @@ async function refreshState(
 
 
         if (
+            data?.event?.status === "final_war_fight"
+        ) {
+
+            const {
+                data:
+                    finalWarBattleShowState,
+                error:
+                    finalWarBattleShowError
+            } =
+                await db.rpc(
+                    "get_broadcast_final_war_battle_show_state",
+                    {
+                        p_code:
+                            roomCode
+                    }
+                );
+
+
+            if (finalWarBattleShowError) {
+
+                console.error(
+                    finalWarBattleShowError
+                );
+
+            }
+
+            else if (finalWarBattleShowState) {
+
+                data.final_war_battle_show =
+                    finalWarBattleShowState;
+            }
+        }
+
+
+        if (
             data?.event?.status === "final_war_build"
             ||
             data?.event?.status === "final_war_ready"
@@ -10826,6 +11240,49 @@ async function refreshState(
 
         if (
             sameUnadvancedFightReveal
+        ) {
+            return;
+        }
+
+
+        /*
+           FINAL WAR FIGHT REVEAL FREEZE
+
+           Final War armies and the locked Audience pool are also static
+           after reveal. Keep this DOM intact until the Host explicitly
+           opens the Battle Window or records a winner.
+        */
+        const oldFinalFightMatch =
+            finalMatchForSnapshot(
+                oldState
+            );
+
+
+        const newFinalFightMatch =
+            finalMatchForSnapshot(
+                data
+            );
+
+
+        const sameUnadvancedFinalWarReveal =
+            oldState?.event?.status ===
+                "final_war_fight"
+            &&
+            data?.event?.status ===
+                "final_war_fight"
+            &&
+            oldFinalFightMatch?.id
+            &&
+            oldFinalFightMatch.id ===
+                newFinalFightMatch?.id
+            &&
+            !oldState?.final_war_battle_show?.revealed
+            &&
+            !data?.final_war_battle_show?.revealed;
+
+
+        if (
+            sameUnadvancedFinalWarReveal
         ) {
             return;
         }
@@ -11185,6 +11642,31 @@ async function refreshState(
         }
 
 
+        let finalWarAdvanceTransitioned =
+            false;
+
+
+        const completedFinalWarMatch =
+            completedFinalWarMatchBetween(
+                oldState,
+                data,
+                initial
+            );
+
+
+        if (
+            completedFinalWarMatch
+        ) {
+
+            finalWarAdvanceTransitioned =
+                await runFinalWarWinnerAdvanceTransition(
+                    oldState,
+                    data,
+                    completedFinalWarMatch
+                );
+        }
+
+
         const incomingFinalWarStage =
             Number(
                 data?.event?.final_war_current_stage
@@ -11202,12 +11684,23 @@ async function refreshState(
         const enteringFinalWarBuildStage =
             !initial
             &&
-            data?.event?.status ===
-                "final_war_build"
+            !finalWarAdvanceTransitioned
             &&
             (
-                oldState?.event?.status !==
+                data?.event?.status ===
                     "final_war_build"
+                ||
+                data?.event?.status ===
+                    "final_war_ready"
+            )
+            &&
+            (
+                ![
+                    "final_war_build",
+                    "final_war_ready"
+                ].includes(
+                    oldState?.event?.status
+                )
                 ||
                 priorFinalWarStage !==
                     incomingFinalWarStage
@@ -11403,6 +11896,7 @@ async function refreshState(
         runFightWinnerPostRenderAnimation();
         runFinalWarBracketIntroPostRenderAnimation();
         runFinalWarBuildPostRenderAnimations();
+        runFinalWarAdvancePostRenderDismissal();
 
         if (draftOrderRevealPending) {
             runDraftOrderReveal();
@@ -12581,8 +13075,28 @@ function renderScene() {
 
     if (status === "final_war_fight") {
 
+        const match =
+            currentFinalMatch();
+
+
+        if (
+            match
+            &&
+            state?.final_war_battle_show?.revealed
+            &&
+            state?.final_war_battle_show?.match_id ===
+                match.id
+        ) {
+
+            return renderBattleShow(
+                match,
+                true
+            );
+        }
+
+
         return renderArmyReveal(
-            currentFinalMatch(),
+            match,
             state.final_war_armies,
             true
         );
@@ -20910,10 +21424,32 @@ function fightRevealKey(
     match
 ) {
 
+    if (
+        match?.stage_number
+        != null
+    ) {
+
+        return [
+            state?.event?.id
+            ?? roomCode
+            ?? "event",
+
+            "final-war",
+
+            Number(
+                match.stage_number
+                ?? 0
+            )
+        ].join(":");
+    }
+
+
     return [
         state?.event?.id
         ?? roomCode
         ?? "event",
+
+        "regular",
 
         match?.round_number
         ?? 0,
@@ -20926,11 +21462,14 @@ function fightRevealKey(
 
 function renderFightAudienceReveal(
     match,
-    animate
+    animate,
+    isFinalWar = false
 ) {
 
     const pool =
-        audienceRegularPoolForMatch(
+        isFinalWar
+        ? audienceFinalPool()
+        : audienceRegularPoolForMatch(
             match.id
         );
 
@@ -21122,7 +21661,7 @@ function renderArmyReveal(
 
 
     const a1 =
-        armies.find(
+        (armies ?? []).find(
             army =>
                 army.player_id ===
                 match.player1_id
@@ -21130,54 +21669,11 @@ function renderArmyReveal(
 
 
     const a2 =
-        armies.find(
+        (armies ?? []).find(
             army =>
                 army.player_id ===
                 match.player2_id
         );
-
-
-    /*
-       Preserve the existing Final War presentation for now.
-       This iteration is specifically the regular-season Fight scene.
-    */
-    if (isFinalWar) {
-
-        return `
-            <div class="scene-kicker">
-                Final War • Stage ${match.stage_number}
-            </div>
-
-            <div class="hero-split">
-
-                ${renderFighterArmy(
-                    match.player1_id,
-                    a1,
-                    true
-                )}
-
-                <div class="vs">
-                    VS
-                </div>
-
-                ${renderFighterArmy(
-                    match.player2_id,
-                    a2,
-                    true
-                )}
-
-            </div>
-
-            <div class="scene-lower-two">
-                ${renderAudiencePoolPanel(match, true)}
-                ${renderAudienceLeaderboardMini(
-                    "Audience Leaders",
-                    "Separate spectator bankrolls reacting to this matchup.",
-                    6
-                )}
-            </div>
-        `;
-    }
 
 
     const key =
@@ -21201,9 +21697,11 @@ function renderArmyReveal(
         >
 
             <div class="scene-kicker fight-reveal-kicker">
-                Round ${match.round_number}
-                •
-                Fight ${match.match_number}
+                ${
+                    isFinalWar
+                    ? `Final War • Stage ${match.stage_number}`
+                    : `Round ${match.round_number} • Fight ${match.match_number}`
+                }
             </div>
 
             <div class="fight-reveal-stage">
@@ -21211,7 +21709,7 @@ function renderArmyReveal(
                 ${renderFighterArmy(
                     match.player1_id,
                     a1,
-                    false,
+                    isFinalWar,
                     "one",
                     animate
                 )}
@@ -21223,7 +21721,7 @@ function renderArmyReveal(
                 ${renderFighterArmy(
                     match.player2_id,
                     a2,
-                    false,
+                    isFinalWar,
                     "two",
                     animate
                 )}
@@ -21232,7 +21730,8 @@ function renderArmyReveal(
 
             ${renderFightAudienceReveal(
                 match,
-                animate
+                animate,
+                isFinalWar
             )}
 
         </div>
@@ -21260,7 +21759,7 @@ function renderFighterArmy(
             class="
                 fighter-panel
                 ${
-                    !isFinalWar
+                    animate
                     ? "fight-reveal-fighter"
                     : ""
                 }
@@ -21277,7 +21776,7 @@ function renderFighterArmy(
             <div
                 class="fighter-name"
                 ${
-                    !isFinalWar
+                    animate
                     ? 'data-fight-reveal-header'
                     : ""
                 }
@@ -21288,7 +21787,7 @@ function renderFighterArmy(
             <div
                 class="fighter-money"
                 ${
-                    !isFinalWar
+                    animate
                     ? 'data-fight-reveal-header'
                     : ""
                 }
@@ -21322,7 +21821,7 @@ function renderFighterArmy(
                                 <div
                                     class="army-zone"
                                     ${
-                                        !isFinalWar
+                                        animate
                                         ? `
                                             data-fight-reveal-zone
                                             data-zone-index="${zoneIndex}"
@@ -21345,7 +21844,7 @@ function renderFighterArmy(
                                                 <div
                                                     class="army-unit"
                                                     ${
-                                                        !isFinalWar
+                                                        animate
                                                         ? `
                                                             data-fight-reveal-unit
                                                             data-unit-index="${unitIndex}"
@@ -21369,7 +21868,7 @@ function renderFighterArmy(
                                             <div
                                                 class="army-unit"
                                                 ${
-                                                    !isFinalWar
+                                                    animate
                                                     ? `
                                                         data-fight-reveal-unit
                                                         data-unit-index="0"
@@ -21394,7 +21893,7 @@ function renderFighterArmy(
             <div
                 class="army-total"
                 ${
-                    !isFinalWar
+                    animate
                     ? 'data-fight-reveal-total'
                     : ""
                 }
@@ -21722,16 +22221,23 @@ function animateFightFighterCascade(
 
 function runFightRevealPostRenderAnimation() {
 
+    const status =
+        state?.event?.status;
+
+
     if (
-        state?.event?.status !==
-        "fight"
+        status !== "fight"
+        &&
+        status !== "final_war_fight"
     ) {
         return;
     }
 
 
     const match =
-        currentMatch();
+        status === "final_war_fight"
+        ? currentFinalMatch()
+        : currentMatch();
 
 
     if (
@@ -22004,7 +22510,8 @@ function runFightRevealPostRenderAnimation() {
 
 
 function renderBattleShow(
-    match
+    match,
+    isFinalWar = false
 ) {
 
     const p1 =
@@ -22031,9 +22538,11 @@ function renderBattleShow(
             <div class="battle-show-heading">
 
                 <div class="scene-kicker">
-                    Round ${match?.round_number}
-                    •
-                    Fight ${match?.match_number}
+                    ${
+                        isFinalWar
+                        ? `Final War • Stage ${match?.stage_number}`
+                        : `Round ${match?.round_number} • Fight ${match?.match_number}`
+                    }
                 </div>
 
                 <div class="battle-show-matchup">
@@ -23249,11 +23758,12 @@ function finalMatchForSnapshot(
 
 
 function finalWarSeedEntry(
-    seedNumber
+    seedNumber,
+    snapshot = state
 ) {
 
     return (
-        (state.final_war_entries ?? [])
+        (snapshot?.final_war_entries ?? [])
         .find(
             entry =>
                 entry.qualified
@@ -23267,11 +23777,12 @@ function finalWarSeedEntry(
 
 
 function finalWarStageDisplay(
-    stageNumber
+    stageNumber,
+    snapshot = state
 ) {
 
     const match =
-        (state.final_war_matches ?? [])
+        (snapshot?.final_war_matches ?? [])
         .find(
             row =>
                 Number(
@@ -23327,7 +23838,8 @@ function finalWarStageDisplay(
 
         const seed2 =
             finalWarSeedEntry(
-                2
+                2,
+                snapshot
             );
 
 
@@ -23374,7 +23886,8 @@ function finalWarStageDisplay(
 
         const seed1 =
             finalWarSeedEntry(
-                1
+                1,
+                snapshot
             );
 
 
@@ -23416,6 +23929,1163 @@ function finalWarStageDisplay(
 
 
     return null;
+}
+
+
+function completedFinalWarMatchBetween(
+    oldSnapshot,
+    incomingState,
+    initial = false
+) {
+
+    if (
+        initial
+        ||
+        finalWarAdvanceTransitionRunning
+        ||
+        oldSnapshot?.event?.status !==
+            "final_war_fight"
+        ||
+        ![
+            "final_war_build",
+            "final_war_ready",
+            "final_war_complete"
+        ].includes(
+            incomingState?.event?.status
+        )
+    ) {
+        return null;
+    }
+
+
+    const stage =
+        Number(
+            oldSnapshot?.event
+                ?.final_war_current_stage
+            ?? 0
+        );
+
+
+    return (
+        (incomingState?.final_war_matches ?? [])
+        .find(
+            match =>
+                Number(
+                    match.stage_number
+                )
+                ===
+                stage
+                &&
+                Boolean(
+                    match.winner_player_id
+                )
+        )
+        ?? null
+    );
+}
+
+
+function renderFinalWarAdvanceStage(
+    snapshot,
+    stageNumber,
+    completedStage,
+    winnerId,
+    loserId
+) {
+
+    const stage =
+        finalWarStageDisplay(
+            stageNumber,
+            snapshot
+        );
+
+
+    if (!stage) {
+        return "";
+    }
+
+
+    const incomingStage =
+        Number(
+            snapshot?.event
+                ?.final_war_current_stage
+            ?? 0
+        );
+
+
+    const isNext =
+        stageNumber ===
+            incomingStage
+        &&
+        stageNumber >
+            completedStage;
+
+
+    const isCompleted =
+        stageNumber <=
+            completedStage;
+
+
+    const fighter = (
+        playerId,
+        name,
+        budget,
+        side
+    ) => {
+
+        const isLoser =
+            stageNumber ===
+                completedStage
+            &&
+            playerId ===
+                loserId;
+
+
+        const isWinnerSource =
+            stageNumber ===
+                completedStage
+            &&
+            playerId ===
+                winnerId;
+
+
+        const isWinnerTarget =
+            isNext
+            &&
+            playerId ===
+                winnerId;
+
+
+        return `
+            <div
+                class="
+                    final-war-advance-fighter
+                    ${side}
+                    ${isLoser ? "eliminated" : ""}
+                    ${isWinnerSource ? "winner-source" : ""}
+                    ${isWinnerTarget ? "winner-target" : ""}
+                "
+                data-final-advance-player="${playerId ?? ""}"
+                data-final-advance-stage="${stageNumber}"
+                style="
+                    --fighter:
+                        ${
+                            playerId
+                            ? playerColor(playerId)
+                            : "#6f7d95"
+                        };
+                "
+            >
+
+                <strong>
+                    ${escapeHtml(name)}
+                </strong>
+
+                ${
+                    budget != null
+                    ? `
+                        <span>
+                            ${money(budget)}
+                        </span>
+                      `
+                    : `
+                        <span class="placeholder">
+                            Advances
+                        </span>
+                      `
+                }
+
+            </div>
+        `;
+    };
+
+
+    return `
+        <article
+            class="
+                final-war-advance-stage
+                ${isCompleted ? "complete" : ""}
+                ${isNext ? "next-stage" : ""}
+            "
+            data-final-advance-stage-card="${stageNumber}"
+            style="
+                --p1:
+                    ${
+                        stage.player1Id
+                        ? playerColor(stage.player1Id)
+                        : "#6f7d95"
+                    };
+                --p2:
+                    ${
+                        stage.player2Id
+                        ? playerColor(stage.player2Id)
+                        : "#6f7d95"
+                    };
+            "
+        >
+
+            <div class="final-war-advance-stage-head">
+
+                <span>
+                    Stage ${stageNumber}
+                </span>
+
+                <strong>
+                    ${
+                        stageNumber === 1
+                        ? "Opening Battle"
+                        : stageNumber === 2
+                        ? "Semifinal"
+                        : "Championship"
+                    }
+                </strong>
+
+            </div>
+
+            <div class="final-war-advance-fighters">
+
+                ${fighter(
+                    stage.player1Id,
+                    stage.player1Name,
+                    stage.player1Budget,
+                    "one"
+                )}
+
+                <div class="final-war-advance-vs">
+                    VS
+                </div>
+
+                ${fighter(
+                    stage.player2Id,
+                    stage.player2Name,
+                    stage.player2Budget,
+                    "two"
+                )}
+
+            </div>
+
+            <div class="final-war-advance-stage-foot">
+
+                ${
+                    stageNumber ===
+                        completedStage
+                    ? `
+                        <span class="resolved">
+                            ${
+                                escapeHtml(
+                                    playerName(
+                                        winnerId
+                                    )
+                                )
+                            }
+                            advances
+                        </span>
+                      `
+                    : isNext
+                    ? `
+                        <span class="up-next">
+                            Next Fight
+                        </span>
+                      `
+                    : stage.winnerId
+                    ? `
+                        <span class="resolved">
+                            ${escapeHtml(
+                                playerName(
+                                    stage.winnerId
+                                )
+                            )}
+                            advances
+                        </span>
+                      `
+                    : `
+                        <span>
+                            Awaiting winner
+                        </span>
+                      `
+                }
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function renderFinalWarAdvanceBracket(
+    snapshot,
+    completedMatch
+) {
+
+    const winnerId =
+        completedMatch
+            .winner_player_id;
+
+
+    const loserId =
+        completedMatch
+            .player1_id ===
+            winnerId
+        ? completedMatch.player2_id
+        : completedMatch.player1_id;
+
+
+    const completedStage =
+        Number(
+            completedMatch.stage_number
+        );
+
+
+    const qualifierCount =
+        Number(
+            snapshot?.event
+                ?.final_war_qualifier_count
+            ?? 4
+        );
+
+
+    const maxStage =
+        Math.max(
+            1,
+            qualifierCount - 1
+        );
+
+
+    const stages = [];
+
+
+    for (
+        let stage = 1;
+        stage <= maxStage;
+        stage++
+    ) {
+
+        stages.push(
+            renderFinalWarAdvanceStage(
+                snapshot,
+                stage,
+                completedStage,
+                winnerId,
+                loserId
+            )
+        );
+    }
+
+
+    const champion =
+        snapshot?.event?.status ===
+            "final_war_complete";
+
+
+    return `
+        <div class="final-war-advance-bracket">
+
+            <div class="final-war-advance-heading">
+
+                <div class="scene-kicker">
+                    Final War Result
+                </div>
+
+                <h1>
+                    ${
+                        champion
+                        ? "The Gauntlet Is Complete"
+                        : `${escapeHtml(
+                            playerName(
+                                winnerId
+                            )
+                          )} Advances`
+                    }
+                </h1>
+
+                <p>
+                    ${
+                        champion
+                        ? "One fighter remains."
+                        : "The next battle is now set."
+                    }
+                </p>
+
+            </div>
+
+            <div
+                class="
+                    final-war-advance-flow
+                    stages-${maxStage}
+                "
+            >
+                ${stages.join("")}
+            </div>
+
+            ${
+                champion
+                ? `
+                    <div
+                        class="final-war-advance-champion-target"
+                        data-final-advance-champion-target
+                        style="
+                            --player:
+                                ${playerColor(
+                                    winnerId
+                                )};
+                        "
+                    >
+                        <span>
+                            Champion
+                        </span>
+
+                        <strong>
+                            ${escapeHtml(
+                                playerName(
+                                    winnerId
+                                )
+                            )}
+                        </strong>
+                    </div>
+                  `
+                : ""
+            }
+
+        </div>
+    `;
+}
+
+
+function launchFinalWarAdvanceFlyer(
+    overlay,
+    source,
+    target,
+    winnerId
+) {
+
+    return new Promise(
+        resolve => {
+
+            if (
+                !source
+                ||
+                !target
+            ) {
+
+                resolve();
+                return;
+            }
+
+
+            const from =
+                source
+                    .getBoundingClientRect();
+
+
+            const to =
+                target
+                    .getBoundingClientRect();
+
+
+            const flyer =
+                source
+                    .cloneNode(
+                        true
+                    );
+
+
+            flyer.className =
+                "final-war-advance-flyer";
+
+
+            flyer.style.setProperty(
+                "--player",
+                playerColor(
+                    winnerId
+                )
+            );
+
+
+            Object.assign(
+                flyer.style,
+                {
+                    position:
+                        "fixed",
+
+                    left:
+                        `${from.left}px`,
+
+                    top:
+                        `${from.top}px`,
+
+                    width:
+                        `${from.width}px`,
+
+                    height:
+                        `${from.height}px`,
+
+                    margin:
+                        "0",
+
+                    zIndex:
+                        "2147483200",
+
+                    pointerEvents:
+                        "none"
+                }
+            );
+
+
+            document.body.appendChild(
+                flyer
+            );
+
+
+            const dx =
+                to.left
+                -
+                from.left;
+
+
+            const dy =
+                to.top
+                -
+                from.top;
+
+
+            const sx =
+                to.width
+                /
+                Math.max(
+                    1,
+                    from.width
+                );
+
+
+            const sy =
+                to.height
+                /
+                Math.max(
+                    1,
+                    from.height
+                );
+
+
+            const animation =
+                flyer.animate(
+                    [
+                        {
+                            opacity:
+                                1,
+                            transform:
+                                "translate(0,0) scale(1)"
+                        },
+
+                        {
+                            opacity:
+                                1,
+                            transform:
+                                `
+                                    translate(
+                                        ${dx}px,
+                                        ${dy}px
+                                    )
+                                    scale(
+                                        ${sx},
+                                        ${sy}
+                                    )
+                                `
+                        }
+                    ],
+                    {
+                        duration:
+                            760,
+                        easing:
+                            "cubic-bezier(.18,.78,.22,1)",
+                        fill:
+                            "forwards"
+                    }
+                );
+
+
+            animation.finished
+                .catch(
+                    () => null
+                )
+                .then(
+                    () => {
+
+                        flyer.remove();
+                        resolve();
+                    }
+                );
+        }
+    );
+}
+
+
+async function runFinalWarWinnerAdvanceTransition(
+    oldSnapshot,
+    incomingState,
+    completedMatch
+) {
+
+    if (
+        finalWarAdvanceTransitionRunning
+        ||
+        !completedMatch
+    ) {
+        return false;
+    }
+
+
+    finalWarAdvanceTransitionRunning =
+        true;
+
+
+    finalWarBracketIntroRunning =
+        false;
+
+
+    const wait =
+        milliseconds =>
+            new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        milliseconds
+                    )
+            );
+
+
+    const winnerId =
+        completedMatch
+            .winner_player_id;
+
+
+    const loserId =
+        completedMatch
+            .player1_id ===
+            winnerId
+        ? completedMatch.player2_id
+        : completedMatch.player1_id;
+
+
+    const overlay =
+        document.createElement(
+            "div"
+        );
+
+
+    overlay.className =
+        "final-war-advance-overlay victory-phase";
+
+
+    overlay.style.setProperty(
+        "--winner",
+        playerColor(
+            winnerId
+        )
+    );
+
+
+    overlay.innerHTML = `
+        <div class="final-war-victory-layer">
+
+            <div class="fight-victory-card">
+
+                <div class="fight-victory-label">
+                    Victory
+                </div>
+
+                <div class="fight-victory-name">
+                    ${escapeHtml(
+                        playerName(
+                            winnerId
+                        )
+                    )}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+
+    document
+        .getElementById(
+            "broadcast-shell"
+        )
+        ?.appendChild(
+            overlay
+        );
+
+
+    const victoryCard =
+        overlay.querySelector(
+            ".fight-victory-card"
+        );
+
+
+    const victoryLayer =
+        overlay.querySelector(
+            ".final-war-victory-layer"
+        );
+
+
+    victoryCard?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(.38)"
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1.04)",
+                offset:
+                    .24
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1)",
+                offset:
+                    .62
+            },
+
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(1.28)"
+            }
+        ],
+        {
+            duration:
+                2550,
+            easing:
+                "cubic-bezier(.16,.82,.22,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    victoryLayer?.animate(
+        [
+            {
+                opacity:
+                    1
+            },
+
+            {
+                opacity:
+                    1,
+                offset:
+                    .72
+            },
+
+            {
+                opacity:
+                    0
+            }
+        ],
+        {
+            duration:
+                2650,
+            easing:
+                "ease",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    await wait(
+        2700
+    );
+
+
+    overlay.classList.remove(
+        "victory-phase"
+    );
+
+
+    overlay.classList.add(
+        "bracket-phase"
+    );
+
+
+    overlay.innerHTML =
+        renderFinalWarAdvanceBracket(
+            incomingState,
+            completedMatch
+        );
+
+
+    const bracket =
+        overlay.querySelector(
+            ".final-war-advance-bracket"
+        );
+
+
+    bracket?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "translateY(12px) scale(.992)"
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "translateY(0) scale(1)"
+            }
+        ],
+        {
+            duration:
+                520,
+            easing:
+                "cubic-bezier(.18,.78,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    await wait(
+        560
+    );
+
+
+    const loser =
+        overlay.querySelector(
+            `.final-war-advance-fighter[data-final-advance-stage="${completedMatch.stage_number}"][data-final-advance-player="${loserId}"]`
+        );
+
+
+    const winnerSource =
+        overlay.querySelector(
+            `.final-war-advance-fighter[data-final-advance-stage="${completedMatch.stage_number}"][data-final-advance-player="${winnerId}"]`
+        );
+
+
+    loser?.animate(
+        [
+            {
+                opacity:
+                    1,
+                filter:
+                    "grayscale(0) brightness(1)",
+                transform:
+                    "scale(1)"
+            },
+
+            {
+                opacity:
+                    .28,
+                filter:
+                    "grayscale(.92) brightness(.62)",
+                transform:
+                    "scale(.985)"
+            }
+        ],
+        {
+            duration:
+                620,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    winnerSource?.animate(
+        [
+            {
+                transform:
+                    "scale(1)",
+                filter:
+                    "brightness(1)"
+            },
+
+            {
+                transform:
+                    "scale(1.035)",
+                filter:
+                    "brightness(1.55)",
+                offset:
+                    .45
+            },
+
+            {
+                transform:
+                    "scale(1)",
+                filter:
+                    "brightness(1.08)"
+            }
+        ],
+        {
+            duration:
+                620,
+            easing:
+                "cubic-bezier(.18,.72,.24,1)",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    await wait(
+        600
+    );
+
+
+    const nextStage =
+        Number(
+            completedMatch.stage_number
+        )
+        +
+        1;
+
+
+    const winnerTarget =
+        overlay.querySelector(
+            `.final-war-advance-fighter[data-final-advance-stage="${nextStage}"][data-final-advance-player="${winnerId}"]`
+        );
+
+
+    const championTarget =
+        overlay.querySelector(
+            "[data-final-advance-champion-target]"
+        );
+
+
+    const destination =
+        winnerTarget
+        ??
+        championTarget;
+
+
+    if (
+        destination
+    ) {
+
+        destination.style.opacity =
+            ".28";
+
+
+        await launchFinalWarAdvanceFlyer(
+            overlay,
+            winnerSource,
+            destination,
+            winnerId
+        );
+
+
+        destination.animate(
+            [
+                {
+                    opacity:
+                        .28,
+                    transform:
+                        "scale(.96)",
+                    filter:
+                        "brightness(.75)"
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "scale(1.045)",
+                    filter:
+                        "brightness(1.6)",
+                    offset:
+                        .48
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "scale(1)",
+                    filter:
+                        "brightness(1)"
+                }
+            ],
+            {
+                duration:
+                    720,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+    }
+
+
+    const nextStageCard =
+        overlay.querySelector(
+            `[data-final-advance-stage-card="${nextStage}"]`
+        );
+
+
+    if (
+        nextStageCard
+    ) {
+
+        nextStageCard.animate(
+            [
+                {
+                    boxShadow:
+                        "0 10px 28px rgba(0,0,0,.20)",
+                    transform:
+                        "scale(1)"
+                },
+
+                {
+                    boxShadow:
+                        `
+                            -16px 0 38px
+                            color-mix(
+                                in srgb,
+                                var(--p1) 30%,
+                                transparent
+                            ),
+                            16px 0 38px
+                            color-mix(
+                                in srgb,
+                                var(--p2) 30%,
+                                transparent
+                            ),
+                            0 0 0 2px
+                            color-mix(
+                                in srgb,
+                                var(--p1) 42%,
+                                var(--p2) 42%
+                            ),
+                            0 12px 32px rgba(0,0,0,.26)
+                        `,
+                    transform:
+                        "scale(1.022)"
+                },
+
+                {
+                    boxShadow:
+                        "0 10px 28px rgba(0,0,0,.20)",
+                    transform:
+                        "scale(1)"
+                }
+            ],
+            {
+                duration:
+                    1300,
+                iterations:
+                    2,
+                direction:
+                    "alternate",
+                easing:
+                    "ease-in-out"
+            }
+        );
+    }
+
+
+    /*
+       Leave the updated bracket completely still for a few seconds after
+       the movement so viewers can read the new matchup.
+    */
+    await wait(
+        3100
+    );
+
+
+    finalWarAdvanceDismissPending =
+        true;
+
+
+    finalWarAdvanceTransitionRunning =
+        false;
+
+
+    return true;
+}
+
+
+function runFinalWarAdvancePostRenderDismissal() {
+
+    if (
+        !finalWarAdvanceDismissPending
+    ) {
+        return;
+    }
+
+
+    const overlay =
+        document.querySelector(
+            ".final-war-advance-overlay"
+        );
+
+
+    finalWarAdvanceDismissPending =
+        false;
+
+
+    if (!overlay) {
+        return;
+    }
+
+
+    const fade =
+        overlay.animate(
+            [
+                {
+                    opacity:
+                        1
+                },
+
+                {
+                    opacity:
+                        0
+                }
+            ],
+            {
+                duration:
+                    520,
+                easing:
+                    "ease",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    fade.finished
+        .catch(
+            () => null
+        )
+        .then(
+            () => {
+
+                overlay.remove();
+
+
+                /*
+                   If the next Final War build arrived while the bracket
+                   covered the stage, play its queued live-build animation
+                   only after the Army Build is actually visible.
+                */
+                runFinalWarBuildPostRenderAnimations();
+            }
+        );
 }
 
 
@@ -24895,6 +26565,15 @@ function playFinalWarBuildRowAnimation(
 
 
 function runFinalWarBuildPostRenderAnimations() {
+
+    if (
+        document.querySelector(
+            ".final-war-advance-overlay"
+        )
+    ) {
+        return;
+    }
+
 
     if (
         (
