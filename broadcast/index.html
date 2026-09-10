@@ -9685,12 +9685,12 @@ span.up-next {
 
 .champion-player-standings,
 .champion-audience-board {
-    padding: 14px;
+    padding: 16px;
     display: grid;
     grid-template-rows:
         auto
         minmax(0,1fr);
-    gap: 10px;
+    gap: 12px;
 }
 
 .champion-section-head {
@@ -9701,24 +9701,24 @@ span.up-next {
 }
 
 .champion-section-kicker {
-    color: #8998b1;
-    font-size: .62rem;
+    color: #93a1b8;
+    font-size: .70rem;
     font-weight: 950;
     letter-spacing: .13em;
     text-transform: uppercase;
 }
 
 .champion-section-title {
-    margin-top: 2px;
+    margin-top: 3px;
     color: #fff;
-    font-size: 1.15rem;
+    font-size: 1.32rem;
     font-weight: 1000;
 }
 
 .champion-section-note,
 .champion-audience-total {
-    color: #98a5ba;
-    font-size: .59rem;
+    color: #a4b0c3;
+    font-size: .67rem;
     font-weight: 800;
 }
 
@@ -9739,13 +9739,13 @@ span.up-next {
 .champion-player-standing {
     --player: #7c8aa6;
     min-width: 0;
-    padding: 9px 11px;
+    padding: 11px 14px;
     display: grid;
     grid-template-columns:
-        39px
+        46px
         minmax(0,1fr)
         auto;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
     border-radius: 9px;
     border:
@@ -9780,7 +9780,7 @@ span.up-next {
 
 .champion-player-rank {
     color: var(--player);
-    font-size: .88rem;
+    font-size: 1.06rem;
     font-weight: 1000;
 }
 
@@ -9793,25 +9793,25 @@ span.up-next {
 .champion-player-standing-main strong {
     min-width: 0;
     color: #fff;
-    font-size: .79rem;
-    font-weight: 950;
+    font-size: .96rem;
+    font-weight: 960;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .champion-player-standing-main span {
-    color: #929fb5;
-    font-size: .56rem;
-    font-weight: 820;
+    color: #9da9bc;
+    font-size: .65rem;
+    font-weight: 850;
     text-transform: uppercase;
     letter-spacing: .05em;
 }
 
 .champion-player-standing-money {
-    color: #f1f5fd;
-    font-size: .76rem;
-    font-weight: 960;
+    color: #f5f8ff;
+    font-size: .92rem;
+    font-weight: 970;
     font-variant-numeric: tabular-nums;
 }
 
@@ -9919,13 +9919,13 @@ span.up-next {
 
 .champion-audience-row {
     min-width: 0;
-    padding: 9px 11px;
+    padding: 11px 13px;
     display: grid;
     grid-template-columns:
-        34px
+        40px
         minmax(0,1fr)
         auto;
-    gap: 9px;
+    gap: 11px;
     align-items: center;
     border-radius: 9px;
     border: 1px solid rgba(255,255,255,.07);
@@ -9935,15 +9935,15 @@ span.up-next {
 .champion-audience-row
 .rank {
     color: #f2c94c;
-    font-size: .76rem;
+    font-size: .92rem;
     font-weight: 1000;
 }
 
 .champion-audience-row strong {
     min-width: 0;
     color: #fff;
-    font-size: .73rem;
-    font-weight: 940;
+    font-size: .89rem;
+    font-weight: 955;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -9951,9 +9951,9 @@ span.up-next {
 
 .champion-audience-row
 .money {
-    color: #f0f4fc;
-    font-size: .70rem;
-    font-weight: 950;
+    color: #f5f8ff;
+    font-size: .84rem;
+    font-weight: 965;
     font-variant-numeric: tabular-nums;
 }
 
@@ -9986,21 +9986,37 @@ span.up-next {
 
     .champion-player-standing,
     .champion-audience-row {
-        padding: 7px 8px;
+        padding: 9px 10px;
+    }
+
+    .champion-player-rank {
+        font-size: .94rem;
     }
 
     .champion-player-standing-main strong {
-        font-size: .72rem;
+        font-size: .84rem;
     }
 
-    .champion-player-standing-money,
+    .champion-player-standing-main span {
+        font-size: .59rem;
+    }
+
+    .champion-player-standing-money {
+        font-size: .80rem;
+    }
+
     .champion-audience-row
-    .money {
-        font-size: .66rem;
+    .rank {
+        font-size: .82rem;
     }
 
     .champion-audience-row strong {
-        font-size: .67rem;
+        font-size: .78rem;
+    }
+
+    .champion-audience-row
+    .money {
+        font-size: .75rem;
     }
 }
 
@@ -10205,6 +10221,8 @@ let finalWarBuildLastAnimationSignatures = new Map();
 
 let finalWarAdvanceTransitionRunning = false;
 let finalWarAdvanceDismissPending = false;
+
+let lastChampionRenderSignature = null;
 
 
 function escapeHtml(value) {
@@ -13301,6 +13319,72 @@ function renderBroadcastDecorations() {
 }
 
 
+function championRenderSignature() {
+
+    if (
+        state?.event?.status !==
+        "final_war_complete"
+    ) {
+        return null;
+    }
+
+
+    const playerPart =
+        finalPlayerPlacements()
+        .map(
+            row => {
+
+                const player =
+                    playerById(
+                        row.playerId
+                    );
+
+
+                return [
+                    row.rank,
+                    row.playerId,
+                    row.finish,
+                    Number(
+                        player?.war_chest
+                        ?? 0
+                    )
+                ].join(":");
+            }
+        )
+        .join("|");
+
+
+    const audiencePart =
+        audienceLeaders(
+            10
+        )
+        .map(
+            row =>
+                [
+                    row.rank,
+                    row.id
+                    ?? row.gambler_id
+                    ?? row.display_name,
+                    row.display_name,
+                    Number(
+                        row.bankroll
+                        ?? 0
+                    )
+                ].join(":")
+        )
+        .join("|");
+
+
+    return [
+        state.event.final_war_champion_id
+        ?? "",
+        audienceCount(),
+        playerPart,
+        audiencePart
+    ].join("||");
+}
+
+
 function renderBroadcast() {
 
     if (!state?.event) {
@@ -13375,8 +13459,56 @@ function renderBroadcast() {
         );
 
 
-    scene.innerHTML =
-        renderScene();
+    const championSignature =
+        championRenderSignature();
+
+
+    const preserveChampionScene =
+        state.event.status ===
+            "final_war_complete"
+        &&
+        Boolean(
+            scene.querySelector(
+                ".champion-final-scene"
+            )
+        )
+        &&
+        championSignature ===
+            lastChampionRenderSignature;
+
+
+    /*
+       The Champion card contains a continuously looping CSS glow.
+
+       Replacing scene.innerHTML every ~900ms destroys and recreates that
+       element, which restarts the animation and makes the pulse look like
+       it harshly cuts off.
+
+       Keep the existing Champion DOM alive while the visible results are
+       unchanged. If a final audience/player value genuinely changes, render
+       once with the new data, then preserve that new DOM on later polls.
+    */
+    if (
+        !preserveChampionScene
+    ) {
+
+        scene.innerHTML =
+            renderScene();
+
+
+        lastChampionRenderSignature =
+            championSignature;
+    }
+
+
+    if (
+        state.event.status !==
+            "final_war_complete"
+    ) {
+
+        lastChampionRenderSignature =
+            null;
+    }
 
 
     requestAnimationFrame(
