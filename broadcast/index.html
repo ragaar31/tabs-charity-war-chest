@@ -7986,6 +7986,217 @@ input {
     transition: none !important;
 }
 
+
+/* =========================================================
+   SETTLEMENT — BASE WAGER + SPECIAL BET BEATS
+   ========================================================= */
+
+.settlement-spotlight-stage {
+    position: relative;
+    overflow: visible;
+}
+
+.settlement-base-result {
+    margin-top: 18px;
+    min-height: 92px;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+}
+
+.settlement-base-label {
+    color: #9eacc4;
+    font-size: .69rem;
+    font-weight: 950;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.settlement-base-result
+.settlement-spotlight-impact {
+    margin-top: 7px;
+}
+
+.settlement-base-result.special-only
+.settlement-spotlight-impact {
+    color: #75829a;
+    font-size: 2.1rem;
+}
+
+.settlement-special-status {
+    margin-top: 22px;
+    min-height: 18px;
+    color: #7f8da6;
+    font-size: .62rem;
+    font-weight: 820;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.settlement-special-popup {
+    --player: #8aa0ff;
+    --special-tilt: 4deg;
+    position: absolute;
+    top: 50%;
+    z-index: 8;
+    width:
+        min(
+            310px,
+            23vw
+        );
+    padding:
+        20px
+        22px;
+    border-radius: 16px;
+    border:
+        2px solid
+        color-mix(
+            in srgb,
+            var(--player) 58%,
+            rgba(255,255,255,.12)
+        );
+    background:
+        radial-gradient(
+            circle at top,
+            color-mix(
+                in srgb,
+                var(--player) 24%,
+                transparent
+            ),
+            transparent 62%
+        ),
+        #171e2b;
+    box-shadow:
+        0 18px 44px
+        rgba(0,0,0,.42),
+        0 0 28px
+        color-mix(
+            in srgb,
+            var(--player) 17%,
+            transparent
+        );
+    pointer-events: none;
+    transform:
+        rotate(
+            var(--special-tilt)
+        );
+}
+
+.settlement-special-popup.right {
+    left:
+        calc(
+            50%
+            +
+            min(
+                420px,
+                37vw
+            )
+        );
+}
+
+.settlement-special-popup.left {
+    right:
+        calc(
+            50%
+            +
+            min(
+                420px,
+                37vw
+            )
+        );
+}
+
+.settlement-special-popup.positive
+.settlement-special-amount {
+    color:
+        color-mix(
+            in srgb,
+            var(--player) 80%,
+            white 20%
+        );
+}
+
+.settlement-special-popup.negative {
+    border-color:
+        rgba(255,115,125,.66);
+}
+
+.settlement-special-popup.negative
+.settlement-special-amount {
+    color: #ff737d;
+}
+
+.settlement-special-kicker {
+    color: #8391aa;
+    font-size: .55rem;
+    font-weight: 950;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.settlement-special-label {
+    margin-top: 5px;
+    color: #fff;
+    font-size: 1.20rem;
+    font-weight: 960;
+    line-height: 1.05;
+}
+
+.settlement-special-amount {
+    margin-top: 9px;
+    font-size: 2.35rem;
+    font-weight: 1000;
+    letter-spacing: -.035em;
+    line-height: .95;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1500px) {
+
+    .settlement-special-popup {
+        width:
+            min(
+                260px,
+                22vw
+            );
+        padding:
+            16px
+            18px;
+    }
+
+    .settlement-special-popup.right {
+        left:
+            calc(
+                50%
+                +
+                min(
+                    365px,
+                    35vw
+                )
+            );
+    }
+
+    .settlement-special-popup.left {
+        right:
+            calc(
+                50%
+                +
+                min(
+                    365px,
+                    35vw
+                )
+            );
+    }
+
+    .settlement-special-label {
+        font-size: 1.04rem;
+    }
+
+    .settlement-special-amount {
+        font-size: 2rem;
+    }
+}
+
 </style>
 </head>
 
@@ -21204,7 +21415,7 @@ function maybeShowWinner() {
 }
 
 
-function settlementResults(
+function settlementPlayerBreakdowns(
     settlement
 ) {
 
@@ -21212,66 +21423,157 @@ function settlementResults(
         new Map();
 
 
-    const add = (
-        playerId,
-        value,
-        label
+    const ensure = (
+        playerId
     ) => {
 
         if (!playerId) {
+            return null;
+        }
+
+
+        if (
+            !result.has(
+                playerId
+            )
+        ) {
+
+            result.set(
+                playerId,
+                {
+                    standard:
+                        0,
+
+                    specials:
+                        new Map()
+                }
+            );
+        }
+
+
+        return result.get(
+            playerId
+        );
+    };
+
+
+    const addStandard = (
+        playerId,
+        value
+    ) => {
+
+        const row =
+            ensure(
+                playerId
+            );
+
+
+        if (!row) {
+            return;
+        }
+
+
+        row.standard +=
+            Number(
+                value
+                ?? 0
+            );
+    };
+
+
+    const addSpecial = (
+        playerId,
+        code,
+        label,
+        value
+    ) => {
+
+        const amount =
+            Number(
+                value
+                ?? 0
+            );
+
+
+        if (
+            !playerId
+            ||
+            amount === 0
+        ) {
+            return;
+        }
+
+
+        const row =
+            ensure(
+                playerId
+            );
+
+
+        if (!row) {
             return;
         }
 
 
         const current =
-            result.get(playerId)
+            row.specials.get(
+                code
+            )
             ?? {
-                value: 0,
-                labels: []
+                code,
+                label,
+                value:
+                    0
             };
 
 
         current.value +=
-            Number(value ?? 0);
+            amount;
 
 
-        if (
-            label
-            &&
-            Number(value ?? 0) !== 0
-        ) {
-            current.labels.push(label);
-        }
-
-
-        result.set(
-            playerId,
+        row.specials.set(
+            code,
             current
         );
     };
 
 
-    // Winner's $500 battle purse.
-    add(
-        settlement.winner_player_id,
-        500,
-        "Battle purse"
-    );
-
-
+    /*
+       BASE RESULT:
+       Standard winner wagers are the first War Chest movement shown on
+       the player's main card.
+    */
     for (
         const bet of
         settlement.standard_bets ?? []
     ) {
 
-        add(
+        addStandard(
             bet.player_id,
-            Number(bet.payout ?? 0)
+            Number(
+                bet.payout
+                ?? 0
+            )
             -
-            Number(bet.amount ?? 0),
-            "Winner bet"
+            Number(
+                bet.amount
+                ?? 0
+            )
         );
     }
+
+
+    /*
+       SPECIAL BEATS:
+       Each of these gets its own tilted side-card and a second War Chest
+       movement after the base winner wager finishes.
+    */
+    addSpecial(
+        settlement.winner_player_id,
+        "battle-purse",
+        "Battle Purse",
+        500
+    );
 
 
     for (
@@ -21279,12 +21581,19 @@ function settlementResults(
         settlement.hedges ?? []
     ) {
 
-        add(
+        addSpecial(
             hedge.player_id,
-            Number(hedge.payout ?? 0)
+            "hedge",
+            "Hedge Fund",
+            Number(
+                hedge.payout
+                ?? 0
+            )
             -
-            Number(hedge.stake ?? 0),
-            "Hedge"
+            Number(
+                hedge.stake
+                ?? 0
+            )
         );
     }
 
@@ -21294,12 +21603,19 @@ function settlementResults(
         settlement.props ?? []
     ) {
 
-        add(
+        addSpecial(
             prop.player_id,
-            Number(prop.payout ?? 0)
+            "prop",
+            "Prop Bet",
+            Number(
+                prop.payout
+                ?? 0
+            )
             -
-            Number(prop.amount ?? 0),
-            "Prop"
+            Number(
+                prop.amount
+                ?? 0
+            )
         );
     }
 
@@ -21309,14 +21625,29 @@ function settlementResults(
         settlement.parlays ?? []
     ) {
 
-        add(
+        addSpecial(
             parlay.player_id,
-            Number(parlay.payout ?? 0)
-            -
-            Number(parlay.starting_amount ?? 0),
-            parlay.leg_count === 3
+            Number(
+                parlay.leg_count
+            ) === 3
+            ? "moonshot"
+            : "parlay",
+
+            Number(
+                parlay.leg_count
+            ) === 3
             ? "Moonshot"
-            : "Parlay"
+            : "Parlay",
+
+            Number(
+                parlay.payout
+                ?? 0
+            )
+            -
+            Number(
+                parlay.starting_amount
+                ?? 0
+            )
         );
     }
 
@@ -21325,6 +21656,16 @@ function settlementResults(
         const item of
         settlement.consumables ?? []
     ) {
+
+        const code =
+            item.item_code ===
+                "war-bond"
+            ? "war-bond"
+            : item.item_code ===
+                "rainy-day"
+            ? "rainy-day"
+            : "consumable";
+
 
         const label =
             item.item_code ===
@@ -21336,13 +21677,14 @@ function settlementResults(
             : "Consumable";
 
 
-        add(
+        addSpecial(
             item.player_id,
+            code,
+            label,
             Number(
                 item.payout_amount
                 ?? 0
-            ),
-            label
+            )
         );
     }
 
@@ -21355,8 +21697,8 @@ function settlementPlayerRows(
     settlement
 ) {
 
-    const results =
-        settlementResults(
+    const breakdowns =
+        settlementPlayerBreakdowns(
             settlement
         );
 
@@ -21365,17 +21707,58 @@ function settlementPlayerRows(
         .map(
             player => {
 
-                const result =
-                    results.get(
+                const breakdown =
+                    breakdowns.get(
                         player.id
                     )
                     ?? {
-                        value:
+                        standard:
                             0,
 
-                        labels:
-                            []
+                        specials:
+                            new Map()
                     };
+
+
+                const specials =
+                    [
+                        ...breakdown
+                            .specials
+                            .values()
+                    ]
+                    .filter(
+                        special =>
+                            Number(
+                                special.value
+                                ?? 0
+                            )
+                            !== 0
+                    );
+
+
+                const standardValue =
+                    Number(
+                        breakdown.standard
+                        ?? 0
+                    );
+
+
+                const totalValue =
+                    standardValue
+                    +
+                    specials.reduce(
+                        (
+                            total,
+                            special
+                        ) =>
+                            total
+                            +
+                            Number(
+                                special.value
+                                ?? 0
+                            ),
+                        0
+                    );
 
 
                 const finalWarChest =
@@ -21385,35 +21768,41 @@ function settlementPlayerRows(
                     );
 
 
-                /*
-                   settlementResults() describes the net effect of this
-                   fight relative to the player's pre-fight War Chest.
-                   Reconstruct that starting value so the show can animate
-                   the War Chest moving to its new total.
-                */
                 const beforeWarChest =
                     finalWarChest
                     -
-                    Number(
-                        result.value
-                        ?? 0
-                    );
+                    totalValue;
 
 
                 return {
                     player,
-                    value:
-                        Number(
-                            result.value
-                            ?? 0
-                        ),
-                    labels:
-                        result.labels
-                        ?? [],
+
+                    standardValue,
+
+                    specials,
+
+                    totalValue,
+
                     beforeWarChest,
+
+                    afterStandardWarChest:
+                        beforeWarChest
+                        +
+                        standardValue,
+
                     finalWarChest
                 };
             }
+        )
+
+        /*
+           No-change players are completely omitted from the payout show.
+           They do not receive a card or consume screen time.
+        */
+        .filter(
+            row =>
+                row.totalValue !==
+                0
         );
 }
 
@@ -21546,19 +21935,24 @@ function renderSettlementSpotlightCard(
     total
 ) {
 
-    const signClass =
-        row.value > 0
+    const baseClass =
+        row.standardValue > 0
         ? "positive"
-        : row.value < 0
+        : row.standardValue < 0
         ? "negative"
         : "neutral";
+
+
+    const hasStandard =
+        row.standardValue !==
+        0;
 
 
     return `
         <div
             class="
                 settlement-spotlight-card
-                ${signClass}
+                ${baseClass}
             "
             style="
                 --player:
@@ -21569,7 +21963,7 @@ function renderSettlementSpotlightCard(
         >
 
             <div class="settlement-spotlight-progress">
-                Player ${index + 1} of ${total}
+                Result ${index + 1} of ${total}
             </div>
 
             <div class="settlement-spotlight-name">
@@ -21578,12 +21972,33 @@ function renderSettlementSpotlightCard(
                 )}
             </div>
 
-            <div class="settlement-spotlight-impact">
-                ${escapeHtml(
-                    settlementDeltaText(
-                        row.value
-                    )
-                )}
+            <div
+                class="
+                    settlement-base-result
+                    ${hasStandard ? "" : "special-only"}
+                "
+            >
+
+                <div class="settlement-base-label">
+                    ${
+                        hasStandard
+                        ? "Winner Bet"
+                        : "Special Payout"
+                    }
+                </div>
+
+                <div class="settlement-spotlight-impact">
+                    ${
+                        hasStandard
+                        ? escapeHtml(
+                            settlementDeltaText(
+                                row.standardValue
+                            )
+                          )
+                        : "—"
+                    }
+                </div>
+
             </div>
 
             <div class="settlement-war-chest-label">
@@ -21599,24 +22014,16 @@ function renderSettlementSpotlightCard(
                 )}
             </div>
 
-            <div class="settlement-cause-row">
-
+            <div class="settlement-special-status">
                 ${
-                    row.labels.length
-                    ? row.labels.map(
-                        label => `
-                            <span>
-                                ${escapeHtml(label)}
-                            </span>
-                        `
-                      ).join("")
-                    : `
-                        <span class="quiet">
-                            No wagers settled
-                        </span>
-                      `
+                    row.specials.length
+                    ? `${row.specials.length} special ${
+                        row.specials.length === 1
+                        ? "result"
+                        : "results"
+                      } waiting`
+                    : "Final result"
                 }
-
             </div>
 
         </div>
@@ -21624,7 +22031,205 @@ function renderSettlementSpotlightCard(
 }
 
 
-function playSettlementSpotlightSequence(
+function settlementSpecialTilt(
+    index
+) {
+
+    const choices = [
+        -6.5,
+        5.0,
+        -4.0,
+        6.0,
+        -5.0,
+        3.5
+    ];
+
+
+    return choices[
+        index
+        %
+        choices.length
+    ];
+}
+
+
+function showSettlementSpecialPopup(
+    stage,
+    row,
+    special,
+    specialIndex
+) {
+
+    return new Promise(
+        resolve => {
+
+            const popup =
+                document.createElement(
+                    "div"
+                );
+
+
+            const positive =
+                Number(
+                    special.value
+                ) > 0;
+
+
+            const tilt =
+                settlementSpecialTilt(
+                    specialIndex
+                    +
+                    row.player.id.length
+                );
+
+
+            const side =
+                specialIndex % 2 === 0
+                ? "right"
+                : "left";
+
+
+            popup.className =
+                `
+                    settlement-special-popup
+                    ${positive ? "positive" : "negative"}
+                    ${side}
+                `;
+
+
+            popup.style.setProperty(
+                "--player",
+                playerColor(
+                    row.player.id
+                )
+            );
+
+
+            popup.style.setProperty(
+                "--special-tilt",
+                `${tilt}deg`
+            );
+
+
+            popup.innerHTML = `
+                <div class="settlement-special-kicker">
+                    Special Result
+                </div>
+
+                <div class="settlement-special-label">
+                    ${escapeHtml(
+                        special.label
+                    )}
+                </div>
+
+                <div class="settlement-special-amount">
+                    ${escapeHtml(
+                        settlementDeltaText(
+                            special.value
+                        )
+                    )}
+                </div>
+            `;
+
+
+            stage.appendChild(
+                popup
+            );
+
+
+            const animation =
+                popup.animate(
+                    [
+                        {
+                            opacity:
+                                0,
+                            transform:
+                                `
+                                    translateY(16px)
+                                    rotate(
+                                        calc(
+                                            var(--special-tilt)
+                                            - 3deg
+                                        )
+                                    )
+                                    scale(.72)
+                                `
+                        },
+
+                        {
+                            opacity:
+                                1,
+                            transform:
+                                `
+                                    translateY(-4px)
+                                    rotate(
+                                        var(--special-tilt)
+                                    )
+                                    scale(1.06)
+                                `,
+                            offset:
+                                .40
+                        },
+
+                        {
+                            opacity:
+                                1,
+                            transform:
+                                `
+                                    translateY(0)
+                                    rotate(
+                                        var(--special-tilt)
+                                    )
+                                    scale(1)
+                                `,
+                            offset:
+                                .72
+                        },
+
+                        {
+                            opacity:
+                                0,
+                            transform:
+                                `
+                                    translateY(-12px)
+                                    rotate(
+                                        var(--special-tilt)
+                                    )
+                                    scale(.94)
+                                `
+                        }
+                    ],
+                    {
+                        duration:
+                            1120,
+                        easing:
+                            "cubic-bezier(.18,.78,.24,1)",
+                        fill:
+                            "forwards"
+                    }
+                );
+
+
+            window.setTimeout(
+                () => {
+
+                    popup.remove();
+                    resolve();
+                },
+                1140
+            );
+
+
+            animation.finished
+                .catch(
+                    () => null
+                );
+        }
+    );
+}
+
+
+async function playSettlementSpotlightSequence(
     overlay,
     settlement,
     rows
@@ -21649,6 +22254,18 @@ function playSettlementSpotlightSequence(
     ) {
         return;
     }
+
+
+    const wait = (
+        milliseconds
+    ) =>
+        new Promise(
+            resolve =>
+                window.setTimeout(
+                    resolve,
+                    milliseconds
+                )
+        );
 
 
     title.animate(
@@ -21677,299 +22294,410 @@ function playSettlementSpotlightSequence(
     );
 
 
-    const firstDelay =
-        620;
-
-
-    /*
-       Give each player enough time to read:
-       entry -> War Chest movement -> result hold -> exit.
-    */
-    const stepDuration =
-        1450;
-
-
-    rows.forEach(
-        (
-            row,
-            index
-        ) => {
-
-            const delay =
-                firstDelay
-                +
-                index
-                *
-                stepDuration;
-
-
-            window.setTimeout(
-                () => {
-
-                    stage.innerHTML =
-                        renderSettlementSpotlightCard(
-                            row,
-                            index,
-                            rows.length
-                        );
-
-
-                    const card =
-                        stage.querySelector(
-                            ".settlement-spotlight-card"
-                        );
-
-
-                    const chest =
-                        stage.querySelector(
-                            "[data-settlement-war-chest]"
-                        );
-
-
-                    if (!card) {
-                        return;
-                    }
-
-
-                    const entry =
-                        card.animate(
-                            [
-                                {
-                                    opacity:
-                                        0,
-                                    transform:
-                                        "translateY(20px) scale(.94)"
-                                },
-
-                                {
-                                    opacity:
-                                        1,
-                                    transform:
-                                        "translateY(0) scale(1.025)",
-                                    offset:
-                                        .45
-                                },
-
-                                {
-                                    opacity:
-                                        1,
-                                    transform:
-                                        "translateY(0) scale(1)"
-                                }
-                            ],
-                            {
-                                duration:
-                                    420,
-                                easing:
-                                    "cubic-bezier(.18,.78,.24,1)",
-                                fill:
-                                    "forwards"
-                            }
-                        );
-
-
-                    animateSettlementWarChest(
-                        chest,
-                        row.beforeWarChest,
-                        row.finalWarChest,
-                        900
-                    );
-
-
-                    if (
-                        row.value !== 0
-                    ) {
-
-                        card.animate(
-                            [
-                                {
-                                    boxShadow:
-                                        "0 18px 55px rgba(0,0,0,.28)"
-                                },
-
-                                {
-                                    boxShadow:
-                                        `
-                                            0 0 0 1px var(--player),
-                                            0 0 34px color-mix(
-                                                in srgb,
-                                                var(--player) 28%,
-                                                transparent
-                                            ),
-                                            0 18px 55px rgba(0,0,0,.28)
-                                        `,
-                                    offset:
-                                        .52
-                                },
-
-                                {
-                                    boxShadow:
-                                        "0 18px 55px rgba(0,0,0,.28)"
-                                }
-                            ],
-                            {
-                                duration:
-                                    900,
-                                easing:
-                                    "cubic-bezier(.18,.72,.24,1)"
-                            }
-                        );
-                    }
-
-
-                    window.setTimeout(
-                        () => {
-
-                            card.animate(
-                                [
-                                    {
-                                        opacity:
-                                            1,
-                                        transform:
-                                            "translateY(0) scale(1)"
-                                    },
-
-                                    {
-                                        opacity:
-                                            0,
-                                        transform:
-                                            "translateY(-16px) scale(.965)"
-                                    }
-                                ],
-                                {
-                                    duration:
-                                        300,
-                                    easing:
-                                        "cubic-bezier(.22,.62,.28,1)",
-                                    fill:
-                                        "forwards"
-                                }
-                            );
-                        },
-                        1080
-                    );
-                },
-                delay
-            );
-        }
+    await wait(
+        620
     );
 
 
-    const sequenceEnd =
-        firstDelay
-        +
-        rows.length
-        *
-        stepDuration;
+    /*
+       It is possible (though unusual) for all settlement components to
+       net to zero. In that case we skip straight to the completion beat.
+    */
+    for (
+        let index = 0;
+        index < rows.length;
+        index++
+    ) {
+
+        const row =
+            rows[index];
 
 
-    window.setTimeout(
-        () => {
-
-            stage.innerHTML = `
-                <div class="settlement-complete-card">
-
-                    <div class="settlement-complete-kicker">
-                        Fight ${settlement.match_number} Settled
-                    </div>
-
-                    <div class="settlement-complete-title">
-                        War Chests Updated
-                    </div>
-
-                </div>
-            `;
+        stage.innerHTML =
+            renderSettlementSpotlightCard(
+                row,
+                index,
+                rows.length
+            );
 
 
-            const complete =
-                stage.querySelector(
-                    ".settlement-complete-card"
-                );
+        const card =
+            stage.querySelector(
+                ".settlement-spotlight-card"
+            );
 
 
-            complete?.animate(
+        const chest =
+            stage.querySelector(
+                "[data-settlement-war-chest]"
+            );
+
+
+        if (!card) {
+            continue;
+        }
+
+
+        card.animate(
+            [
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translateY(20px) scale(.94)"
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateY(0) scale(1.025)",
+                    offset:
+                        .45
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateY(0) scale(1)"
+                }
+            ],
+            {
+                duration:
+                    420,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+        await wait(
+            240
+        );
+
+
+        /*
+           BASE WINNER WAGER FIRST
+        */
+        if (
+            row.standardValue !==
+            0
+        ) {
+
+            animateSettlementWarChest(
+                chest,
+                row.beforeWarChest,
+                row.afterStandardWarChest,
+                900
+            );
+
+
+            card.animate(
                 [
                     {
-                        opacity:
-                            0,
-                        transform:
-                            "scale(.94)"
+                        boxShadow:
+                            "0 18px 55px rgba(0,0,0,.28)"
                     },
+
                     {
-                        opacity:
-                            1,
-                        transform:
-                            "scale(1)"
+                        boxShadow:
+                            `
+                                0 0 0 1px var(--player),
+                                0 0 34px color-mix(
+                                    in srgb,
+                                    var(--player) 28%,
+                                    transparent
+                                ),
+                                0 18px 55px rgba(0,0,0,.28)
+                            `,
+                        offset:
+                            .52
+                    },
+
+                    {
+                        boxShadow:
+                            "0 18px 55px rgba(0,0,0,.28)"
                     }
                 ],
                 {
                     duration:
-                        360,
+                        900,
                     easing:
-                        "cubic-bezier(.18,.78,.24,1)",
+                        "cubic-bezier(.18,.72,.24,1)"
+                }
+            );
+
+
+            await wait(
+                1040
+            );
+
+        }
+
+        else {
+
+            /*
+               No standard winner-bet movement for this player. Hold the
+               identity card briefly, then go directly into special beats.
+            */
+            await wait(
+                440
+            );
+        }
+
+
+        let currentWarChest =
+            row.afterStandardWarChest;
+
+
+        /*
+           SPECIAL BETS / PAYOUTS
+           Each gets a separate side-card, then the War Chest visibly
+           moves again after that card lands.
+        */
+        for (
+            let specialIndex = 0;
+            specialIndex < row.specials.length;
+            specialIndex++
+        ) {
+
+            const special =
+                row.specials[
+                    specialIndex
+                ];
+
+
+            const popupPromise =
+                showSettlementSpecialPopup(
+                    stage,
+                    row,
+                    special,
+                    specialIndex
+                );
+
+
+            /*
+               Let the special result card land and become readable before
+               moving the money again.
+            */
+            await wait(
+                420
+            );
+
+
+            const nextWarChest =
+                currentWarChest
+                +
+                Number(
+                    special.value
+                    ?? 0
+                );
+
+
+            animateSettlementWarChest(
+                chest,
+                currentWarChest,
+                nextWarChest,
+                760
+            );
+
+
+            card.animate(
+                [
+                    {
+                        filter:
+                            "brightness(1)"
+                    },
+                    {
+                        filter:
+                            Number(
+                                special.value
+                            ) >= 0
+                            ? "brightness(1.18)"
+                            : "brightness(.82)",
+                        offset:
+                            .42
+                    },
+                    {
+                        filter:
+                            "brightness(1)"
+                    }
+                ],
+                {
+                    duration:
+                        760,
+                    easing:
+                        "cubic-bezier(.18,.72,.24,1)"
+                }
+            );
+
+
+            currentWarChest =
+                nextWarChest;
+
+
+            await popupPromise;
+
+
+            await wait(
+                190
+            );
+        }
+
+
+        /*
+           Ensure the visible number exactly matches the authoritative
+           settlement result after the last incremental beat.
+        */
+        if (chest) {
+
+            chest.textContent =
+                money(
+                    row.finalWarChest
+                );
+        }
+
+
+        await wait(
+            360
+        );
+
+
+        const exit =
+            card.animate(
+                [
+                    {
+                        opacity:
+                            1,
+                        transform:
+                            "translateY(0) scale(1)"
+                    },
+
+                    {
+                        opacity:
+                            0,
+                        transform:
+                            "translateY(-16px) scale(.965)"
+                    }
+                ],
+                {
+                    duration:
+                        300,
+                    easing:
+                        "cubic-bezier(.22,.62,.28,1)",
                     fill:
                         "forwards"
                 }
             );
-        },
-        sequenceEnd
+
+
+        await exit.finished
+            .catch(
+                () => null
+            );
+
+
+        await wait(
+            140
+        );
+    }
+
+
+    stage.innerHTML = `
+        <div class="settlement-complete-card">
+
+            <div class="settlement-complete-kicker">
+                Fight ${settlement.match_number} Settled
+            </div>
+
+            <div class="settlement-complete-title">
+                War Chests Updated
+            </div>
+
+        </div>
+    `;
+
+
+    const complete =
+        stage.querySelector(
+            ".settlement-complete-card"
+        );
+
+
+    complete?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "scale(.94)"
+            },
+            {
+                opacity:
+                    1,
+                transform:
+                    "scale(1)"
+            }
+        ],
+        {
+            duration:
+                360,
+            easing:
+                "cubic-bezier(.18,.78,.24,1)",
+            fill:
+                "forwards"
+        }
     );
 
 
-    window.setTimeout(
-        () => {
-
-            /*
-               Use a normal CSS state for the exit instead of a Web
-               Animation with fill:'forwards'. This guarantees the overlay
-               returns to a clean reusable opacity state for Fight 2, 3, 4...
-            */
-            clearSettlementOverlayAnimations(
-                overlay
-            );
-
-
-            overlay.classList.remove(
-                "prearmed"
-            );
-
-
-            overlay.classList.add(
-                "settlement-exiting"
-            );
-
-
-            window.setTimeout(
-                () => {
-
-                    overlay.classList.remove(
-                        "active",
-                        "settlement-exiting"
-                    );
-
-
-                    overlay.innerHTML =
-                        "";
-
-
-                    settlementSequenceMatchId =
-                        null;
-
-
-                    /*
-                       Ensure there is no stale animation state left on the
-                       reusable overlay element.
-                    */
-                    clearSettlementOverlayAnimations(
-                        overlay
-                    );
-                },
-                790
-            );
-        },
-        sequenceEnd
-        +
+    await wait(
         1500
+    );
+
+
+    /*
+       Reusable CSS fade: no fill-forwards opacity survives into the next
+       fight's settlement.
+    */
+    clearSettlementOverlayAnimations(
+        overlay
+    );
+
+
+    overlay.classList.remove(
+        "prearmed"
+    );
+
+
+    overlay.classList.add(
+        "settlement-exiting"
+    );
+
+
+    await wait(
+        790
+    );
+
+
+    overlay.classList.remove(
+        "active",
+        "settlement-exiting"
+    );
+
+
+    overlay.innerHTML =
+        "";
+
+
+    settlementSequenceMatchId =
+        null;
+
+
+    clearSettlementOverlayAnimations(
+        overlay
     );
 }
 
@@ -22305,7 +23033,7 @@ function maybeShowPayout() {
                 </h2>
 
                 <p>
-                    One War Chest at a time.
+                    Winner bets first. Special payouts follow.
                 </p>
 
             </div>
