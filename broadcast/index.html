@@ -10020,6 +10020,102 @@ span.up-next {
     }
 }
 
+
+/* =========================================================
+   GLOBAL BROADCAST SCENE TRANSITIONS
+   ========================================================= */
+
+/*
+   During a normal phase handoff the outgoing #scene becomes a temporary
+   ghost while a fresh #scene is installed underneath it. Child animations
+   on the new scene can start immediately without waiting for the old one
+   to disappear.
+*/
+.scene-transition-ghost {
+    pointer-events: none !important;
+    will-change:
+        opacity,
+        transform,
+        filter;
+}
+
+
+/* =========================================================
+   BATTLE SHOW — CHROMA-SAFE SPLIT SHUTTER
+   ========================================================= */
+
+.battle-scene-shutter {
+    position: absolute;
+    inset: 0;
+    z-index: 5000;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.battle-scene-shutter-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: calc(50% + 1px);
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(31,42,61,.22),
+            transparent 52%
+        ),
+        linear-gradient(
+            180deg,
+            #101621,
+            #080d15
+        );
+    will-change: transform;
+}
+
+.battle-scene-shutter-panel.left {
+    left: 0;
+    border-right: 1px solid rgba(242,201,76,.16);
+}
+
+.battle-scene-shutter-panel.right {
+    right: 0;
+    border-left: 1px solid rgba(242,201,76,.16);
+}
+
+.battle-scene-shutter-seam {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    bottom: 12%;
+    width: 2px;
+    z-index: 2;
+    transform:
+        translateX(-50%);
+    border-radius: 999px;
+    background:
+        linear-gradient(
+            180deg,
+            transparent,
+            rgba(242,201,76,.72) 24%,
+            rgba(242,201,76,.94) 50%,
+            rgba(242,201,76,.72) 76%,
+            transparent
+        );
+    box-shadow:
+        0 0 18px rgba(242,201,76,.22);
+    opacity: 0;
+    transform-origin: center;
+}
+
+
+/*
+   The Battle Show itself never receives an opacity entrance animation.
+   Green is either fully covered by the opaque shutter or fully visible.
+*/
+.scene:has(.battle-show-scene) {
+    opacity: 1;
+    transform: none;
+}
+
 </style>
 </head>
 
@@ -10223,6 +10319,9 @@ let finalWarAdvanceTransitionRunning = false;
 let finalWarAdvanceDismissPending = false;
 
 let lastChampionRenderSignature = null;
+
+let lastScenePresentationKey = null;
+let sceneTransitionSerial = 0;
 
 
 function escapeHtml(value) {
@@ -12415,6 +12514,18 @@ async function refreshState(
             );
 
 
+            /*
+               Initial load / refresh reconstructs the CURRENT presentation
+               directly. Historical phase changes should never replay their
+               global transitions.
+            */
+            lastScenePresentationKey =
+                null;
+
+
+            cleanupSceneTransitionArtifacts();
+
+
             firstState = false;
         }
 
@@ -13385,6 +13496,854 @@ function championRenderSignature() {
 }
 
 
+function scenePresentationKey() {
+
+    if (!state?.event) {
+        return "none";
+    }
+
+
+    const event =
+        state.event;
+
+
+    const round =
+        Number(
+            event.current_round
+            ?? 0
+        );
+
+
+    const matchNumber =
+        Number(
+            event.current_match_number
+            ?? 0
+        );
+
+
+    switch (
+        event.status
+    ) {
+
+        case "lobby":
+            return "lobby";
+
+
+        case "locked":
+            return "locked";
+
+
+        case "draft_order":
+            return "draft-order";
+
+
+        /*
+           Draft picks already have their own unit-flight / snake-draft
+           animations, so the entire Draft phase is one presentation scene.
+        */
+        case "draft":
+            return "draft";
+
+
+        case "draft_complete":
+            return "draft-complete";
+
+
+        case "shop":
+            return `shop:${round}`;
+
+
+        case "army_build":
+            return `army-build:${round}`;
+
+
+        case "betting_open":
+            return `betting-open:${round}`;
+
+
+        /*
+           Include current matchup here so the post-settlement return to
+           Pools Locked is treated as a new presentation beat. In practice
+           that transition normally occurs underneath the opaque Settlement
+           sequence and is already finished when Settlement fades away.
+        */
+        case "betting_locked":
+            return `pools:${round}:${matchNumber}`;
+
+
+        case "fight": {
+
+            const match =
+                currentMatch();
+
+
+            const matchKey =
+                [
+                    Number(
+                        match?.round_number
+                        ?? round
+                    ),
+                    Number(
+                        match?.match_number
+                        ?? matchNumber
+                    )
+                ].join(":");
+
+
+            if (
+                match?.winner_player_id
+            ) {
+                return `fight-result:${matchKey}`;
+            }
+
+
+            if (
+                match
+                &&
+                state?.battle_show
+                    ?.revealed
+                &&
+                state?.battle_show
+                    ?.match_id ===
+                    match.id
+            ) {
+                return `battle-show:${matchKey}`;
+            }
+
+
+            return `fight-reveal:${matchKey}`;
+        }
+
+
+        case "regular_complete":
+            return "regular-complete";
+
+
+        case "final_war_build":
+        case "final_war_ready": {
+
+            const stage =
+                Number(
+                    event.final_war_current_stage
+                    ?? 0
+                );
+
+
+            const currentIntroKey =
+                [
+                    event.id
+                    ?? roomCode
+                    ?? "event",
+
+                    stage
+                ].join(":");
+
+
+            if (
+                finalWarBracketIntroRunning
+                &&
+                finalWarBracketIntroKey ===
+                    currentIntroKey
+            ) {
+                return `final-bracket-intro:${stage}`;
+            }
+
+
+            /*
+               Build and Ready share the same visual scene. Submission
+               progress should update in place rather than transition.
+            */
+            return `final-army-build:${stage}`;
+        }
+
+
+        case "final_war_fight": {
+
+            const match =
+                currentFinalMatch();
+
+
+            const stage =
+                Number(
+                    match?.stage_number
+                    ??
+                    event.final_war_current_stage
+                    ??
+                    0
+                );
+
+
+            if (
+                match
+                &&
+                state?.final_war_battle_show
+                    ?.revealed
+                &&
+                state?.final_war_battle_show
+                    ?.match_id ===
+                    match.id
+            ) {
+                return `final-battle-show:${stage}`;
+            }
+
+
+            return `final-fight-reveal:${stage}`;
+        }
+
+
+        case "final_war_complete":
+            return "champion";
+
+
+        default:
+            return `status:${event.status}`;
+    }
+}
+
+
+function isBattleShowPresentationKey(
+    key
+) {
+
+    return (
+        key?.startsWith(
+            "battle-show:"
+        )
+        ||
+        key?.startsWith(
+            "final-battle-show:"
+        )
+    );
+}
+
+
+function isFightRevealPresentationKey(
+    key
+) {
+
+    return (
+        key?.startsWith(
+            "fight-reveal:"
+        )
+        ||
+        key?.startsWith(
+            "final-fight-reveal:"
+        )
+    );
+}
+
+
+function shouldSkipGenericSceneTransition(
+    previousKey,
+    nextKey
+) {
+
+    if (
+        !previousKey
+        ||
+        previousKey ===
+            nextKey
+    ) {
+        return true;
+    }
+
+
+    /*
+       Regular-season winner presentation owns the complete:
+           greenscreen -> Victory -> settlement waiting
+       animation and must not be softened by the generic scene crossfade.
+    */
+    if (
+        nextKey.startsWith(
+            "fight-result:"
+        )
+    ) {
+        return true;
+    }
+
+
+    /*
+       Final War advancement owns:
+           greenscreen -> Victory -> bracket -> next scene
+       through its dedicated overlay.
+    */
+    if (
+        isBattleShowPresentationKey(
+            previousKey
+        )
+        &&
+        (
+            nextKey.startsWith(
+                "final-army-build:"
+            )
+            ||
+            nextKey ===
+                "champion"
+        )
+    ) {
+        return true;
+    }
+
+
+    /*
+       Regular Season Complete -> Final War already has the custom
+       elimination / FINAL FOUR sequence.
+    */
+    if (
+        previousKey ===
+            "regular-complete"
+        &&
+        nextKey.startsWith(
+            "final-bracket-intro:"
+        )
+    ) {
+        return true;
+    }
+
+
+    return false;
+}
+
+
+function cleanupSceneTransitionArtifacts() {
+
+    document
+        .querySelectorAll(
+            ".scene-transition-ghost"
+        )
+        .forEach(
+            node =>
+                node.remove()
+        );
+
+
+    document
+        .querySelectorAll(
+            ".battle-scene-shutter"
+        )
+        .forEach(
+            node =>
+                node.remove()
+        );
+}
+
+
+function installNextSceneElement(
+    oldScene,
+    nextHtml
+) {
+
+    const nextScene =
+        document.createElement(
+            "section"
+        );
+
+
+    nextScene.id =
+        "scene";
+
+
+    nextScene.className =
+        "scene active";
+
+
+    nextScene.innerHTML =
+        nextHtml;
+
+
+    oldScene.removeAttribute(
+        "id"
+    );
+
+
+    oldScene.classList.add(
+        "scene-transition-ghost"
+    );
+
+
+    oldScene.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    oldScene.style.pointerEvents =
+        "none";
+
+
+    oldScene.parentNode.insertBefore(
+        nextScene,
+        oldScene
+    );
+
+
+    return nextScene;
+}
+
+
+function runStandardSceneTransition(
+    oldScene,
+    nextHtml
+) {
+
+    const serial =
+        ++sceneTransitionSerial;
+
+
+    cleanupSceneTransitionArtifacts();
+
+
+    const nextScene =
+        installNextSceneElement(
+            oldScene,
+            nextHtml
+        );
+
+
+    /*
+       Old scene stays above the new one during the overlap.
+       This gives us a true crossfade instead of a fade-in after a hard cut.
+    */
+    oldScene.style.zIndex =
+        "3";
+
+
+    nextScene.style.zIndex =
+        "2";
+
+
+    const outgoing =
+        oldScene.animate(
+            [
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateX(0) scale(1)",
+                    filter:
+                        "brightness(1)"
+                },
+
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translateX(-18px) scale(.995)",
+                    filter:
+                        "brightness(.86)"
+                }
+            ],
+            {
+                duration:
+                    390,
+                easing:
+                    "cubic-bezier(.22,.64,.26,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    const incoming =
+        nextScene.animate(
+            [
+                {
+                    opacity:
+                        0,
+                    transform:
+                        "translateX(18px) scale(.995)",
+                    filter:
+                        "brightness(.92)"
+                },
+
+                {
+                    opacity:
+                        1,
+                    transform:
+                        "translateX(0) scale(1)",
+                    filter:
+                        "brightness(1)"
+                }
+            ],
+            {
+                duration:
+                    470,
+                easing:
+                    "cubic-bezier(.18,.78,.24,1)",
+                fill:
+                    "both"
+            }
+        );
+
+
+    Promise
+        .allSettled(
+            [
+                outgoing.finished,
+                incoming.finished
+            ]
+        )
+        .then(
+            () => {
+
+                if (
+                    serial !==
+                    sceneTransitionSerial
+                ) {
+                    return;
+                }
+
+
+                oldScene.remove();
+
+
+                /*
+                   Cancel after completion so no fill-forwards Web Animation
+                   remains attached to the persistent new #scene element.
+                */
+                try {
+                    incoming.cancel();
+                }
+                catch {}
+
+
+                nextScene.style.zIndex =
+                    "";
+            }
+        );
+
+
+    return nextScene;
+}
+
+
+function runBattleShowShutterTransition(
+    oldScene,
+    nextHtml
+) {
+
+    const serial =
+        ++sceneTransitionSerial;
+
+
+    cleanupSceneTransitionArtifacts();
+
+
+    const stage =
+        oldScene.parentElement;
+
+
+    const nextScene =
+        installNextSceneElement(
+            oldScene,
+            nextHtml
+        );
+
+
+    /*
+       Do NOT fade the Battle Show. The #00FF00 chroma area remains at full
+       opacity throughout. Opaque panels physically cover/uncover it, so OBS
+       never sees half-transparent chroma pixels.
+    */
+    oldScene.style.zIndex =
+        "3";
+
+
+    nextScene.style.zIndex =
+        "2";
+
+
+    const shutter =
+        document.createElement(
+            "div"
+        );
+
+
+    shutter.className =
+        "battle-scene-shutter";
+
+
+    shutter.innerHTML = `
+        <div class="battle-scene-shutter-panel left"></div>
+        <div class="battle-scene-shutter-panel right"></div>
+        <div class="battle-scene-shutter-seam"></div>
+    `;
+
+
+    stage.appendChild(
+        shutter
+    );
+
+
+    const left =
+        shutter.querySelector(
+            ".battle-scene-shutter-panel.left"
+        );
+
+
+    const right =
+        shutter.querySelector(
+            ".battle-scene-shutter-panel.right"
+        );
+
+
+    const seam =
+        shutter.querySelector(
+            ".battle-scene-shutter-seam"
+        );
+
+
+    const leftClose =
+        left.animate(
+            [
+                {
+                    transform:
+                        "translateX(-101%)"
+                },
+
+                {
+                    transform:
+                        "translateX(0)"
+                }
+            ],
+            {
+                duration:
+                    300,
+                easing:
+                    "cubic-bezier(.34,.01,.22,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    const rightClose =
+        right.animate(
+            [
+                {
+                    transform:
+                        "translateX(101%)"
+                },
+
+                {
+                    transform:
+                        "translateX(0)"
+                }
+            ],
+            {
+                duration:
+                    300,
+                easing:
+                    "cubic-bezier(.34,.01,.22,1)",
+                fill:
+                    "forwards"
+            }
+        );
+
+
+    seam?.animate(
+        [
+            {
+                opacity:
+                    0,
+                transform:
+                    "scaleY(.2)"
+            },
+
+            {
+                opacity:
+                    0,
+                transform:
+                    "scaleY(.2)",
+                offset:
+                    .72
+            },
+
+            {
+                opacity:
+                    1,
+                transform:
+                    "scaleY(1)"
+            }
+        ],
+        {
+            duration:
+                300,
+            easing:
+                "ease",
+            fill:
+                "forwards"
+        }
+    );
+
+
+    Promise
+        .allSettled(
+            [
+                leftClose.finished,
+                rightClose.finished
+            ]
+        )
+        .then(
+            async () => {
+
+                if (
+                    serial !==
+                    sceneTransitionSerial
+                ) {
+                    return;
+                }
+
+
+                /*
+                   Scene swap happens only after the stage is 100% covered.
+                */
+                oldScene.remove();
+
+
+                await new Promise(
+                    resolve =>
+                        window.setTimeout(
+                            resolve,
+                            90
+                        )
+                );
+
+
+                const leftOpen =
+                    left.animate(
+                        [
+                            {
+                                transform:
+                                    "translateX(0)"
+                            },
+
+                            {
+                                transform:
+                                    "translateX(-101%)"
+                            }
+                        ],
+                        {
+                            duration:
+                                470,
+                            easing:
+                                "cubic-bezier(.18,.78,.24,1)",
+                            fill:
+                                "forwards"
+                        }
+                    );
+
+
+                const rightOpen =
+                    right.animate(
+                        [
+                            {
+                                transform:
+                                    "translateX(0)"
+                            },
+
+                            {
+                                transform:
+                                    "translateX(101%)"
+                            }
+                        ],
+                        {
+                            duration:
+                                470,
+                            easing:
+                                "cubic-bezier(.18,.78,.24,1)",
+                            fill:
+                                "forwards"
+                        }
+                    );
+
+
+                seam?.animate(
+                    [
+                        {
+                            opacity:
+                                1
+                        },
+
+                        {
+                            opacity:
+                                0
+                        }
+                    ],
+                    {
+                        duration:
+                            180,
+                        easing:
+                            "ease",
+                        fill:
+                            "forwards"
+                    }
+                );
+
+
+                await Promise.allSettled(
+                    [
+                        leftOpen.finished,
+                        rightOpen.finished
+                    ]
+                );
+
+
+                if (
+                    serial !==
+                    sceneTransitionSerial
+                ) {
+                    return;
+                }
+
+
+                shutter.remove();
+
+
+                nextScene.style.zIndex =
+                    "";
+            }
+        );
+
+
+    return nextScene;
+}
+
+
+function replaceSceneWithPresentationTransition(
+    scene,
+    nextHtml,
+    previousKey,
+    nextKey
+) {
+
+    /*
+       Army Reveal -> Battle Show gets the chroma-safe mechanical shutter.
+    */
+    if (
+        isFightRevealPresentationKey(
+            previousKey
+        )
+        &&
+        isBattleShowPresentationKey(
+            nextKey
+        )
+    ) {
+
+        return runBattleShowShutterTransition(
+            scene,
+            nextHtml
+        );
+    }
+
+
+    return runStandardSceneTransition(
+        scene,
+        nextHtml
+    );
+}
+
+
 function renderBroadcast() {
 
     if (!state?.event) {
@@ -13453,10 +14412,27 @@ function renderBroadcast() {
             footerStatus();
 
 
-    const scene =
+    let scene =
         document.getElementById(
             "scene"
         );
+
+
+    const nextSceneKey =
+        scenePresentationKey();
+
+
+    const previousSceneKey =
+        lastScenePresentationKey;
+
+
+    const sceneKeyChanged =
+        Boolean(
+            previousSceneKey
+        )
+        &&
+        previousSceneKey !==
+            nextSceneKey;
 
 
     const championSignature =
@@ -13481,19 +14457,55 @@ function renderBroadcast() {
        The Champion card contains a continuously looping CSS glow.
 
        Replacing scene.innerHTML every ~900ms destroys and recreates that
-       element, which restarts the animation and makes the pulse look like
-       it harshly cuts off.
-
-       Keep the existing Champion DOM alive while the visible results are
-       unchanged. If a final audience/player value genuinely changes, render
-       once with the new data, then preserve that new DOM on later polls.
+       element, so unchanged Champion data preserves the exact same DOM.
     */
     if (
         !preserveChampionScene
     ) {
 
-        scene.innerHTML =
+        const nextHtml =
             renderScene();
+
+
+        const canTransition =
+            sceneKeyChanged
+            &&
+            Boolean(
+                scene.childElementCount
+            )
+            &&
+            !shouldSkipGenericSceneTransition(
+                previousSceneKey,
+                nextSceneKey
+            );
+
+
+        if (
+            canTransition
+        ) {
+
+            scene =
+                replaceSceneWithPresentationTransition(
+                    scene,
+                    nextHtml,
+                    previousSceneKey,
+                    nextSceneKey
+                );
+
+        }
+
+        else {
+
+            /*
+               Specialized sequences (Victory, Settlement, Final Four, etc.)
+               already own their handoffs and render immediately.
+            */
+            cleanupSceneTransitionArtifacts();
+
+
+            scene.innerHTML =
+                nextHtml;
+        }
 
 
         lastChampionRenderSignature =
@@ -13509,6 +14521,10 @@ function renderBroadcast() {
         lastChampionRenderSignature =
             null;
     }
+
+
+    lastScenePresentationKey =
+        nextSceneKey;
 
 
     requestAnimationFrame(
