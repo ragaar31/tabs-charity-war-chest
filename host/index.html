@@ -5544,6 +5544,37 @@ function renderFinalWarHost() {
     content.innerHTML = `
         ${matchHeader}
 
+        <div class="battle-show-host-control">
+
+            ${
+                match.battle_show_revealed_at
+                ? `
+                    <div class="battle-show-live-state">
+                        <strong>
+                            Battle Window Live
+                        </strong>
+
+                        <span>
+                            The Final War Broadcast greenscreen is currently displayed.
+                        </span>
+                    </div>
+                  `
+                : `
+                    <button
+                        class="battle-show-button"
+                        onclick="showFinalWarBattleWindow()"
+                    >
+                        Show Battle Window
+                    </button>
+
+                    <p class="status">
+                        Switch the Broadcast from the Final War Army Reveal to the OBS gameplay window when TABS is ready.
+                    </p>
+                  `
+            }
+
+        </div>
+
         <div class="actions">
 
             <button
@@ -5724,6 +5755,85 @@ async function revealFinalWarArmies() {
 
     setMessage(
         "Final War armies revealed."
+    );
+}
+
+
+async function showFinalWarBattleWindow() {
+
+    const match =
+        finalWarCurrentMatch();
+
+
+    if (!match) {
+
+        setMessage(
+            "There is no active Final War fight."
+        );
+
+        return;
+    }
+
+
+    if (
+        eventData?.status !==
+            "final_war_fight"
+    ) {
+
+        setMessage(
+            "Final War armies must be revealed first."
+        );
+
+        return;
+    }
+
+
+    if (
+        match.winner_player_id
+    ) {
+
+        setMessage(
+            "A winner has already been recorded for this Final War fight."
+        );
+
+        return;
+    }
+
+
+    setMessage(
+        "Showing Final War Battle Window on Broadcast..."
+    );
+
+
+    const {
+        error
+    } =
+        await db.rpc(
+            "reveal_current_final_war_battle_show",
+            {
+                p_event_id:
+                    currentEventId
+            }
+        );
+
+
+    if (error) {
+
+        setMessage(
+            "Error: "
+            +
+            error.message
+        );
+
+        return;
+    }
+
+
+    await loadState();
+
+
+    setMessage(
+        "Final War Battle Window is live on the Broadcast."
     );
 }
 
