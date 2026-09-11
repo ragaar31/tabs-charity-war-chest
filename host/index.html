@@ -685,11 +685,294 @@ a { color: white; }
     font-size: .86rem;
 }
 
+
+
+/* =========================================================
+   HOST — FIXED CONTROL DOCK
+   Keeps phase/progression controls visible while the
+   information panels remain independently scrollable.
+   ========================================================= */
+
+.host-control-dock {
+    position: fixed;
+    z-index: 1000;
+    top: 18px;
+    right: 18px;
+    width: 300px;
+    max-height: calc(100vh - 36px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 16px;
+    background: rgba(12,15,23,.94);
+    box-shadow: 0 18px 55px rgba(0,0,0,.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.host-control-dock.hidden {
+    display: none !important;
+}
+
+.host-control-dock-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.11);
+    background: rgba(255,255,255,.045);
+}
+
+.host-control-dock-heading {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.host-control-dock-kicker {
+    font-size: .65rem;
+    font-weight: bold;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    opacity: .52;
+}
+
+.host-control-dock-phase {
+    margin-top: 3px;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.host-control-dock-toggle {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.08);
+    color: white;
+    font-size: 1rem;
+}
+
+.host-control-dock-body {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 13px;
+}
+
+.host-control-dock-room {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+    margin-bottom: 11px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+    font-size: .75rem;
+    opacity: .72;
+}
+
+.host-control-dock-room strong {
+    font-size: .92rem;
+    letter-spacing: .14em;
+    opacity: 1;
+}
+
+.host-control-dock-message {
+    margin: 0 0 11px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.055);
+    font-size: .78rem;
+    line-height: 1.35;
+    opacity: .78;
+}
+
+.host-control-dock-message:empty {
+    display: none;
+}
+
+.host-control-dock-section + .host-control-dock-section {
+    margin-top: 13px;
+    padding-top: 13px;
+    border-top: 1px solid rgba(255,255,255,.09);
+}
+
+.host-control-dock-label {
+    margin-bottom: 7px;
+    font-size: .68rem;
+    font-weight: bold;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    opacity: .48;
+}
+
+.host-control-dock-summary {
+    margin: 0 0 9px;
+    font-size: .78rem;
+    line-height: 1.35;
+    opacity: .68;
+}
+
+.host-control-dock-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.host-control-dock-actions.two-up {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+}
+
+.host-control-dock button:not(.host-control-dock-toggle) {
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 12px;
+    line-height: 1.15;
+}
+
+.host-control-dock .dock-winner-button {
+    min-height: 46px;
+}
+
+.host-control-dock .dock-event-button {
+    margin-top: 2px;
+    background: #6d2932;
+    color: white;
+}
+
+.host-control-dock.collapsed .host-control-dock-body {
+    display: none;
+}
+
+.host-control-dock.collapsed {
+    max-height: none;
+}
+
+/* Primary phase controls are mirrored into the fixed dock. */
+.mirrored-inline-control {
+    display: none !important;
+}
+
+@media (min-width: 1450px) {
+    main {
+        width: min(1100px, calc(100% - 360px));
+        margin-left: max(3vw, calc((100vw - 1450px) / 2));
+        margin-right: auto;
+    }
+
+    .player-join-qr {
+        right: 338px;
+    }
+}
+
+@media (max-width: 1449px) {
+    body {
+        padding-bottom: 170px;
+    }
+
+    body.host-control-dock-collapsed {
+        padding-bottom: 82px;
+    }
+
+    .host-control-dock {
+        top: auto;
+        right: auto;
+        bottom: 12px;
+        left: 50%;
+        width: min(1100px, calc(100vw - 24px));
+        max-height: 44vh;
+        transform: translateX(-50%);
+    }
+
+    .host-control-dock-header {
+        padding: 10px 12px;
+    }
+
+    .host-control-dock-body {
+        padding: 10px 12px 12px;
+    }
+
+    .host-control-dock-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px,1fr));
+        gap: 10px 14px;
+    }
+
+    .host-control-dock-section + .host-control-dock-section {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+    }
+}
+
+@media (max-width: 620px) {
+    body {
+        padding-bottom: 190px;
+    }
+
+    body.host-control-dock-collapsed {
+        padding-bottom: 76px;
+    }
+
+    .host-control-dock {
+        bottom: 8px;
+        width: calc(100vw - 16px);
+        max-height: 52vh;
+        border-radius: 13px;
+    }
+
+    .host-control-dock-sections {
+        display: block;
+    }
+
+    .host-control-dock-section + .host-control-dock-section {
+        margin-top: 11px;
+        padding-top: 11px;
+        border-top: 1px solid rgba(255,255,255,.09);
+    }
+}
+
 </style>
 </head>
 
 
 <body>
+
+
+<div id="host-control-dock" class="host-control-dock hidden">
+    <div class="host-control-dock-header">
+        <div class="host-control-dock-heading">
+            <div class="host-control-dock-kicker">Host Controls</div>
+            <div id="host-control-dock-phase" class="host-control-dock-phase">Lobby</div>
+        </div>
+        <button
+            id="host-control-dock-toggle"
+            class="host-control-dock-toggle"
+            type="button"
+            title="Collapse host controls"
+            aria-label="Collapse host controls"
+            onclick="toggleHostControlDock()"
+        >
+            ▾
+        </button>
+    </div>
+
+    <div class="host-control-dock-body">
+        <div class="host-control-dock-room">
+            <span>Room</span>
+            <strong id="host-control-dock-room">------</strong>
+        </div>
+        <p id="host-control-dock-message" class="host-control-dock-message"></p>
+        <div id="host-control-dock-sections" class="host-control-dock-sections"></div>
+    </div>
+</div>
+
 
 <div
     id="player-join-qr"
@@ -873,6 +1156,9 @@ let chaosResolveTimer = null;
 const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8"}];
 
 let lastAutoChaosKey = null;
+
+let hostControlDockCollapsed =
+    localStorage.getItem("tabs_host_control_dock_collapsed") === "1";
 
 
 
@@ -1673,6 +1959,7 @@ function render() {
     renderFinalWarHost();
 
     renderPlayerJoinQr();
+    renderHostControlDock();
 
     scheduleChaosResolution();
 }
@@ -1946,6 +2233,765 @@ function renderActions() {
             `
         );
     }
+}
+
+
+function toggleHostControlDock() {
+
+    hostControlDockCollapsed =
+        !hostControlDockCollapsed;
+
+    localStorage.setItem(
+        "tabs_host_control_dock_collapsed",
+        hostControlDockCollapsed ? "1" : "0"
+    );
+
+    applyHostControlDockCollapsedState();
+}
+
+
+function applyHostControlDockCollapsedState() {
+
+    const dock =
+        document.getElementById(
+            "host-control-dock"
+        );
+
+    const toggle =
+        document.getElementById(
+            "host-control-dock-toggle"
+        );
+
+    if (!dock || !toggle) {
+        return;
+    }
+
+    dock.classList.toggle(
+        "collapsed",
+        hostControlDockCollapsed
+    );
+
+    document.body.classList.toggle(
+        "host-control-dock-collapsed",
+        hostControlDockCollapsed
+    );
+
+    toggle.textContent =
+        hostControlDockCollapsed
+        ? "▴"
+        : "▾";
+
+    toggle.title =
+        hostControlDockCollapsed
+        ? "Expand host controls"
+        : "Collapse host controls";
+
+    toggle.setAttribute(
+        "aria-label",
+        toggle.title
+    );
+}
+
+
+function hostDockSection(
+    label,
+    body,
+    summary = ""
+) {
+
+    return `
+        <div class="host-control-dock-section">
+            <div class="host-control-dock-label">
+                ${escapeHtml(label)}
+            </div>
+
+            ${
+                summary
+                ? `
+                    <p class="host-control-dock-summary">
+                        ${summary}
+                    </p>
+                  `
+                : ""
+            }
+
+            ${body}
+        </div>
+    `;
+}
+
+
+function hideMirroredInlineControls() {
+
+    const selectors = [
+        "#host-actions button",
+        ".new-event-button",
+        "#army-next-phase button",
+        "#betting-host-content .next-phase button",
+        "#betting-host-content .fight-control > button",
+        "#betting-host-content .battle-show-host-control button",
+        "#betting-host-content .winner-choice button",
+        "#final-war-host-content > .actions button",
+        "#final-war-host-content .battle-show-host-control button"
+    ];
+
+    document
+        .querySelectorAll(
+            selectors.join(",")
+        )
+        .forEach(
+            button =>
+                button.classList.add(
+                    "mirrored-inline-control"
+                )
+        );
+}
+
+
+function renderHostControlDock() {
+
+    const dock =
+        document.getElementById(
+            "host-control-dock"
+        );
+
+    const phase =
+        document.getElementById(
+            "host-control-dock-phase"
+        );
+
+    const room =
+        document.getElementById(
+            "host-control-dock-room"
+        );
+
+    const message =
+        document.getElementById(
+            "host-control-dock-message"
+        );
+
+    const sections =
+        document.getElementById(
+            "host-control-dock-sections"
+        );
+
+
+    if (
+        !dock ||
+        !phase ||
+        !room ||
+        !message ||
+        !sections
+    ) {
+        return;
+    }
+
+
+    if (!eventData) {
+        dock.classList.add("hidden");
+        return;
+    }
+
+
+    dock.classList.remove("hidden");
+
+    phase.textContent =
+        document
+            .getElementById("phase-title")
+            ?.textContent
+        ?? "Host Controls";
+
+    room.textContent =
+        eventData.code ?? "------";
+
+    message.textContent =
+        document
+            .getElementById("host-message")
+            ?.textContent
+        ?? "";
+
+
+    const status =
+        eventData.status;
+
+    let html = "";
+
+
+    if (status === "lobby") {
+
+        html += hostDockSection(
+            "Lobby",
+            `
+                <div class="host-control-dock-actions two-up">
+                    <button
+                        class="secondary"
+                        ${players.length >= 8 ? "disabled" : ""}
+                        onclick="addChaosGambler()"
+                    >
+                        🎲 Add Chaos
+                    </button>
+
+                    <button
+                        class="secondary"
+                        ${players.length >= 8 ? "disabled" : ""}
+                        onclick="fillChaosGamblers()"
+                    >
+                        🎲 Fill to 8
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="addTestAudience()"
+                    >
+                        🧪 +10 Audience
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="clearTestAudience()"
+                    >
+                        Clear Audience
+                    </button>
+                </div>
+            `,
+            `${players.length} / 8 player seats filled.`
+        );
+
+        html += hostDockSection(
+            "Advance",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="lockLobbyAndDetermineOrder()">
+                        Lock Lobby &amp; Determine Draft Order
+                    </button>
+                </div>
+            `
+        );
+    }
+
+
+    else if (status === "locked") {
+
+        html += hostDockSection(
+            "Advance",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="randomizeOrder()">
+                        Determine Draft Order
+                    </button>
+                </div>
+            `
+        );
+    }
+
+
+    else if (status === "draft_order") {
+
+        html += hostDockSection(
+            "Draft Order",
+            `
+                <div class="host-control-dock-actions">
+                    <button
+                        class="secondary"
+                        onclick="randomizeOrder()"
+                    >
+                        Reroll Order
+                    </button>
+
+                    <button onclick="beginDraft()">
+                        Begin Draft
+                    </button>
+                </div>
+            `
+        );
+    }
+
+
+    else if (status === "draft") {
+
+        const state =
+            getCurrentDraftState();
+
+        html += hostDockSection(
+            "Draft",
+            `
+                <div class="host-control-dock-actions">
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            state?.player
+            ? `Pick ${state.pick}: ${escapeHtml(state.player.display_name)} is on the clock.`
+            : "Draft in progress."
+        );
+    }
+
+
+    else if (status === "draft_complete") {
+
+        html += hostDockSection(
+            "Advance",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="startRegularSeason()">
+                        Begin Regular Season
+                    </button>
+                </div>
+            `
+        );
+    }
+
+
+    else if (status === "shop") {
+
+        html += hostDockSection(
+            "Round Shop",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="closeShopAndLockBudgets()">
+                        Close Shop &amp; Lock Army Tiers
+                    </button>
+
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            `Round ${eventData.current_round}`
+        );
+    }
+
+
+    else if (status === "army_build") {
+
+        const submittedCount =
+            players.filter(
+                player =>
+                    armySubmissions.some(
+                        row =>
+                            row.round_number === eventData.current_round
+                            &&
+                            row.player_id === player.id
+                    )
+            ).length;
+
+        const allSubmitted =
+            players.length > 0
+            &&
+            submittedCount === players.length;
+
+        html += hostDockSection(
+            "Army Build",
+            `
+                <div class="host-control-dock-actions">
+                    <button
+                        ${allSubmitted ? "" : "disabled"}
+                        onclick="beginBetting()"
+                    >
+                        Begin Betting
+                    </button>
+
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            `${submittedCount} / ${players.length} armies submitted.`
+        );
+    }
+
+
+    else if (status === "betting_open") {
+
+        const readyCount =
+            players.filter(
+                player =>
+                    player.betting_ready_round ===
+                    eventData.current_round
+            ).length;
+
+        html += hostDockSection(
+            "Betting",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="lockBetting()">
+                        Lock Betting &amp; Reveal Pools
+                    </button>
+
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            `${readyCount} / ${players.length} players ready.`
+        );
+    }
+
+
+    else if (status === "betting_locked") {
+
+        const match =
+            currentFightMatch();
+
+        html += hostDockSection(
+            "Current Fight",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="revealCurrentArmies()">
+                        Reveal Armies
+                    </button>
+
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            match
+            ? `${escapeHtml(playerName(match.player1_id))} vs ${escapeHtml(playerName(match.player2_id))}`
+            : "Waiting for the current matchup."
+        );
+    }
+
+
+    else if (status === "fight") {
+
+        const match =
+            currentFightMatch();
+
+        if (match) {
+
+            html += hostDockSection(
+                `Fight ${match.match_number}`,
+                `
+                    <div class="host-control-dock-actions">
+                        ${
+                            match.battle_show_revealed_at
+                            ? `
+                                <button class="secondary" disabled>
+                                    Battle Window Live
+                                </button>
+                              `
+                            : `
+                                <button
+                                    class="battle-show-button"
+                                    onclick="showBattleWindow()"
+                                >
+                                    Show Battle Window
+                                </button>
+                              `
+                        }
+                    </div>
+                `,
+                `${escapeHtml(playerName(match.player1_id))} vs ${escapeHtml(playerName(match.player2_id))}`
+            );
+
+            html += hostDockSection(
+                "Record Winner",
+                `
+                    <div class="host-control-dock-actions two-up">
+                        <button
+                            class="dock-winner-button ${
+                                match.winner_player_id === match.player1_id
+                                ? "secondary"
+                                : ""
+                            }"
+                            onclick="recordWinner('${match.player1_id}')"
+                        >
+                            ${escapeHtml(playerName(match.player1_id))} Wins
+                        </button>
+
+                        <button
+                            class="dock-winner-button ${
+                                match.winner_player_id === match.player2_id
+                                ? "secondary"
+                                : ""
+                            }"
+                            onclick="recordWinner('${match.player2_id}')"
+                        >
+                            ${escapeHtml(playerName(match.player2_id))} Wins
+                        </button>
+                    </div>
+                `
+            );
+
+            if (match.status === "winner_recorded") {
+
+                html += hostDockSection(
+                    "Advance",
+                    `
+                        <div class="host-control-dock-actions">
+                            <button onclick="settleFight()">
+                                Settle Fight
+                            </button>
+                        </div>
+                    `,
+                    `Winner: ${escapeHtml(playerName(match.winner_player_id))}`
+                );
+            }
+        }
+    }
+
+
+    else if (status === "regular_complete") {
+
+        html += hostDockSection(
+            "Final War",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="seedFinalWar()">
+                        Lock Final Skills &amp; Seed Final War
+                    </button>
+
+                    ${
+                        players.some(
+                            player => player.is_bot
+                        )
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveChaosGamblers(false)"
+                            >
+                                🎲 Resolve Chaos Gamblers
+                            </button>
+                          `
+                        : ""
+                    }
+                </div>
+            `,
+            "Regular Season complete."
+        );
+    }
+
+
+    else if (status === "final_war_build") {
+
+        const match =
+            finalWarCurrentMatch();
+
+        const hasBotFinalist =
+            match
+            &&
+            players.some(
+                player =>
+                    player.is_bot
+                    &&
+                    [
+                        match.player1_id,
+                        match.player2_id
+                    ].includes(player.id)
+            );
+
+        const readyCount =
+            match
+            ? [
+                finalWarSubmissionFor(
+                    match.id,
+                    match.player1_id
+                ),
+                finalWarSubmissionFor(
+                    match.id,
+                    match.player2_id
+                )
+              ].filter(Boolean).length
+            : 0;
+
+        html += hostDockSection(
+            "Final War Build",
+            `
+                <div class="host-control-dock-actions">
+                    ${
+                        hasBotFinalist
+                        ? `
+                            <button
+                                class="secondary"
+                                onclick="resolveFinalWarBots(false)"
+                            >
+                                🎲 Resolve Chaos Finalists
+                            </button>
+                          `
+                        : `
+                            <button class="secondary" disabled>
+                                Waiting for Armies
+                            </button>
+                          `
+                    }
+                </div>
+            `,
+            `${readyCount} / 2 finalist armies submitted.`
+        );
+    }
+
+
+    else if (status === "final_war_ready") {
+
+        const match =
+            finalWarCurrentMatch();
+
+        html += hostDockSection(
+            "Final War",
+            `
+                <div class="host-control-dock-actions">
+                    <button onclick="revealFinalWarArmies()">
+                        Reveal Armies &amp; Begin Fight
+                    </button>
+                </div>
+            `,
+            match
+            ? `${escapeHtml(finalWarPlayerName(match.player1_id))} vs ${escapeHtml(finalWarPlayerName(match.player2_id))}`
+            : "Finalists ready."
+        );
+    }
+
+
+    else if (status === "final_war_fight") {
+
+        const match =
+            finalWarCurrentMatch();
+
+        if (match) {
+
+            html += hostDockSection(
+                `Final War — Stage ${match.stage_number}`,
+                `
+                    <div class="host-control-dock-actions">
+                        ${
+                            match.battle_show_revealed_at
+                            ? `
+                                <button class="secondary" disabled>
+                                    Battle Window Live
+                                </button>
+                              `
+                            : `
+                                <button
+                                    class="battle-show-button"
+                                    onclick="showFinalWarBattleWindow()"
+                                >
+                                    Show Battle Window
+                                </button>
+                              `
+                        }
+                    </div>
+                `,
+                `${escapeHtml(finalWarPlayerName(match.player1_id))} vs ${escapeHtml(finalWarPlayerName(match.player2_id))}`
+            );
+
+            html += hostDockSection(
+                "Record Winner",
+                `
+                    <div class="host-control-dock-actions two-up">
+                        <button
+                            class="dock-winner-button"
+                            onclick="recordFinalWarWinner('${match.player1_id}')"
+                        >
+                            ${escapeHtml(finalWarPlayerName(match.player1_id))} Wins
+                        </button>
+
+                        <button
+                            class="dock-winner-button"
+                            onclick="recordFinalWarWinner('${match.player2_id}')"
+                        >
+                            ${escapeHtml(finalWarPlayerName(match.player2_id))} Wins
+                        </button>
+                    </div>
+                `
+            );
+        }
+    }
+
+
+    else if (status === "final_war_complete") {
+
+        html += hostDockSection(
+            "Complete",
+            `
+                <div class="host-control-dock-actions">
+                    <button class="secondary" disabled>
+                        Event Complete
+                    </button>
+                </div>
+            `,
+            eventData.final_war_champion_id
+            ? `Champion: ${escapeHtml(finalWarPlayerName(eventData.final_war_champion_id))}`
+            : "Final War complete."
+        );
+    }
+
+
+    html += hostDockSection(
+        "Event",
+        `
+            <div class="host-control-dock-actions">
+                <button
+                    class="dock-event-button"
+                    onclick="startNewEvent()"
+                >
+                    Start New Event
+                </button>
+            </div>
+        `
+    );
+
+
+    sections.innerHTML = html;
+
+    applyHostControlDockCollapsedState();
+    hideMirroredInlineControls();
 }
 
 
@@ -5908,12 +6954,25 @@ async function recordFinalWarWinner(
 
 function setMessage(message) {
 
-    document
-        .getElementById(
+    const hostMessage =
+        document.getElementById(
             "host-message"
-        )
-        .textContent =
+        );
+
+    if (hostMessage) {
+        hostMessage.textContent =
             message;
+    }
+
+    const dockMessage =
+        document.getElementById(
+            "host-control-dock-message"
+        );
+
+    if (dockMessage) {
+        dockMessage.textContent =
+            message;
+    }
 }
 
 
