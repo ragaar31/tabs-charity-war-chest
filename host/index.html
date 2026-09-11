@@ -846,6 +846,97 @@ a { color: white; }
     color: white;
 }
 
+/* Start New Event safety interlock */
+.new-event-safety {
+    display: grid;
+    gap: 8px;
+}
+
+.new-event-arm-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.10);
+    cursor: pointer;
+    user-select: none;
+}
+
+.new-event-arm-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.new-event-arm-copy strong {
+    font-size: .82rem;
+}
+
+.new-event-arm-copy span {
+    font-size: .68rem;
+    opacity: .58;
+}
+
+.new-event-arm-switch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 24px;
+}
+
+.new-event-arm-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.new-event-arm-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    transition: .16s ease;
+}
+
+.new-event-arm-track::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: .16s ease;
+}
+
+.new-event-arm-switch input:checked + .new-event-arm-track {
+    background: #8b303d;
+    border-color: rgba(255,255,255,.30);
+}
+
+.new-event-arm-switch input:checked + .new-event-arm-track::after {
+    transform: translateX(20px);
+}
+
+.new-event-arm-switch input:focus-visible + .new-event-arm-track {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.dock-event-button:disabled,
+.new-event-button:disabled {
+    background: #4b2a2f !important;
+    opacity: .38;
+    cursor: not-allowed;
+}
+
 .host-control-dock.collapsed .host-control-dock-body {
     display: none;
 }
@@ -1014,6 +1105,8 @@ a { color: white; }
             <button
                 class="new-event-button"
                 onclick="startNewEvent()"
+                disabled
+                title="Arm New Event in Host Controls first"
             >
                 Start New Event
             </button>
@@ -1253,6 +1346,9 @@ let chaosResolveTimer = null;
 const PLAYER_COLORS = [{"code": "scarlet", "label": "Scarlet", "hex": "#FF4D5A"}, {"code": "tangerine", "label": "Tangerine", "hex": "#FF8A3D"}, {"code": "gold", "label": "Gold", "hex": "#F2C94C"}, {"code": "emerald", "label": "Emerald", "hex": "#32D583"}, {"code": "cyan", "label": "Cyan", "hex": "#22D3EE"}, {"code": "blue", "label": "Blue", "hex": "#3B82F6"}, {"code": "violet", "label": "Violet", "hex": "#8B5CF6"}, {"code": "pink", "label": "Pink", "hex": "#FF7AB8"}];
 
 let lastAutoChaosKey = null;
+
+// Safety interlock for the destructive Start New Event action.
+let newEventArmed = false;
 
 let hostControlDockCollapsed =
     localStorage.getItem("tabs_host_control_dock_collapsed") === "1";
@@ -3075,13 +3171,35 @@ function renderHostControlDock() {
     html += hostDockSection(
         "Event",
         `
-            <div class="host-control-dock-actions">
-                <button
-                    class="dock-event-button"
-                    onclick="startNewEvent()"
-                >
-                    Start New Event
-                </button>
+            <div class="new-event-safety">
+                <label class="new-event-arm-row">
+                    <span class="new-event-arm-copy">
+                        <strong>Arm New Event</strong>
+                        <span>Required before reset control unlocks</span>
+                    </span>
+
+                    <span class="new-event-arm-switch">
+                        <input
+                            class="new-event-arm-input"
+                            type="checkbox"
+                            ${newEventArmed ? "checked" : ""}
+                            onchange="setNewEventArmed(this.checked)"
+                            aria-label="Arm Start New Event button"
+                        >
+                        <span class="new-event-arm-track"></span>
+                    </span>
+                </label>
+
+                <div class="host-control-dock-actions">
+                    <button
+                        class="dock-event-button"
+                        onclick="startNewEvent()"
+                        ${newEventArmed ? "" : "disabled"}
+                        title="${newEventArmed ? "Start a new event" : "Flip Arm New Event first"}"
+                    >
+                        Start New Event
+                    </button>
+                </div>
             </div>
         `
     );
@@ -3091,6 +3209,7 @@ function renderHostControlDock() {
 
     applyHostControlDockCollapsedState();
     hideMirroredInlineControls();
+    syncNewEventSafetyControls();
 }
 
 
@@ -6187,7 +6306,57 @@ async function closeShopAndLockBudgets() {
 }
 
 
+function syncNewEventSafetyControls() {
+
+    document
+        .querySelectorAll(
+            ".new-event-arm-input"
+        )
+        .forEach(
+            input => {
+                input.checked =
+                    newEventArmed;
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".new-event-button, .dock-event-button"
+        )
+        .forEach(
+            button => {
+                button.disabled =
+                    !newEventArmed;
+
+                button.title =
+                    newEventArmed
+                    ? "Start a new event"
+                    : "Flip Arm New Event first";
+            }
+        );
+}
+
+
+function setNewEventArmed(armed) {
+
+    newEventArmed =
+        Boolean(armed);
+
+    syncNewEventSafetyControls();
+}
+
+
 function startNewEvent() {
+
+    if (!newEventArmed) {
+        setMessage(
+            "Arm New Event before using the reset control."
+        );
+        syncNewEventSafetyControls();
+        return;
+    }
+
 
     const phaseLabel =
         eventData?.status
@@ -6203,6 +6372,7 @@ function startNewEvent() {
 
 
     if (!confirmed) {
+        setNewEventArmed(false);
         return;
     }
 
