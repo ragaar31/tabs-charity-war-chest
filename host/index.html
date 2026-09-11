@@ -1124,6 +1124,103 @@ a { color: white; }
 let currentEventId =
     localStorage.getItem("tabs_host_event_id");
 
+
+
+/* =========================================================
+   SCREEN WAKE LOCK
+   Keeps the host display awake while an event is active.
+   Browsers may release the lock when the page is hidden or
+   the OS enters a power-saving state, so it is reacquired
+   whenever the page becomes visible again.
+   ========================================================= */
+
+let screenWakeLock = null;
+let screenWakeLockRequestPending = false;
+
+
+function shouldKeepScreenAwake() {
+    return Boolean(
+        currentEventId
+        && document.visibilityState === "visible"
+    );
+}
+
+
+async function requestScreenWakeLock() {
+
+    if (
+        !shouldKeepScreenAwake()
+        || !("wakeLock" in navigator)
+        || screenWakeLockRequestPending
+        || (screenWakeLock && !screenWakeLock.released)
+    ) {
+        return;
+    }
+
+    screenWakeLockRequestPending = true;
+
+    try {
+
+        const lock =
+            await navigator.wakeLock.request("screen");
+
+        screenWakeLock = lock;
+
+        lock.addEventListener(
+            "release",
+            () => {
+                if (screenWakeLock === lock) {
+                    screenWakeLock = null;
+                }
+            },
+            { once: true }
+        );
+    }
+
+    catch (error) {
+        console.warn(
+            "Screen Wake Lock unavailable:",
+            error
+        );
+    }
+
+    finally {
+        screenWakeLockRequestPending = false;
+    }
+}
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (document.visibilityState === "visible") {
+            requestScreenWakeLock();
+
+            // A suspended mobile tab can miss realtime updates.
+            // Pull the latest state immediately on return so the
+            // user does not need to manually refresh to catch up.
+            if (shouldKeepScreenAwake()) {
+                loadState();
+            }
+        }
+    }
+);
+
+window.addEventListener(
+    "pageshow",
+    requestScreenWakeLock
+);
+
+// Some mobile browsers are more willing to grant a wake lock
+// immediately after user interaction. This also gives a failed
+// request another harmless chance without showing extra UI.
+document.addEventListener(
+    "pointerdown",
+    requestScreenWakeLock,
+    { passive: true }
+);
+
+
 let eventData = null;
 let players = [];
 let picks = [];
@@ -1412,6 +1509,8 @@ async function createEvent() {
             "tabs_host_event_id",
             currentEventId
         );
+
+        requestScreenWakeLock();
 
         await loadState();
         startRealtime();
@@ -7236,6 +7335,7 @@ async function initialize() {
         await loadState();
 
         if (currentEventId) {
+            requestScreenWakeLock();
             startRealtime();
         }
 
